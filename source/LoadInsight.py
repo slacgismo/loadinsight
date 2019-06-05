@@ -12,6 +12,10 @@ def main() :
 def nop(x):
 	return(x)
 
+def rand(x,N,M):
+	import numpy as np
+	pd.DataFrame(np.random.randn(N,M))
+
 class DataObject:
 	"""DataObject hold all data artifacts as pandas DataFrames 
 	   and associated storage specifications.
@@ -21,26 +25,38 @@ class DataObject:
 
 	def __init__(self,
 			name="NULL",
-			data=pd.DataFrame(),
+			data=None,
 			url=None,
+			unpack=None,
 			convert=None) :
 	
 		# this is the dataframe to use
 		self.name = name
-		self.data = data
 	
+		# download data if url given
 		if url != None :
 			import curl
 			# download the url
 
-		self.df_convert = {} # conversion that are handed off to pandas
-		if convert is dict and data is dict :
-			# perform convert operations (if any)
-			for item, call in convert.items():
-				if item in data.keys() :
-					data["item"] = call(data["item"])
-				else :
-					self.df_convert[item] = call
+			# unpack download data to dataframe (if not csv)
+			if unpack :
+
+				# perform unpack operations (if any)
+				self.data = pd.DataFrame(cachename)
+
+			else:
+				self.data = pd.DataFrame(localname)
+
+		elif data is pd.DataFrame :
+			self.data = data
+
+		elif data is None:
+			self.data = pd.DataFrame()
+
+		if convert is dict:
+			for column, action in convert.items() :
+				if column in self.data.headers :
+					self.data[column] = map(action,self.data[column])
 
 	def __str__(self):
 		return("%s: %s" % (self.name,self.data))
@@ -58,7 +74,7 @@ class DataObject:
 	def read(self) :
 		print("Reading %s..." % (self.name))
 		if self.name != "NULL" :
-			self.data = pd.DataFrame(get_localfile())
+			self.data = pd.DataFrame(get_localfile(),convert=convert)
 		else :
 			self.data = pd.DataFrame()
 
