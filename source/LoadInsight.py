@@ -20,20 +20,18 @@ def main() :
 		p.run()
 		p.save()
 	except:
-		p.cleanup(delete_local=True)
+		p.cleanup()
 		raise
-	p.cleanup(delete_local=True)
+	p.cleanup()
 
 class pipeline:
 	def __init__(self):
-		if not os.path.exists(config.local_path):
-			os.mkdir(config.local_path)
 		self.tasklist = []
 
 	def save(self):
 		if config.save_data:
 			for key,info in cache.items():
-				shutil.copyfile(local_path(info["hash"]),local_path(key))
+				shutil.copyfile(local_path(info["hash"]),remote_path(key))
 
 	def cleanup(self,delete_local=config.clean_local):
 		global cache
@@ -42,13 +40,13 @@ class pipeline:
 			filename = local_path(info["hash"])
 			if delete_local and os.path.exists(filename):
 				os.remove(filename)
-			del info["data"]
+			if config.use_cache:
+				del info["data"]
 
 	def add(self,entry):
 		self.tasklist.append(entry)
 
 	def run(self):
-		print(self.tasklist)
 		for task in self.tasklist:
 			task.run()
 
@@ -82,7 +80,15 @@ def verbose(msg):
 		print("%s: %s" % (inspect.stack()[1].function,msg))
 
 def local_path(name):
+	if not os.path.exists(config.local_path):
+		os.mkdir(config.local_path)
 	return config.local_path+name+".csv"
+
+def remote_path(name):
+	if not os.path.exists(config.remote_path):
+		os.mkdir(config.remote_path)
+	return config.remote_path+name+".csv"
+
 
 def csv_reader(name):
 	"""Default CSV reader"""

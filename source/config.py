@@ -1,6 +1,9 @@
 
 # path to the local copies of the data
-local_path = "data/"
+local_path = "local/"
+
+# path to the remove data store
+remote_path = "remote/"
 
 # size of an experimental data array
 size = [1000,10]
