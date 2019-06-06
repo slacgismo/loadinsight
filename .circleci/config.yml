@@ -5,6 +5,7 @@ jobs:
       - image: circleci/buildpack-deps:xenial
     steps:
       - checkout
+      - run:
           name: Make sure Python 3.6 is properly setup
           command: |
             sudo apt-get install software-properties-common python-software-properties --yes
