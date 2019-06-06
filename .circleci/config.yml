@@ -11,5 +11,5 @@ jobs:
             cd source
             python LoadInsight.py
       - store_artifacts:
-          path: /home/circleci/project/remote
+          path: /home/circleci/project/source/remote
           destination: /output
