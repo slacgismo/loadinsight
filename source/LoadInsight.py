@@ -5,13 +5,26 @@ import inspect
 import config # local config file
 from math import *
 import hashlib
+import shutil
 
 cache = {}
 
 def main() :
+	init()
 	make_random(output="random").run()
+	make_copy(input="random",output="random_copy").run()
 	normalize_rows(input="random",output="normal").run()
+	save()
 	cleanup(delete_local=True)		
+
+def init():
+	if not os.path.exists(config.local_path):
+		os.mkdir(config.local_path)
+
+def save():
+	if config.save_data:
+		for key,info in cache.items():
+			shutil.copyfile(local_path(info["hash"]),local_path(key))
 
 def cleanup(delete_local=config.clean_local):
 	verbose("cleaning cache")
