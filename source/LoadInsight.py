@@ -13,7 +13,8 @@ def main() :
 	init()
 	make_random(output="random").run()
 	make_copy(input="random",output="random_copy").run()
-	normalize_rows(input="random",output="normal").run()
+	normalize_rows_max(input="random",output="normal_max").run()
+	normalize_rows_sum(input="random_copy",output="normal_sum").run()
 	save()
 	cleanup(delete_local=True)		
 
@@ -118,8 +119,8 @@ class make_random :
 		assert(((data.std()-1.0).abs() < 2/sqrt(config.size[0])).all())
 		verbose("%s check ok" % (self.output))
 
-class normalize_rows :
-	"""Normalizes the rows of an array"""
+class normalize_rows_max :
+	"""Normalizes the rows of an array to their max"""
 	def __init__(self, input, output,
 			  	 reader = csv_reader,
 			  	 writer = csv_writer):
@@ -127,7 +128,7 @@ class normalize_rows :
 		self.write = writer
 		self.output = output
 	def run(self):
-		verbose("normalizing rows of %s" % (self.output))
+		verbose("normalizing rows of %s to max" % (self.output))
 		offset = self.input.min()
 		range = self.input.max() - offset
 		output = (self.input - offset) / range
@@ -136,6 +137,26 @@ class normalize_rows :
 	def check(self,data):
 		assert((data.min()>=0).all())
 		assert((data.max()>=0).all())
+		verbose("%s check ok" % (self.output))
+	
+class normalize_rows_sum :
+	"""Normalizes the rows of an array to their sums"""
+	def __init__(self, input, output,
+			  	 reader = csv_reader,
+			  	 writer = csv_writer):
+		self.input = reader(input)
+		self.write = writer
+		self.output = output
+	def run(self):
+		verbose("normalizing rows of %s to sum" % (self.output))
+		offset = self.input.min()
+		range = self.input.max() - offset
+		output = (self.input - offset) / range
+		output = output / output.sum()
+		self.check(output)
+		self.write(self.output,output)
+	def check(self,data):
+		assert(((data.sum()-1.0).abs()<0.0001).all())
 		verbose("%s check ok" % (self.output))
 	
 if __name__ == '__main__':
