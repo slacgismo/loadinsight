@@ -3,6 +3,8 @@ jobs:
   build:
     docker:
       - image: circleci/buildpack-deps:xenial
+    steps:
+      - checkout
       - run: |
           cd source
           python3 LoadInsight.py
