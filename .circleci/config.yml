@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run: |
           cd source
-          python3 LoadInsight.py
+          python LoadInsight.py
       - store_artifacts:
           path: /home/circleci/project/remote
           destination: /output
