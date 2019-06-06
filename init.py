@@ -24,7 +24,7 @@ DEBUG = False # by default we run with DEBUG off
 FILE_USAGE_EXPLANATAION = """
     Usage:
     python init.py -h  # displays this help message
-    python init.py -d  # run in debug (prints to console as well as file)
+    python init.py -d  # run in debug - prints to console as well as to the lctk.log file
 """
 
 
@@ -67,7 +67,7 @@ def parse_cmd_line_opts(argv):
         return
     
     try:
-        opts, args = getopt.getopt(argv, 'hdi:')
+        opts, args = getopt.getopt(argv, 'hd:')
         for opt, arg in opts:
             if opt == '-h':
                 print(FILE_USAGE_EXPLANATAION)
