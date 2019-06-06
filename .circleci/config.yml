@@ -9,6 +9,9 @@ jobs:
       - run: python -m unittest  
           
   deploy:
+    docker:
+      - image: circleci/python:3.6.8
+      
     working_directory: ~/loadinsight
     steps:
       - run: |
