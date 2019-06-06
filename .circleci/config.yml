@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/buildpack-deps:xenial
+      - run: |
+          cd source
+          python3 LoadInsight.py
+      - store_artifacts:
+          path: /home/circleci/project/remote
+          destination: /output
