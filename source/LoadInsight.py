@@ -7,10 +7,11 @@ from math import *
 import hashlib
 import shutil
 
-# move to pipeline
+# move cache to inside pipeline
 cache = {}
 
-def main() :
+def selftest() :
+	"""Test the implementation"""
 	try:
 		p = pipeline()
 		p.add(make_random(output="random"))
@@ -25,15 +26,19 @@ def main() :
 	p.cleanup()
 
 class pipeline:
+	"""Pipeline implementation"""
 	def __init__(self):
+		"""Create a new pipeline"""
 		self.tasklist = []
 
 	def save(self):
+		"""Save the results from a pipeline run to the remote path"""
 		if config.save_data:
 			for key,info in cache.items():
 				shutil.copyfile(local_path(info["hash"]),remote_path(key))
 
 	def cleanup(self,delete_local=config.clean_local):
+		"""Cleanup after a pipeline run"""
 		global cache
 		verbose("cleaning cache")
 		for key,info in cache.items():
@@ -44,14 +49,18 @@ class pipeline:
 				del info["data"]
 
 	def add(self,entry):
+		"""Add a task to the pipeline"""
 		self.tasklist.append(entry)
 
 	def run(self):
+		"""Run the tasks in a pipeline"""
+		# todo: run them in dependency order, in parallel,
+		#       and skip unneeded updates
 		for task in self.tasklist:
 			task.run()
 
 def hash_file(filename):
-   """This function returns the SHA-1 hash of the file named"""
+   """Return the SHA-1 hash of the file contents"""
    h = hashlib.sha1()
    with open(filename,'rb') as file:
        chunk = 0
@@ -61,34 +70,27 @@ def hash_file(filename):
    return h.hexdigest()
 
 def hash_data(data) :
-	"""This function returns the SHA-1 hash of the data representation"""
+	"""Return the SHA-1 hash of the data itself"""
 	h = hashlib.sha1()
 	h.update(("%s" % (data)).encode())
 	return h.hexdigest()
 
-def get_class_of(meth):
-	for cls in inspect.getmro(meth.__self__.__class__):
-		if cls.__dict__.get(meth.__name__) is meth:
-			return cls
-	if inspect.isfunction(meth):
-		return getattr(inspect.getmodule(meth),
-			meth.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0])
-	return None  
-
 def verbose(msg):
+	"""Generate a verbose output message"""
 	if config.verbose :
 		print("%s: %s" % (inspect.stack()[1].function,msg))
 
 def local_path(name):
+	"""Get the local storage path for a named object"""
 	if not os.path.exists(config.local_path):
 		os.mkdir(config.local_path)
 	return config.local_path+name+".csv"
 
 def remote_path(name):
+	"""Get the remote storage path for a named object"""
 	if not os.path.exists(config.remote_path):
 		os.mkdir(config.remote_path)
 	return config.remote_path+name+".csv"
-
 
 def csv_reader(name):
 	"""Default CSV reader"""
@@ -116,32 +118,38 @@ class make_copy :
 	"""Generates a copy of the input"""
 	def __init__(self, input, output,
 				 reader=csv_reader, writer=csv_writer):
+		"""Create the transformation"""
 		self.read = reader
 		self.write = writer
 		self.input = input
 		self.output = output
 	def run(self):
+		"""Run the transformation"""
 		self.input = self.read(self.input)
 		verbose("copying %s" % (self.output))
 		output = self.input
 		self.check(output)
 		self.write(self.output,output)
 	def check(self,data):
+		"""Check the transformation output"""
 		verbose("%s check ok" % (self.output))
 
 class make_random :
 	"""Generates a random array of size specified by config.size"""
 	def __init__(self, output,
 				 writer=csv_writer):
+		"""Create the transformation"""
 		self.write = writer
 		self.output = output
 	def run(self):
+		"""Run the transformation"""
 		self.input = np.random.randn(config.size[0],config.size[1])
 		verbose("generating %s" % (self.output))
 		output = pd.DataFrame(self.input)
 		self.check(output)
 		self.write(self.output,output)
 	def check(self,data):
+		"""Check the transformation output"""
 		assert((data.mean().abs() < 2/config.size[1]).all())
 		assert(((data.std()-1.0).abs() < 2/sqrt(config.size[0])).all())
 		verbose("%s check ok" % (self.output))
@@ -151,11 +159,13 @@ class normalize_rows_max :
 	def __init__(self, input, output,
 			  	 reader = csv_reader,
 			  	 writer = csv_writer):
+		"""Create the transformation"""
 		self.read = reader
 		self.write = writer
 		self.input = input
 		self.output = output
 	def run(self):
+		"""Run the transformation"""
 		self.input = self.read(self.input)
 		verbose("normalizing rows of %s to max" % (self.output))
 		offset = self.input.min()
@@ -164,8 +174,9 @@ class normalize_rows_max :
 		self.check(output)
 		self.write(self.output,output)
 	def check(self,data):
-		assert((data.min()>=0).all())
-		assert((data.max()>=0).all())
+		"""Check the transformation output"""
+		assert((data.min()==0).all())
+		assert((data.max()==1).all())
 		verbose("%s check ok" % (self.output))
 	
 class normalize_rows_sum :
@@ -173,11 +184,13 @@ class normalize_rows_sum :
 	def __init__(self, input, output,
 			  	 reader = csv_reader,
 			  	 writer = csv_writer):
+		"""Create the transformation"""
 		self.read = reader
 		self.input = input
 		self.write = writer
 		self.output = output
 	def run(self):
+		"""Run the transformation"""
 		self.input = self.read(self.input)
 		verbose("normalizing rows of %s to sum" % (self.output))
 		offset = self.input.min()
@@ -187,8 +200,12 @@ class normalize_rows_sum :
 		self.check(output)
 		self.write(self.output,output)
 	def check(self,data):
+		"""Check the transformation output"""
 		assert(((data.sum()-1.0).abs()<0.0001).all())
 		verbose("%s check ok" % (self.output))
-	
+
+# direct load only
 if __name__ == '__main__':
-	main()
+
+	# run the self-test
+	selftest()
