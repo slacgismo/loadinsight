@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.8
+
+    working_directory: ~/loadinsight
+    steps:
+      - run: python -m unittest  
+          
+  deploy:
+    working_directory: ~/loadinsight
+    steps:
+      - run: |
+          echo "Hello, I'm not deploying yet, but that's ok, I will soon..."
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
