@@ -1,5 +1,8 @@
 name: venv_loadinsight
 dependencies:
   - python=3.6
+  - pandas
+  - numpy
   - pip:
     - boto3
+    - requests
