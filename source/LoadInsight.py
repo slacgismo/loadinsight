@@ -1,11 +1,9 @@
 import pandas as pd
 import numpy as np
 import os
-import inspect
-import config_test as config # test config file
 from math import *
-import hashlib
-import shutil
+
+import config_test as config # test config file
 
 # move cache to inside pipeline
 cache = {}
@@ -38,6 +36,7 @@ class pipeline:
         """Save the results from a pipeline run to the remote path"""
         if config.SAVE_DATA:
             for key,info in cache.items():
+                import shutil
                 shutil.copyfile(local_path(info["hash"]),remote_path(key))
 
     def cleanup(self,delete_local=config.CLEAN_LOCAL):
@@ -64,6 +63,7 @@ class pipeline:
 
 def hash_file(filename):
    """Return the SHA-1 hash of the file contents"""
+   import hashlib
    h = hashlib.sha1()
    with open(filename,'rb') as file:
        chunk = 0
@@ -74,6 +74,7 @@ def hash_file(filename):
 
 def hash_data(data) :
     """Return the SHA-1 hash of the data itself"""
+    import hashlib
     h = hashlib.sha1()
     h.update(("%s" % (data)).encode())
     return h.hexdigest()
@@ -81,6 +82,7 @@ def hash_data(data) :
 def verbose(msg):
     """Generate a verbose output message"""
     if config.VERBOSE :
+        import inspect
         print("%s: %s" % (inspect.stack()[1].function,msg))
 
 def local_path(name):
@@ -101,7 +103,8 @@ def csv_reader(name):
     """Default CSV reader"""
     global cache
     if config.USE_CACHE:
-        return cache[name]["data"]
+        import copy
+        return copy.deepcopy(cache[name]["data"])
     filename = local_path(cache[name]["hash"])
     verbose("reading %s" % (filename))
     return pd.read_csv(filename)
@@ -155,8 +158,8 @@ class make_random :
         self.write(self.output,output)
     def check(self,data):
         """Check the transformation output"""
-        assert((data.mean().abs() < 2/config.RANDOM_SIZE[1]).all())
-        assert(((data.std()-1.0).abs() < 2/sqrt(config.RANDOM_SIZE[0])).all())
+        assert((data.mean().abs() < 5/config.RANDOM_SIZE[1]).all())
+        assert(((data.std()-1.0).abs() < 5/sqrt(config.RANDOM_SIZE[0])).all())
         verbose("%s check ok" % (self.output))
 
 class normalize_rows_max :
@@ -171,11 +174,10 @@ class normalize_rows_max :
         self.output = output
     def run(self):
         """Run the transformation"""
-        self.input = self.read(self.input)
         verbose("normalizing rows of %s to max" % (self.output))
-        offset = self.input.min()
-        range = self.input.max() - offset
-        output = (self.input - offset) / range
+        output = self.read(self.input)
+        output -= output.min()
+        output /= output.max()
         self.check(output)
         self.write(self.output,output)
     def check(self,data):
@@ -196,12 +198,10 @@ class normalize_rows_sum :
         self.output = output
     def run(self):
         """Run the transformation"""
-        self.input = self.read(self.input)
         verbose("normalizing rows of %s to sum" % (self.output))
-        offset = self.input.min()
-        range = self.input.max() - offset
-        output = (self.input - offset) / range
-        output = output / output.sum()
+        output = self.read(self.input)
+        output -= output.min()
+        output /= output.sum()
         self.check(output)
         self.write(self.output,output)
     def check(self,data):
