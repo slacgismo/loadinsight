@@ -6,12 +6,15 @@ jobs:
 
     working_directory: ~/loadinsight
     steps:
-      - run: python -m unittest  
+      - checkout
+      - run: 
+          name: Run Unit Tests
+          command: python -m unittest  
           
   deploy:
     docker:
       - image: circleci/python:3.6.8
-      
+
     working_directory: ~/loadinsight
     steps:
       - run: |
