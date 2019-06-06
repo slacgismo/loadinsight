@@ -9,11 +9,12 @@ import shutil
 
 # move cache to inside pipeline
 cache = {}
+cachename = ""
 
 def selftest() :
     """Test the implementation"""
     try:
-        p = pipeline()
+        p = pipeline(name="selftest/")
         p.add(make_random(output="random"))
         p.add(make_copy(input="random",output="random_copy"))
         p.add(normalize_rows_max(input="random",output="normal_max"))
@@ -27,9 +28,11 @@ def selftest() :
 
 class pipeline:
     """Pipeline implementation"""
-    def __init__(self):
+    def __init__(self,name=""):
         """Create a new pipeline"""
         self.tasklist = []
+        global cachename
+        cachename = name
 
     def save(self):
         """Save the results from a pipeline run to the remote path"""
@@ -82,15 +85,17 @@ def verbose(msg):
 
 def local_path(name):
     """Get the local storage path for a named object"""
-    if not os.path.exists(config.local_path):
-        os.mkdir(config.local_path)
-    return config.local_path+name+".csv"
+    path = config.local_path + cachename
+    if not os.path.exists(path):
+        os.makedirs(path,exist_ok=True)
+    return path+name+".csv"
 
 def remote_path(name):
     """Get the remote storage path for a named object"""
-    if not os.path.exists(config.remote_path):
-        os.mkdir(config.remote_path)
-    return config.remote_path+name+".csv"
+    path = config.remote_path + cachename
+    if not os.path.exists(path):
+        os.makedirs(path,exist_ok=True)
+    return path+name+".csv"
 
 def csv_reader(name):
     """Default CSV reader"""
