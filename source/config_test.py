@@ -1,21 +1,21 @@
 
 # path to the local copies of the data
-local_path = "local/"
+LOCAL_PATH = "local/"
 
 # path to the remove data store
-remote_path = "remote/"
+REMOTE_PATH = "remote/"
 
 # size of an experimental data array
-size = [1000,10]
+RANDOM_SIZE = [1000,10]
 
 # verbose output flag
-verbose = True
+VERBOSE = True
 
 # flag to enable use of the memory cache for data
-use_cache = True
+USE_CACHE = True
 
 # flag to enable cleanup of file copies of cached data
-clean_local = True
+CLEAN_LOCAL = True
 
 # flag to enable saving data in cache to named csv files
-save_data = True
+SAVE_DATA = True

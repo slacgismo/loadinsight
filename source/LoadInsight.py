@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import inspect
-import config # local config file
+import config_test as config # test config file
 from math import *
 import hashlib
 import shutil
@@ -36,11 +36,11 @@ class pipeline:
 
     def save(self):
         """Save the results from a pipeline run to the remote path"""
-        if config.save_data:
+        if config.SAVE_DATA:
             for key,info in cache.items():
                 shutil.copyfile(local_path(info["hash"]),remote_path(key))
 
-    def cleanup(self,delete_local=config.clean_local):
+    def cleanup(self,delete_local=config.CLEAN_LOCAL):
         """Cleanup after a pipeline run"""
         global cache
         verbose("cleaning cache")
@@ -48,7 +48,7 @@ class pipeline:
             filename = local_path(info["hash"])
             if delete_local and os.path.exists(filename):
                 os.remove(filename)
-            if config.use_cache:
+            if config.USE_CACHE:
                 del info["data"]
 
     def add(self,entry):
@@ -80,19 +80,19 @@ def hash_data(data) :
 
 def verbose(msg):
     """Generate a verbose output message"""
-    if config.verbose :
+    if config.VERBOSE :
         print("%s: %s" % (inspect.stack()[1].function,msg))
 
 def local_path(name):
     """Get the local storage path for a named object"""
-    path = config.local_path + cachename
+    path = config.LOCAL_PATH + cachename
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
     return path+name+".csv"
 
 def remote_path(name):
     """Get the remote storage path for a named object"""
-    path = config.remote_path + cachename
+    path = config.REMOTE_PATH + cachename
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
     return path+name+".csv"
@@ -100,7 +100,7 @@ def remote_path(name):
 def csv_reader(name):
     """Default CSV reader"""
     global cache
-    if config.use_cache:
+    if config.USE_CACHE:
         return cache[name]["data"]
     filename = local_path(cache[name]["hash"])
     verbose("reading %s" % (filename))
@@ -114,7 +114,7 @@ def csv_writer(name,data):
     filename = local_path(datahash)
     verbose("writing %s to %s" % (name,filename))
     data.to_csv(filename)
-    if config.use_cache:
+    if config.USE_CACHE:
         cache[name] = {"hash":datahash, "data":data}
     else:
         cache[name] = {"hash":datahash}
@@ -140,7 +140,7 @@ class make_copy :
         verbose("%s check ok" % (self.output))
 
 class make_random :
-    """Generates a random array of size specified by config.size"""
+    """Generates a random array of size specified by config.RANDOM_SIZE"""
     def __init__(self, output,
                  writer=csv_writer):
         """Create the transformation"""
@@ -148,15 +148,15 @@ class make_random :
         self.output = output
     def run(self):
         """Run the transformation"""
-        self.input = np.random.randn(config.size[0],config.size[1])
+        self.input = np.random.randn(config.RANDOM_SIZE[0],config.RANDOM_SIZE[1])
         verbose("generating %s" % (self.output))
         output = pd.DataFrame(self.input)
         self.check(output)
         self.write(self.output,output)
     def check(self,data):
         """Check the transformation output"""
-        assert((data.mean().abs() < 2/config.size[1]).all())
-        assert(((data.std()-1.0).abs() < 2/sqrt(config.size[0])).all())
+        assert((data.mean().abs() < 2/config.RANDOM_SIZE[1]).all())
+        assert(((data.std()-1.0).abs() < 2/sqrt(config.RANDOM_SIZE[0])).all())
         verbose("%s check ok" % (self.output))
 
 class normalize_rows_max :
