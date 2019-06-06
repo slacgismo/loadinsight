@@ -12,7 +12,6 @@ import os
 import sys
 import getopt
 import logging
-import requests
 #from raven import Client
 
 from logging.handlers import RotatingFileHandler
@@ -20,7 +19,7 @@ from logging.handlers import RotatingFileHandler
 
 #error_reporter = None
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
-DEBUG = False # by default we run the HH with DEBUG off
+DEBUG = False # by default we run with DEBUG off
 
 FILE_USAGE_EXPLANATAION = """
     Usage:
