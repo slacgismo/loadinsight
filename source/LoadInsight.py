@@ -7,33 +7,46 @@ from math import *
 import hashlib
 import shutil
 
+# move to pipeline
 cache = {}
 
 def main() :
-	init()
-	make_random(output="random").run()
-	make_copy(input="random",output="random_copy").run()
-	normalize_rows_max(input="random",output="normal_max").run()
-	normalize_rows_sum(input="random_copy",output="normal_sum").run()
-	save()
-	cleanup(delete_local=True)		
+	p = pipeline()
+	p.add(make_random(output="random"))
+	p.add(make_copy(input="random",output="random_copy"))
+	p.add(normalize_rows_max(input="random",output="normal_max"))
+	p.add(normalize_rows_sum(input="random_copy",output="normal_sum"))
+	p.run()
+	p.save()
+	p.cleanup(delete_local=True)		
 
-def init():
-	if not os.path.exists(config.local_path):
-		os.mkdir(config.local_path)
+class pipeline:
+	def __init__(self):
+		if not os.path.exists(config.local_path):
+			os.mkdir(config.local_path)
+		self.tasklist = []
 
-def save():
-	if config.save_data:
+	def save(self):
+		if config.save_data:
+			for key,info in cache.items():
+				shutil.copyfile(local_path(info["hash"]),local_path(key))
+
+	def cleanup(self,delete_local=config.clean_local):
+		global cache
+		verbose("cleaning cache")
 		for key,info in cache.items():
-			shutil.copyfile(local_path(info["hash"]),local_path(key))
+			filename = local_path(info["hash"])
+			if delete_local and os.path.exists(filename):
+				os.remove(filename)
+			del info["data"]
 
-def cleanup(delete_local=config.clean_local):
-	verbose("cleaning cache")
-	for key,info in cache.items():
-		filename = local_path(info["hash"])
-		if delete_local and os.path.exists(filename):
-			os.remove(filename)
-		del info["data"]
+	def add(self,entry):
+		self.tasklist.append(entry)
+
+	def run(self):
+		print(self.tasklist)
+		for task in self.tasklist:
+			task.run()
 
 def hash_file(filename):
    """This function returns the SHA-1 hash of the file named"""
@@ -69,6 +82,7 @@ def local_path(name):
 
 def csv_reader(name):
 	"""Default CSV reader"""
+	global cache
 	if config.use_cache:
 		return cache[name]["data"]
 	filename = local_path(cache[name]["hash"])
@@ -77,6 +91,7 @@ def csv_reader(name):
 
 def csv_writer(name,data):
 	"""Default CSV writer"""
+	global cache
 	datahash = hash_data(data)
 	verbose("datahash(%s) is %s" % (name,datahash))
 	filename = local_path(datahash)
@@ -91,10 +106,12 @@ class make_copy :
 	"""Generates a copy of the input"""
 	def __init__(self, input, output,
 				 reader=csv_reader, writer=csv_writer):
-		self.input = reader(input)
+		self.read = reader
 		self.write = writer
+		self.input = input
 		self.output = output
 	def run(self):
+		self.input = self.read(self.input)
 		verbose("copying %s" % (self.output))
 		output = self.input
 		self.check(output)
@@ -106,10 +123,10 @@ class make_random :
 	"""Generates a random array of size specified by config.size"""
 	def __init__(self, output,
 				 writer=csv_writer):
-		self.input = np.random.randn(config.size[0],config.size[1])
 		self.write = writer
 		self.output = output
 	def run(self):
+		self.input = np.random.randn(config.size[0],config.size[1])
 		verbose("generating %s" % (self.output))
 		output = pd.DataFrame(self.input)
 		self.check(output)
@@ -124,10 +141,12 @@ class normalize_rows_max :
 	def __init__(self, input, output,
 			  	 reader = csv_reader,
 			  	 writer = csv_writer):
-		self.input = reader(input)
+		self.read = reader
 		self.write = writer
+		self.input = input
 		self.output = output
 	def run(self):
+		self.input = self.read(self.input)
 		verbose("normalizing rows of %s to max" % (self.output))
 		offset = self.input.min()
 		range = self.input.max() - offset
@@ -144,10 +163,12 @@ class normalize_rows_sum :
 	def __init__(self, input, output,
 			  	 reader = csv_reader,
 			  	 writer = csv_writer):
-		self.input = reader(input)
+		self.read = reader
+		self.input = input
 		self.write = writer
 		self.output = output
 	def run(self):
+		self.input = self.read(self.input)
 		verbose("normalizing rows of %s to sum" % (self.output))
 		offset = self.input.min()
 		range = self.input.max() - offset
