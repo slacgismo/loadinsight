@@ -11,14 +11,18 @@ import shutil
 cache = {}
 
 def main() :
-	p = pipeline()
-	p.add(make_random(output="random"))
-	p.add(make_copy(input="random",output="random_copy"))
-	p.add(normalize_rows_max(input="random",output="normal_max"))
-	p.add(normalize_rows_sum(input="random_copy",output="normal_sum"))
-	p.run()
-	p.save()
-	p.cleanup(delete_local=True)		
+	try:
+		p = pipeline()
+		p.add(make_random(output="random"))
+		p.add(make_copy(input="random",output="random_copy"))
+		p.add(normalize_rows_max(input="random",output="normal_max"))
+		p.add(normalize_rows_sum(input="random_copy",output="normal_sum"))
+		p.run()
+		p.save()
+	except:
+		p.cleanup(delete_local=True)
+		raise
+	p.cleanup(delete_local=True)
 
 class pipeline:
 	def __init__(self):
