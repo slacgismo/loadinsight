@@ -6,6 +6,10 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install libraries
+          command: |
+            pip install matplotlib
+      - run:
           name: Run test
           command: |
             cd source
