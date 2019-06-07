@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 config = load_config("config_test")
 
+# load the require LI modules (TODO: make it a package)
 import external
 import pipeline
 import extract
@@ -13,8 +14,10 @@ import electrification
 import normalize
 import composition
 
+# create the RBSA pipeline
 rbsa = pipeline.pipeline(name="rbsa")
 
+# define the RBSA pipeline
 rbsa.add([
     external.load(input="RBSA",output="config_RBSA")
     extract.rbsa(input="config_RBSA", output="RBSA_data"),
@@ -40,11 +43,17 @@ rbsa.add([
     pipeline.send(input="residential_composition",output="ceus")
 ])
 
+# create the CEUS pipeline
 ceus = pipeline.pipeline(name="ceus")
+
+# define the CEUS pipeline
 ceus.add([ # TODO
     ])
 
+# create the feeder pipeline
 feeder = pipepline.pipeline(name="feeder")
+
+# define the feeder pipeline
 feeder.add([
     external.rules(input="RULES_OF_ASSOCIATION",output="rules_of_association"),
     pipeline.receive(input="rbsa",output="residential_composition"),
@@ -59,14 +68,17 @@ feeder.add([
     compose.feeder(input=["commercial_components","residential_components","feeder_mix"], output="feeder_composition"),
     ])
 
+# run the pipelines
 rbsa.run(parallel=False)
 ceus.run(parallel=False)
 feeder.run(parellel=False)
 
+# save the results
 rbsa.save()
 ceus.save()
 feeder.save()
 
+# cleanup the pipelines
 rbsa.cleanup()
 ceus.cleanup()
 feeder.cleanup()
