@@ -84,4 +84,4 @@ class data:
     def plot(self,name,**kwargs):
         self.df.plot(**kwargs)
         import matplotlib.pyplot as plt 
-        plt.savefig(name)
+        plt.savefig(remote_path(name))
