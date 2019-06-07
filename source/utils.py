@@ -39,19 +39,19 @@ def verbose(msg):
         import inspect
         print("%s: %s" % (inspect.stack()[1].function,msg))
 
-def local_path(name):
+def local_path(name,extension=".csv"):
     """Get the local storage path for a named object"""
     path = config.LOCAL_PATH + cachename
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
-    return path+name+".csv"
+    return path+name+extension
 
-def remote_path(name):
+def remote_path(name,extension=".csv"):
     """Get the remote storage path for a named object"""
     path = config.REMOTE_PATH + cachename
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
-    return path+name+".csv"
+    return path+name+extension
 
 def csv_reader(name):
     """Default CSV reader"""
@@ -84,4 +84,4 @@ class data:
     def plot(self,name,**kwargs):
         self.df.plot(**kwargs)
         import matplotlib.pyplot as plt 
-        plt.savefig(remote_path(name))
+        plt.savefig(remote_path(name,extension=""))
