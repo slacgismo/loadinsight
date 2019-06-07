@@ -9,7 +9,7 @@ jobs:
           name: Run test
           command: |
             cd source
-            python LoadInsight.py
+            python selftest.py
       - store_artifacts:
           path: /home/circleci/project/source/remote
           destination: /output
