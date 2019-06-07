@@ -8,8 +8,7 @@ jobs:
       - run:
           name: Install libraries
           command: |
-            sudo apt-get -y install python3-pip
-            sudo pip3 install matplotlib
+            sudo pip install matplotlib
       - run:
           name: Run test
           command: |
