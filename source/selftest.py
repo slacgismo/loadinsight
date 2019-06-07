@@ -1,4 +1,5 @@
 from utils import *
+import matplotlib.pyplot as plt
 
 config = load_config("config_test")
 
@@ -16,6 +17,10 @@ def selftest() :
         p.add(normalize.rows_sum(input="random_copy",output="normal_sum"))
         p.run()
         p.save()
+
+        d = data("normal_sum")
+        d.plot("normal_sum_max.png",kind='area')
+
     except:
         p.cleanup()
         raise

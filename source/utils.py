@@ -76,3 +76,12 @@ def csv_writer(name,data):
     else:
         cache[name] = {"hash":datahash}
 
+class data:
+    """Data artifact container"""
+    def __init__(self,name,reader=csv_reader):
+        self.df = reader(name)
+
+    def plot(self,name,**kwargs):
+        self.df.plot(**kwargs)
+        import matplotlib.pyplot as plt 
+        plt.savefig(name)
