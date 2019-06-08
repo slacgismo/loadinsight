@@ -1,6 +1,8 @@
 import os
-from utils import *
+import inspect
 import pandas as pd
+
+from utils import *
 
 config = None
 def load_config(name=None):
@@ -36,16 +38,36 @@ def hash_data(data) :
     h.update(("%s" % (data)).encode())
     return h.hexdigest()
 
-def verbose(msg):
+class context:
+    def __init__(self, module_name=None, class_name=None, function_name=None):
+        self.module_name = module_name
+        self.class_name = class_name
+        if function_name is None :
+            self.function_name = inspect.stack()[1].function
+        else:
+            self.function_name = function_name
+    def __str__(self):
+        result = self.function_name
+        if not self.class_name is None:
+            result = self.class_name + ".%s"%(result)
+        if not self.module_name is None:
+            result = self.module_name + ".%s"%(result)
+        return result
+
+def verbose(msg,context=None):
     """Generate a verbose output message"""
     if config.VERBOSE :
-        import inspect
-        print("%s: %s" % (inspect.stack()[1].function,msg))
+        if context == None:
+            print(msg)
+        else:
+            print("%s: %s" % (str(context),msg))
 
-def warning(msg):
+def warning(msg,context=None):
     """Generate a verbose output message"""
-    import inspect
-    print("WARNING: %s -- %s" % (inspect.stack()[1].function,msg))
+    if context == None:
+        print("WARNING: %s" % (msg))
+    else:
+        print("WARNING: [%s] %s" % (str(context),msg))
 
 def local_path(name,extension=".csv"):
     """Get the local storage path for a named object"""
@@ -73,16 +95,16 @@ def csv_reader(name):
         import copy
         return copy.deepcopy(cache[name]["data"])
     filename = local_path(cache[name]["hash"])
-    verbose("reading %s" % (filename))
+    verbose("reading %s" % (filename), context(__name__))
     return pd.read_csv(filename)
 
 def csv_writer(name,data):
     """Default CSV writer"""
     global cache
     datahash = hash_data(data)
-    verbose("datahash(%s) is %s" % (name,datahash))
+    verbose("datahash(%s) is %s" % (name,datahash), context(__name__))
     filename = local_path(datahash)
-    verbose("writing %s to %s" % (name,filename))
+    verbose("writing %s to %s" % (name,filename), context(__name__))
     data.to_csv(filename)
     if config.USE_CACHE:
         cache[name] = {"hash":datahash, "data":data}
@@ -130,4 +152,4 @@ class data:
             import matplotlib.pyplot as plt 
             plt.savefig(remote_path(name,extension=""))
         else:
-            warning("dataframe is empty, %s.plot(%s) not generated" % (self.name,name))
+            warning("dataframe is empty, %s.plot(%s) not generated" % (self.name,name), context(__name__))

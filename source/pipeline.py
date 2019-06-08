@@ -21,7 +21,7 @@ class pipeline:
     def cleanup(self,delete_local=config.CLEAN_LOCAL):
         """Cleanup after a pipeline run"""
         global cache
-        verbose("cleaning cache")
+        verbose("cleaning cache", context(class_name=__class__.__name__))
         for key,info in cache.items():
             filename = local_path(info["hash"])
             if delete_local and os.path.exists(filename):
@@ -50,7 +50,7 @@ class pipeline:
     def get_data(self,name):
         return self.datalist[name]
 
-    def run(self):
+    def run(self,**kwargs):
         """Run the tasks in a pipeline"""
         # todo: run them in dependency order, in parallel,
         #       and skip unneeded updates
