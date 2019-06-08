@@ -9,6 +9,8 @@ def load_config(name=None):
             raise Exception("config name is not defined yet (did you forget to call utils.load_config first?)")
         import importlib
         config = importlib.import_module(name)
+    else :
+        raise Exception("cannot load a different configuration (%s is already loaded)" % (config))
     return config
 
 # move cache to inside pipeline
