@@ -17,30 +17,56 @@ import composition
 # create the RBSA pipeline
 rbsa = pipeline.pipeline(name="rbsa")
 
+RBSA = data("RBSA", reader=config_reader)
+config_RBSA = data("config_RBSA")
+RBSA_data = data("RBSA_data")
+RBSA_loads = data("RBSA_loads")
+DEVICE_MAP = data("DEVICE_MAP", reader=config_reader)
+device_map = data("device_map")
+site_loads = data("site_loads")
+zipcode_map = data("zipcode_map")
+site_loads = data("site_loads")
+area_loads = data("area_loads")
+heat_cool_index = data("heat_cool_index")
+enduse_loads = data("enduse_loads")
+gas_fractions = data("gas_fractions")
+total_loads = data("total_loads")
+normalization_rules = data("normalization_rules")
+normal_loads = data("normal_loads")
+tmy_data = data("tmy_data")
+loadshapes = data("loadshapes")
+total_loadshapes = data("total_loadshapes")
+gas_fractions = data("gas_fractions")
+enduse_loadshapes = data("enduse_loadshapes")
+normalization_rules = data("normalization_rules")
+normal_loadshapes = data("normal_loadshapes")
+daytype_definitions = data("daytype_definitions")
+residential_composition = data("residential_composition")
+
 # define the RBSA pipeline
 rbsa.add([
-    external.load(input="RBSA",output="config_RBSA")
-    extract.rbsa(input="config_RBSA", output="RBSA_data"),
-    clean.rbsa(input="RBSA_data", output="RBSA_loads"),
-    external.load(input="DEVICE_MAP", output="device_map"),
-    group.devices(input=["device_map","RBSA_loads"], output="site_loads"),
-    group.zipcodes(input="RBSA_data", output="zipcode_map"),
-    group.sites(input=["zipcode_map","site_loads"], output="area_loads"),
-    external.load(input="NOAA_DATA", output="NOAA_data"),
-    index.heat_cool(input="NOAA_DATA", output="heat_cool_index")
-    group.enduses(input=["heat_cool_index","area_loads"], output="enduse_loads"),
-    external.load(input="GAS_FRACTIONS", output="gas_fractions"),
-    electrification.undiscount_gas(input=["enduse_loads","gas_fractions"], output="total_loads"),
-    external.load(input="LOAD_NORMALIZATION_RULES", output="normalization_rules"),
-    normalize.max(input=["normalization_rules","total_loads"], output="normal_loads"),
-    sensitivity.find(input="normal_loads", output="loadshapes"),
-    external.load(input="TMY_DATA", output="tmy_data"),
-    project.loadshape(input=["tmy_data","loadshape"], output="total_loadshapes"),
-    electrification.discount_gas(input=["gas_fractions","total_loadshapes"], output="enduse_loadshapes"),
-    normalize.max(input=["normalization_rules","enduse_loadshapes"], output="normal_loadshapes"),
-    external.load(input="DAYTYPE_DEFINITIONS", output="daytype_definitions"),
-    extract.daytypes(input=["daytype_definitions","normal_loadshapes"], output="residential_composition"),
-    pipeline.send(input="residential_composition",output="ceus")
+    external.load({"inputs": [RBSA],"outputs": [config_RBSA]})
+    extract.rbsa({"inputs": [config_RBSA], "outputs": [RBSA_data]}),
+    clean.rbsa({"inputs": [RBSA_data], "outputs": [RBSA_loads]}),
+    external.load({"inputs": [DEVICE_MAP], "outputs": [device_map]}),
+    group.devices({"inputs": [device_map,RBSA_loads], "outputs": [site_loads]}),
+    group.zipcodes({"inputs": [RBSA_data], "outputs": [zipcode_map]}),
+    group.sites({"inputs": [zipcode_map,site_loads], "outputs": [area_loads]}),
+    external.load({"inputs": [NOAA_DATA], "outputs": [NOAA_data]}),
+    index.heat_cool({"inputs": [NOAA_DATA], "outputs": [heat_cool_index]})
+    group.enduses({"inputs": [heat_cool_index,area_loads], "outputs": [enduse_loads]}),
+    external.load({"inputs": [GAS_FRACTIONS], "outputs": [gas_fractions]}),
+    electrification.undiscount_gas({"inputs": [enduse_loads,gas_fractions], "outputs": [total_loads]}),
+    external.load({"inputs": [LOAD_NORMALIZATION_RULES], "outputs": [normalization_rules]}),
+    normalize.max({"inputs": [normalization_rules,total_loads], "outputs": normal_loads}),
+    sensitivity.find({"inputs": [normal_loads], "outputs": [loadshapes]}),
+    external.load({"inputs": [TMY_DATA], "outputs": [tmy_data]}),
+    project.loadshape({"inputs": [tmy_data,loadshapes], "outputs": [total_loadshapes]}),
+    electrification.discount_gas({"inputs": [gas_fractions,total_loadshapes], "outputs": [enduse_loadshapes]}),
+    normalize.max({"inputs": [normalization_rules,enduse_loadshapes], "outputs": [normal_loadshapes]}),
+    external.load({"inputs": [DAYTYPE_DEFINITIONS], "outputs": [daytype_definitions]}),
+    extract.daytypes({"inputs": [daytype_definitions,normal_loadshapes], "outputs": [residential_composition]}),
+    pipeline.send({"inputs": [residential_composition], "outputs": [ceus]})
 ])
 
 # create the CEUS pipeline
@@ -55,17 +81,17 @@ feeder = pipepline.pipeline(name="feeder")
 
 # define the feeder pipeline
 feeder.add([
-    external.rules(input="RULES_OF_ASSOCIATION",output="rules_of_association"),
-    pipeline.receive(input="rbsa",output="residential_composition"),
-    compose.rules(input=["residential_composition","rules_of_association"], output="residential_enduse_components"),
-    external.building_mix(input="RESIDENTIAL_MIX",output="residential_mix"),
-    compose.buildings(input=["residential_mix","residential_enduse_components"], output="residential_components"),
-    pipeline.receive(input="ceus",output="commercial_composition"),
-    compose.rules(input=["commercial_composition","rules_of_association"], output="commercial_enduse_components"),
-    external.building_mix(input="COMMERCIAL_MIX",output="commercial_mix"),
-    compose.buildings(input=["commercial_mix","commercial_enduse_components"], output="commercial_components"),
-    external.feeders(input="FEEDER_MIX", output="feeder_mix"),
-    compose.feeder(input=["commercial_components","residential_components","feeder_mix"], output="feeder_composition"),
+    external.rules({"inputs": [RULES_OF_ASSOCIATION], "outputs": [rules_of_association]}),
+    pipeline.receive({"inputs": [rbsa], "outputs": [residential_composition]}),
+    compose.rules({"inputs": [residential_composition,rules_of_association], "outputs": [residential_enduse_components]}),
+    external.building_mix({"inputs": [RESIDENTIAL_MIX], "outputs": [residential_mix]}),
+    compose.buildings({"inputs": [residential_mix,residential_enduse_components], "outputs": [residential_components]}),
+    pipeline.receive({"inputs": [ceus], "outputs": [commercial_composition]}),
+    compose.rules({"inputs": [commercial_composition,rules_of_association], "outputs": [commercial_enduse_components]}),
+    external.building_mix({"inputs": [COMMERCIAL_MIX], "outputs": [commercial_mix]}),
+    compose.buildings({"inputs": [commercial_mix,commercial_enduse_components], "outputs": [commercial_components]}),
+    external.feeders({"inputs": [FEEDER_MIX], "outputs": [feeder_mix]}),
+    compose.feeder({"inputs": [commercial_components,residential_components,feeder_mix], "outputs": [feeder_composition]}),
     ])
 
 # run the pipelines
