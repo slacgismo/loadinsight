@@ -92,7 +92,9 @@ def csv_writer(name,data):
 class data:
     """Data artifact container"""
     # TODO: derive this from DataFrame so operators work on data directly instead of get/set values
-    def __init__(self,name):
+    def __init__(self,name,
+                 reader = csv_reader,
+                 writer = csv_writer):
         self.name = name
         self.df = None
 

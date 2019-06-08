@@ -36,9 +36,9 @@ class pipeline:
     def set_tasks(self,tasklist = []):
         self.tasklist = tasklist
 
-    def add_data(self,name):
-        item = data(name)
-        self.datalist[name] = item
+    def add_data(self,**kwargs):
+        item = data(**kwargs)
+        self.datalist[kwargs["name"]] = item
         return item
 
     def set_data(self,datalist = []):
