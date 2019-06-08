@@ -19,10 +19,10 @@ def selftest() :
         normal_sum = data("normal_sum")
 
         # create the pipeline tasks
-        p.add(make.random(outputs=[random]))
-        p.add(make.copy(inputs=[random],outputs=[random_copy]))
-        p.add(normalize.rows_max(inputs=[random],outputs=[normal_max]))
-        p.add(normalize.rows_sum(inputs=[random_copy],outputs=[normal_sum]))
+        p.add(make.random({"outputs":[random]}))
+        p.add(make.copy({"inputs": [random], "outputs": [random_copy]}))
+        p.add(normalize.rows_max({"inputs": [random], "outputs": [normal_max]}))
+        p.add(normalize.rows_sum({"inputs": [random_copy],"outputs": [normal_sum]}))
 
         # run the pipeline
         p.run()
@@ -35,7 +35,7 @@ def selftest() :
 
     finally:
 
-        # remote local copies of artifacts
+        # remove local copies of artifacts
         p.cleanup()
 
 # direct load only

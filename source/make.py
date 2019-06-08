@@ -8,10 +8,10 @@ from math import *
 
 class copy :
     """Generates a copy of the input"""
-    def __init__(self, inputs, outputs):
+    def __init__(self, args):
         """Create the transformation"""
-        self.inputs = inputs
-        self.outputs = outputs
+        self.inputs = args["inputs"]
+        self.outputs = args["outputs"]
 
     def run(self):
         """Run the transformation"""
@@ -23,13 +23,14 @@ class copy :
 
     def check(self):
         """Check the transformation output"""
+        # TODO: move check to data object
         verbose("make.copy.check %s ok" % (self.outputs))
 
 class random :
     """Generates a random array of size specified by config.RANDOM_SIZE"""
-    def __init__(self, outputs):
+    def __init__(self, args):
         """Create the transformation"""
-        self.outputs = outputs
+        self.outputs = args["outputs"]
 
     def run(self):
         """Run the transformation"""
@@ -42,6 +43,7 @@ class random :
 
     def check(self):
         """Check the transformation output"""
+        # TODO: move check to data object
         data = self.outputs[0].get_data()
         assert((data.mean().abs() < 5/config.RANDOM_SIZE[1]).all())
         assert(((data.std()-1.0).abs() < 5/sqrt(config.RANDOM_SIZE[0])).all())

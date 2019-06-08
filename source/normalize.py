@@ -4,10 +4,10 @@ config = load_config()
 
 class rows_max :
     """Normalizes the rows of an array to their max"""
-    def __init__(self, inputs, outputs):
+    def __init__(self, args):
         """Create the transformation"""
-        self.inputs = inputs
-        self.outputs = outputs
+        self.inputs = args["inputs"]
+        self.outputs = args["outputs"]
 
     def run(self):
         """Run the transformation"""
@@ -22,6 +22,7 @@ class rows_max :
 
     def check(self):
         """Check the transformation output"""
+        # TODO: move check to data object
         data = self.outputs[0].get_data()
         assert((data.min()==0).all())
         assert((data.max()==1).all())
@@ -29,10 +30,10 @@ class rows_max :
     
 class rows_sum :
     """Normalizes the rows of an array to their sums"""
-    def __init__(self, inputs, outputs):
+    def __init__(self, args):
         """Create the transformation"""
-        self.inputs = inputs
-        self.outputs = outputs
+        self.inputs = args["inputs"]
+        self.outputs = args["outputs"]
 
     def run(self):
         """Run the transformation"""
@@ -47,6 +48,7 @@ class rows_sum :
 
     def check(self):
         """Check the transformation output"""
+        # TODO: move check to data object
         data = self.outputs[0].get_data()
         assert(((data.sum()-1.0).abs()<0.0001).all())
         verbose("%s check ok" % (self.outputs))

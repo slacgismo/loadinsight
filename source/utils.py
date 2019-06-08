@@ -61,6 +61,11 @@ def remote_path(name,extension=".csv"):
         os.makedirs(path,exist_ok=True)
     return path+name+extension
 
+def config_reader(name):
+    """Reader for config data"""
+    # TODO
+    return pd.DataFrame()
+    
 def csv_reader(name):
     """Default CSV reader"""
     global cache
