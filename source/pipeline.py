@@ -8,7 +8,7 @@ class pipeline:
         """Create a new pipeline"""
         self.tasklist = []
         global cachename
-        cachename = name
+        cachename = name + "/"
 
     def save(self):
         """Save the results from a pipeline run to the remote path"""

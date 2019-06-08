@@ -1,5 +1,6 @@
 import os
 from utils import *
+import pandas as pd
 
 config = None
 def load_config(name=None):
@@ -9,7 +10,7 @@ def load_config(name=None):
             raise Exception("config name is not defined yet (did you forget to call utils.load_config first?)")
         import importlib
         config = importlib.import_module(name)
-    else :
+    elif not name == None:
         raise Exception("cannot load a different configuration (%s is already loaded)" % (config))
     return config
 
@@ -40,6 +41,11 @@ def verbose(msg):
     if config.VERBOSE :
         import inspect
         print("%s: %s" % (inspect.stack()[1].function,msg))
+
+def warning(msg):
+    """Generate a verbose output message"""
+    import inspect
+    print("WARNING: %s -- %s" % (inspect.stack()[1].function,msg))
 
 def local_path(name,extension=".csv"):
     """Get the local storage path for a named object"""
@@ -80,10 +86,41 @@ def csv_writer(name,data):
 
 class data:
     """Data artifact container"""
-    def __init__(self,name,reader=csv_reader):
-        self.df = reader(name)
+    # TODO: derive this from DataFrame so operators work on data directly instead of get/set values
+    def __init__(self,name):
+        self.name = name
+        self.df = None
+
+    def __repr__(self):
+        return self.name
+
+    def set_data(self,data) :
+        if data is pd.core.frame.DataFrame:
+            self.df = data
+        else:
+            self.df = pd.DataFrame(data)
+
+    def copy_data(self,data):
+        if data is pd.core.frameDataFrame:
+            self.df = deepcopy(data)
+        else:
+            self.df = pd.DataFrame(deepcopy(data))
+
+    def get_data(self):
+        return self.df
+
+    def read(self,reader=csv_reader,force=False):
+        if self.df is None or force:
+            self.df = csv_reader(self.name)
+
+    def write(self,writer=csv_writer):
+        csv_writer(self.name,self.df)
 
     def plot(self,name,**kwargs):
-        self.df.plot(**kwargs)
-        import matplotlib.pyplot as plt 
-        plt.savefig(remote_path(name,extension=""))
+        self.read()
+        if len(self.df) > 0:
+            self.df.plot(**kwargs)
+            import matplotlib.pyplot as plt 
+            plt.savefig(remote_path(name,extension=""))
+        else:
+            warning("dataframe is empty, %s.plot(%s) not generated" % (self.name,name))

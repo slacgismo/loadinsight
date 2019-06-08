@@ -8,44 +8,41 @@ from math import *
 
 class copy :
     """Generates a copy of the input"""
-    def __init__(self, input, output,
-                 reader=csv_reader, writer=csv_writer):
+    def __init__(self, inputs, outputs):
         """Create the transformation"""
-        self.read = reader
-        self.write = writer
-        self.input = input
-        self.output = output
+        self.inputs = inputs
+        self.outputs = outputs
 
     def run(self):
         """Run the transformation"""
-        self.input = self.read(self.input)
-        verbose("copying %s" % (self.output))
-        output = self.input
-        self.check(output)
-        self.write(self.output,output)
+        self.inputs[0].read()
+        self.outputs[0].set_data(self.inputs[0].get_data())
+        self.outputs[0].write()
+        verbose("make.copy %s -> %s" % (self.inputs,self.outputs))
+        self.check()
 
-    def check(self,data):
+    def check(self):
         """Check the transformation output"""
-        verbose("%s check ok" % (self.output))
+        verbose("make.copy.check %s ok" % (self.outputs))
 
 class random :
     """Generates a random array of size specified by config.RANDOM_SIZE"""
-    def __init__(self, output,
-                 writer=csv_writer):
+    def __init__(self, outputs):
         """Create the transformation"""
-        self.write = writer
-        self.output = output
+        self.outputs = outputs
 
     def run(self):
         """Run the transformation"""
-        self.input = np.random.randn(config.RANDOM_SIZE[0],config.RANDOM_SIZE[1])
-        verbose("generating %s" % (self.output))
-        output = pd.DataFrame(self.input)
-        self.check(output)
-        self.write(self.output,output)
+        random_size = config.RANDOM_SIZE
+        data = np.random.randn(random_size[0],random_size[1])
+        self.outputs[0].set_data(data)
+        self.outputs[0].write()
+        verbose("make.random %s -> %s" % (random_size,self.outputs))
+        self.check()
 
-    def check(self,data):
+    def check(self):
         """Check the transformation output"""
+        data = self.outputs[0].get_data()
         assert((data.mean().abs() < 5/config.RANDOM_SIZE[1]).all())
         assert(((data.std()-1.0).abs() < 5/sqrt(config.RANDOM_SIZE[0])).all())
-        verbose("%s check ok" % (self.output))
+        verbose("make.copy.check %s ok" % (self.outputs))
