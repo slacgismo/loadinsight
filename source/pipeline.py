@@ -7,7 +7,7 @@ class pipeline:
     def __init__(self,name=""):
         """Create a new pipeline"""
         self.tasklist = []
-        self.datalist = []
+        self.datalist = {}
         global cachename
         cachename = name + "/"
 
@@ -38,14 +38,17 @@ class pipeline:
 
     def add_data(self,name):
         item = data(name)
-        self.datalist.append(item)
+        self.datalist[name] = item
         return item
 
     def set_data(self,datalist = []):
-        self.datalist = []
+        self.datalist = {}
         for data in datalist:
             self.add_data(data)
         return self.datalist
+
+    def get_data(self,name):
+        return self.datalist[name]
 
     def run(self):
         """Run the tasks in a pipeline"""
