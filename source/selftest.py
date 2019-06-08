@@ -13,16 +13,16 @@ def selftest() :
         p = pipeline.pipeline(name="selftest")
 
         # create the data artifacts used by the pipelines tasks
-        random = data("random")
-        random_copy = data("random_copy")
-        normal_max = data("normal_max")
-        normal_sum = data("normal_sum")
+        random = p.add_data("random")
+        random_copy = p.add_data("random_copy")
+        normal_max = p.add_data("normal_max")
+        normal_sum = p.add_data("normal_sum")
 
         # create the pipeline tasks
-        p.add(make.random({"outputs":[random]}))
-        p.add(make.copy({"inputs": [random], "outputs": [random_copy]}))
-        p.add(normalize.rows_max({"inputs": [random], "outputs": [normal_max]}))
-        p.add(normalize.rows_sum({"inputs": [random_copy],"outputs": [normal_sum]}))
+        p.add_task(make.random({"outputs":[random]}))
+        p.add_task(make.copy({"inputs": [random], "outputs": [random_copy]}))
+        p.add_task(normalize.rows_max({"inputs": [random], "outputs": [normal_max]}))
+        p.add_task(normalize.rows_sum({"inputs": [random_copy],"outputs": [normal_sum]}))
 
         # run the pipeline
         p.run()

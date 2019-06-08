@@ -7,6 +7,7 @@ class pipeline:
     def __init__(self,name=""):
         """Create a new pipeline"""
         self.tasklist = []
+        self.datalist = []
         global cachename
         cachename = name + "/"
 
@@ -28,9 +29,23 @@ class pipeline:
             if config.USE_CACHE:
                 del info["data"]
 
-    def add(self,entry):
+    def add_task(self,entry):
         """Add a task to the pipeline"""
         self.tasklist.append(entry)
+
+    def set_tasks(self,tasklist = []):
+        self.tasklist = tasklist
+
+    def add_data(self,name):
+        item = data(name)
+        self.datalist.append(item)
+        return item
+
+    def set_data(self,datalist = []):
+        self.datalist = []
+        for data in datalist:
+            self.add_data(data)
+        return self.datalist
 
     def run(self):
         """Run the tasks in a pipeline"""
