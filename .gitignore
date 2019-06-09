@@ -368,4 +368,8 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# ignore CSV and PNG artifacts
+*.csv
+*.png
+
 # End of https://www.gitignore.io/api/macos,django,python,windows,pycharm,sublimetext,visualstudiocode
