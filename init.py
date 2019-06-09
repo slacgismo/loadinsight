@@ -16,9 +16,8 @@ import importlib
 #from raven import Client
 from logging.handlers import RotatingFileHandler
 
-
 #error_reporter = None
-LOCAL_DEBUG = False  # DO NOT OVERWRITE MANUALLY!!
+LOCAL_DEBUG = False  # DO NOT OVERWRITE MANUALLY - this gets set via the config file!!
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 FILE_USAGE_EXPLANATAION = """
@@ -73,11 +72,14 @@ def parse_cmd_line_opts(argv):
             if opt == '-h':
                 print(FILE_USAGE_EXPLANATAION)
                 sys.exit()
+            
             elif opt == '-d':
                 print('Running LCTK with DEBUG set to True')
                 LOCAL_DEBUG = True
+            
             elif opt == '-s':
                 custom_settings = importlib.import_module(arg)
+                print(f'Running LCTK with the {arg} settings file')
                 LOCAL_DEBUG = custom_settings.DEBUG
                 
     except getopt.GetoptError:
