@@ -37,14 +37,19 @@ class safecache:
     """
     cachelist = {}
     share = {}
+    verbose = False # local verbose control (config is not available during init)
 
-    def __init__(self,name = "global"):
+    def __init__(self,name="global"):
         self.name = name
         if name in self.cachelist.keys():
             self.data = self.cachelist[name].data
+            if self.verbose :
+                print("safecache('%s') linked to %s" %(name,self.cachelist[name].data))
         else:
             self.data = {}
             self.cachelist[name] = self
+            if self.verbose :
+                print("safecache('%s') create as %s" %(name,self.cachelist[name].data))
 
     def __repr__(self):
         return "safecache(name='%s') = %s" % (self.name, str(self.cachelist[self.name].data))
@@ -54,16 +59,21 @@ class safecache:
 
     def get_path(self,root):
         """Returns the full path to where the cache data is stored"""
-        return root + self.name + "/"
+        path = root + self.name + "/"
+        if self.verbose :
+            print("%s.get_path(root='%s') -> %s" % (self.name,root,path))
+        return path
 
     def set_item(self,name,value):
         """Sets an item in the cache"""
-        #verbose("safecache.cachelist['%s']['%s'] <- %s" % (self.name,name,value), context=context(class_name="safecache"))
+        if self.verbose :
+            print("safecache.cachelist['%s']['%s'] <- %s" % (self.name,name,value))
         self.cachelist[self.name].data[name] = value
 
     def get_item(self,name):
         """Gets an item from the cache"""
-        #verbose("safecache.cachelist['%s']['%s'] -> %s" % (self.name,name,self.data[name]), context=context(class_name="safecache"))
+        if self.verbose:
+            print("safecache.cachelist['%s']['%s'] -> %s" % (self.name,name,self.data[name]))
         return self.cachelist[self.name].data[name]
 
     def items(self):
@@ -84,15 +94,16 @@ class safecache:
 
     def clean(self, delete_local):
         """Cleans up the cache after it is not longer needed"""
-        #verbose("safecache.cachelist['%s'] = %s" % (self.name,repr(self)), context=context(class_name="safecache"))
+        if self.verbose :
+            print("safecache.cachelist['%s'] = %s" % (self.name,repr(self)))
         for key,info in self.cachelist[self.name].data.items():
-            filename = local_path(info["hash"])
+            filename = local_path(info["hash"],cache=self)
             if delete_local and os.path.exists(filename):
                 os.remove(filename)
             if config.USE_CACHE and "data" in info.keys():
                 del info["data"]
 
-cache = safecache("global")
+global_cache = safecache("global")
 
 def hash_file(filename):
    """Return the SHA-1 hash of the file contents"""
@@ -144,21 +155,21 @@ def warning(msg,context=None):
     else:
         print("WARNING: [%s] %s" % (str(context),msg))
 
-def local_path(name,extension=".csv"):
+def local_path(name,extension=".csv",cache=global_cache):
     """Get the local storage path for a named object"""
     path = cache.get_path(root=config.LOCAL_PATH)
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
     return path+name+extension
 
-def remote_path(name,extension=".csv"):
+def remote_path(name,extension=".csv",cache=global_cache):
     """Get the remote storage path for a named object"""
     path = cache.get_path(root=config.REMOTE_PATH)
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
     return path+name+extension
 
-def config_reader(name,force=False):
+def config_reader(name,force=False,cache=global_cache):
     """Reader for config data"""
     pathname = config.CONFIG_PATH + name + ".json"
     with open(pathname,"r") as fh:
@@ -169,21 +180,21 @@ def config_reader(name,force=False):
             raise
     return pd.DataFrame()
     
-def csv_reader(name,force=False):
+def csv_reader(name,force=False,cache=global_cache):
     """Default CSV reader"""
     if config.USE_CACHE:
         import copy
         return copy.deepcopy(cache.get_item(name)["data"])
     else:
-        filename = local_path(cache[name]["hash"])
+        filename = local_path(cache.get_item(name)["hash"],cache=cache)
         verbose("reading %s" % (filename), context(__name__))
         return pd.read_csv(filename)
 
-def csv_writer(name,data):
+def csv_writer(name,data,cache=global_cache):
     """Default CSV writer"""
     datahash = hash_data(data)
     verbose("datahash(%s) is %s" % (name,datahash), context(__name__))
-    filename = local_path(datahash)
+    filename = local_path(datahash,cache=cache)
     if not os.path.exists(filename):
         verbose("writing %s to %s" % (name,filename), context(__name__))
         data.to_csv(filename)
@@ -241,7 +252,7 @@ class data:
     def read(self,force=False):
         """Read the data from the reader"""
         if self.df is None or force:
-            self.df = self.reader(self.name,force)
+            self.df = self.reader(name=self.name,force=force,cache=self.cache)
 
     def write(self):
         """Write the data to the writer"""
@@ -251,7 +262,7 @@ class data:
             except:
                 print("ERROR: check of %s failed" % self.name)
                 raise
-        self.writer(self.name,self.df)
+        self.writer(name=self.name,data=self.df,cache=self.cache)
 
     def plot(self,name,**kwargs):
         """Plot the data"""

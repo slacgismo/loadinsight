@@ -26,14 +26,14 @@ class pipeline:
         self.name = name
         self.tasklist = []
         self.datalist = {}
-        self.cache = safecache("global") # TODO: change from global to private scope
+        self.cache = safecache(name)
 
     def save(self):
         """Save the results from a pipeline run to the remote path"""
         if config.SAVE_DATA:
             for key,info in self.cache.items():
                 import shutil
-                shutil.copyfile(local_path(info["hash"]),remote_path(key))
+                shutil.copyfile(local_path(info["hash"],cache=self.cache),remote_path(key,cache=self.cache))
 
     def cleanup(self):
         """Cleanup after a pipeline run"""

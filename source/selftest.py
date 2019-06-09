@@ -19,9 +19,9 @@ def selftest() :
         random = p.add_data(name="random", 
             check=check.random, plot=plot.stack)
         random_copy = p.add_data(name="random_copy", 
-            check=check.random, plot=plot.stack)
+            check=check.random, plot=plot.stack, scope=p.name)
         normal_max = p.add_data(name="normal_max", 
-            check=check.normal_max_rows, plot=plot.line)
+            check=check.normal_max_rows, plot=plot.line, scope=p.name)
         normal_sum = p.add_data(name="normal_sum", 
             check=check.normal_sum_rows, plot=plot.line)
 
