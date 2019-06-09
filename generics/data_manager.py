@@ -1,0 +1,2 @@
+class DataManager(object):
+    pass
