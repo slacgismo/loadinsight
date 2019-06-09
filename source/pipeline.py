@@ -5,8 +5,8 @@ Usage:
     config = load_config("my_config")
     import pipeline, task, check, plot
     my_pipe = pipeline.pipeline(name="selftest")
-    my_input = my_pipe.add_data(name="my_input")
-    my_input = my_pipe.add_data(name="my_input", check=check.my_data, plot=plot.my_plot)
+    my_input = my_pipe.create_data(name="my_input")
+    my_input = my_pipe.create_data(name="my_input", check=check.my_data, plot=plot.my_plot)
     my_pipe.add_task(task.my_task(args={"inputs":[my_input],"outputs":[my_output]}))
     my_pipe.run()
     my_pipe.save()
@@ -52,7 +52,7 @@ class pipeline:
     def set_tasks(self,tasklist = []):
         self.tasklist = tasklist
 
-    def add_data(self,**kwargs):
+    def create_data(self,**kwargs):
         item = data(**kwargs)
         self.datalist[kwargs["name"]] = item
         return item
@@ -60,8 +60,7 @@ class pipeline:
     def set_data(self,datalist = []):
         self.datalist = {}
         for data in datalist:
-            self.add_data(data)
-        return self.datalist
+            self.create_data(data)
 
     def get_data(self,name):
         return self.datalist[name]

@@ -10,19 +10,19 @@ import plot
 import make
 import normalize
 
-def selftest() :
+def example() :
     """Test the implementation"""
     try:
-        p = pipeline.pipeline(name="selftest")
+        p = pipeline.pipeline(name="example")
 
         # create the data artifacts used by the pipelines tasks
-        random = p.add_data(name="random", 
+        random = p.create_data(name="random", 
             check=check.random, plot=plot.stack)
-        random_copy = p.add_data(name="random_copy", 
+        random_copy = p.create_data(name="random_copy", 
             check=check.random, plot=plot.stack)
-        normal_max = p.add_data(name="normal_max", 
+        normal_max = p.create_data(name="normal_max", 
             check=check.normal_max_rows, plot=plot.line)
-        normal_sum = p.add_data(name="normal_sum", 
+        normal_sum = p.create_data(name="normal_sum", 
             check=check.normal_sum_rows, plot=plot.line)
 
         # create the pipeline tasks
@@ -49,4 +49,4 @@ def selftest() :
 if __name__ == '__main__':
 
     # run the self-test
-    selftest()
+    example()
