@@ -20,30 +20,25 @@ config = load_config()
 
 class pipeline:
     """Pipeline implementation"""
+
     def __init__(self,name=""):
         """Create a new pipeline"""
+        self.name = name
         self.tasklist = []
         self.datalist = {}
-        global cachename
-        cachename = name + "/"
+        self.cache = safecache(name)
 
     def save(self):
         """Save the results from a pipeline run to the remote path"""
         if config.SAVE_DATA:
-            for key,info in cache.items():
+            for key,info in self.cache.items():
                 import shutil
                 shutil.copyfile(local_path(info["hash"]),remote_path(key))
 
-    def cleanup(self,delete_local=config.CLEAN_LOCAL):
+    def cleanup(self):
         """Cleanup after a pipeline run"""
-        global cache
-        verbose("cleaning up", context(class_name=__class__.__name__))
-        for key,info in cache.items():
-            filename = local_path(info["hash"])
-            if delete_local and os.path.exists(filename):
-                os.remove(filename)
-            if config.USE_CACHE and "data" in info.keys():
-                del info["data"]
+        verbose("cleaning up", context(class_name=self.name))
+        self.cache.clean(delete_local=config.CLEAN_LOCAL)
 
     def add_task(self,entry):
         """Add a task to the pipeline"""

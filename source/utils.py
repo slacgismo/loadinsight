@@ -18,8 +18,53 @@ def load_config(name=None):
     return config
 
 # move cache to inside pipeline
-cache = {}
-cachename = ""
+class safecache:
+
+    cachelist = {}
+    share = {}
+
+    def __init__(self,name = ""):
+        self.name = name
+        self.data = {}
+        self.cachelist[name] = self
+
+    def __repr__(self):
+        return "safecache(name='%s'): %s" % (self.name, json.dumps(self.cachelist[self.name].data))
+
+    def __str__(self):
+        return self.name
+
+    def __setitem__(self,name,value):
+        verbose("safecache['%s'] <- %s" % (name,value), context=context(class_name="safecache"))
+        self.cachelist[self.name].data[name] = value
+
+    def __getitem__(self,name):
+        verbose("safecache['%s'] -> %s" % (name,self.data[name]), context=context(class_name="safecache"))
+        return self.cachelist[self.name].data[name]
+
+    def items(self):
+        return self.cachelist[self.name].data.items()
+
+    def keys(self):
+        return self.cachelist[self.name].data.keys()
+
+    def values(self):
+        return self.cachelist[self.name].data.values()
+
+    def to_dict(self):
+        return self.cachelist[self.name].data
+
+    def clean(self, delete_local):
+        verbose("safecache['%s'] = %s" % (self.name,repr(self)), context=context(class_name="safecache"))
+        for key,info in self.cachelist[self.name].data.items():
+            filename = local_path(info["hash"])
+            if delete_local and os.path.exists(filename):
+                os.remove(filename)
+            if config.USE_CACHE and "data" in info.keys():
+                del info["data"]
+
+
+cache = safecache()
 
 def hash_file(filename):
    """Return the SHA-1 hash of the file contents"""
@@ -45,9 +90,9 @@ class context:
         self.module_name = module_name
         self.class_name = class_name
         if function_name is None :
-            self.function_name = inspect.stack()[1].function
+            self.function_name = inspect.stack()[1].function + "()"
         else:
-            self.function_name = function_name
+            self.function_name = function_name + "()"
     def __str__(self):
         result = self.function_name
         if not self.class_name is None:
@@ -73,14 +118,14 @@ def warning(msg,context=None):
 
 def local_path(name,extension=".csv"):
     """Get the local storage path for a named object"""
-    path = config.LOCAL_PATH + cachename
+    path = config.LOCAL_PATH + cache.name
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
     return path+name+extension
 
 def remote_path(name,extension=".csv"):
     """Get the remote storage path for a named object"""
-    path = config.REMOTE_PATH + cachename
+    path = config.REMOTE_PATH + cache.name
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
     return path+name+extension
@@ -98,7 +143,6 @@ def config_reader(name,force=False):
     
 def csv_reader(name,force=False):
     """Default CSV reader"""
-    global cache
     if config.USE_CACHE:
         import copy
         return copy.deepcopy(cache[name]["data"])
@@ -109,7 +153,6 @@ def csv_reader(name,force=False):
 
 def csv_writer(name,data):
     """Default CSV writer"""
-    global cache
     datahash = hash_data(data)
     verbose("datahash(%s) is %s" % (name,datahash), context(__name__))
     filename = local_path(datahash)
@@ -188,3 +231,4 @@ class data:
                 self.plotter(filename=remote_path(name,extension=""),data=self.df,**kwargs)
         else:
             warning("dataframe is empty, %s.plot(%s) not generated" % (self.name,name), context(__name__))
+
