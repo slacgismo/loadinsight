@@ -1,33 +1,55 @@
-"""
-Implement a task pipeline which operates on data objects
-Usage:
-    from utils import *
-    config = load_config("my_config")
-    import pipeline, task, check, plot
-    my_pipe = pipeline.pipeline(name="selftest")
-    my_input = my_pipe.add_data(name="my_input")
-    my_input = my_pipe.add_data(name="my_input", check=check.my_data, plot=plot.my_plot)
-    my_pipe.add_task(task.my_task(args={"inputs":[my_input],"outputs":[my_output]}))
-    my_pipe.run()
-    my_pipe.save()
-    my_pipe.plot() 
-    my_pipe.cleanup()
-"""
+import uuid
+from generics import task as t
 
-from generics import DataManager
-
-class Pipeline(DataManager):
+class Pipeline():
     """
-    Pipeline implementation
+    LCTK pipeline implementation.
+    Takes in a given number of Task objects and executes their function
+    in the given order. The pipeline is in charge of managing the overall
+    atomicity of the pipeline execution and the success/failure rollback 
+    protocol, to include global setup and cleanup.
     """
-    def __init__(self, name=""):
+    def __init__(self, name=None):
         """
         Constructor for a generic pipeline
+        name <string>: optional name for the pipeline
         """
+        if not name:
+            # w/o a name, generate a random UUID to name this pipeline
+            self.name = str(uuid.uuid4())
+        else:
+            # we currently don't mitigate name conflicts 
+            self.name = name 
         self.tasklist = []
         self.datalist = {}
         # global cachename
         # cachename = name + "/"
+
+    def add_task(self, entry):
+        """
+        Add a task to the pipeline
+        """
+        if isinstance(entry, t.Task):
+            self.tasklist.append(entry)
+        else:
+            raise TypeError('LCTK does not support pipeline execution of tasks that are not an instance of <Task>')
+
+    def run(self, **kwargs):
+        """
+        Run the tasks in a pipeline
+        """
+        for fn in self.tasklist:
+            fn.run()
+        # todo: run them in dependency order, in parallel,
+        #       and skip unneeded updates
+        # for task in self.tasklist:
+        #     if hasattr(task,"inputs"):
+        #         readall(task.inputs)
+        #     setall(task.outputs,pd.DataFrame())
+        #     task.run()
+        #     writeall(task.outputs)
+        #     if hasattr(task,"check"):
+        #         task.check()
 
     def save(self):
         """
@@ -39,24 +61,18 @@ class Pipeline(DataManager):
         #         import shutil
         #         shutil.copyfile(local_path(info["hash"]),remote_path(key))
 
-    def cleanup(self, delete_local=config.CLEAN_LOCAL):
+    def cleanup(self, delete_local):
         """
         Cleanup after a pipeline run
         """
-        global cache
-        verbose("cleaning up", context(class_name=__class__.__name__))
-        for key,info in cache.items():
-            filename = local_path(info["hash"])
-            if delete_local and os.path.exists(filename):
-                os.remove(filename)
-            if config.USE_CACHE and "data" in info.keys():
-                del info["data"]
-
-    def add_task(self, entry):
-        """
-        Add a task to the pipeline
-        """
-        self.tasklist.append(entry)
+        # global cache
+        # verbose("cleaning up", context(class_name=__class__.__name__))
+        # for key,info in cache.items():
+        #     filename = local_path(info["hash"])
+        #     if delete_local and os.path.exists(filename):
+        #         os.remove(filename)
+        #     if config.USE_CACHE and "data" in info.keys():
+        #         del info["data"]
 
     def set_tasks(self, tasklist=[]):
         self.tasklist = tasklist
@@ -76,17 +92,21 @@ class Pipeline(DataManager):
         return self.datalist[name]
 
     def run(self,**kwargs):
-        """Run the tasks in a pipeline"""
+        """
+        Run the tasks in a pipeline
+        """
+        for fn in self.tasklist:
+            fn.run()
         # todo: run them in dependency order, in parallel,
         #       and skip unneeded updates
-        for task in self.tasklist:
-            if hasattr(task,"inputs"):
-                readall(task.inputs)
-            setall(task.outputs,pd.DataFrame())
-            task.run()
-            writeall(task.outputs)
-            if hasattr(task,"check"):
-                task.check()
+        # for task in self.tasklist:
+        #     if hasattr(task,"inputs"):
+        #         readall(task.inputs)
+        #     setall(task.outputs,pd.DataFrame())
+        #     task.run()
+        #     writeall(task.outputs)
+        #     if hasattr(task,"check"):
+        #         task.check()
 
     # def plot(self,**kwargs):
     #     for name,data in self.datalist.items():

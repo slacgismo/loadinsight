@@ -4,4 +4,4 @@ from settings import base
 class TestLctkSetup(unittest.TestCase):
 
     def test_debug_is_off_by_default(self):
-        self.assertEquals(base.DEBUG, False)
+        self.assertEqual(base.DEBUG, False)
