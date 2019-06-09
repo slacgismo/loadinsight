@@ -193,8 +193,8 @@ def csv_reader(name,force=False,cache=global_cache):
 def csv_writer(name,data,cache=global_cache):
     """Default CSV writer"""
     datahash = hash_data(data)
-    verbose("datahash(%s) is %s" % (name,datahash), context(__name__))
     filename = local_path(datahash,cache=cache)
+    verbose("datahash(%s) is %s, filename is %s" % (name,datahash,filename), context(__name__))
     if not os.path.exists(filename):
         verbose("writing %s to %s" % (name,filename), context(__name__))
         data.to_csv(filename)
@@ -244,6 +244,9 @@ class data:
     def set_data(self,data) :
         """Set the data (must be a valid pandas DataFrame initialization)"""
         self.df = pd.DataFrame(data)
+
+    def get_hash(self):
+        return hash_data(self.df)
 
     def get_data(self):
         """Get the data (return a pandas DataFrame)"""
