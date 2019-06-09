@@ -10,10 +10,10 @@ import plot
 import make
 import normalize
 
-def selftest() :
+def example() :
     """Test the implementation"""
     try:
-        p = pipeline.pipeline(name="selftest")
+        p = pipeline.pipeline(name="example")
 
         # create the data artifacts used by the pipelines tasks
         random = p.add_data(name="random", 
@@ -48,5 +48,5 @@ def selftest() :
 # direct load only
 if __name__ == '__main__':
 
-    # run the self-test
-    selftest()
+    # run the example
+    example()

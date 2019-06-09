@@ -31,13 +31,12 @@ class pipeline:
     def save(self):
         """Save the results from a pipeline run to the remote path"""
         if config.SAVE_DATA:
-            print(self.datalist)
             for name,data in self.datalist.items():
                 data_hash = data.get_hash()
                 import shutil
                 local = local_path(data_hash,cache=data.cache)
-                remote = remote_path(name,cache=self.cache)
-                verbose("pipeline.%s.save(): copying %s to %s" % (self.name,local,remote))
+                remote = remote_path(name,cache=data.cache)
+                verbose("pipeline.%s.save(): copying %s to %s (cache = %s)" % (self.name,local,remote,str(data)))
                 shutil.copyfile(local,remote)
 
     def cleanup(self):

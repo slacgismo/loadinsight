@@ -29,6 +29,9 @@ class random :
     def run(self):
         """Run the transformation"""
         random_size = config.RANDOM_SIZE
-        data = np.random.randn(random_size[0],random_size[1])
+        #data = np.random.randn(random_size[0],random_size[1])
+        warning("debugging values in use", context=context("make","random","run"))
+        data = np.ones((10,10))
+        data[0] = 0.0
         self.outputs[0].set_data(data)
         verbose("%s -> %s" % (random_size,self.outputs), context(__name__,__class__.__name__))

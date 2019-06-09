@@ -18,7 +18,7 @@ VERBOSE = True
 USE_CACHE = True
 
 # flag to enable cleanup of file copies of cached data
-CLEAN_LOCAL = True
+CLEAN_LOCAL = False
 
 # flag to enable saving data in cache to named csv files
 SAVE_DATA = True
