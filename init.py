@@ -12,19 +12,21 @@ import os
 import sys
 import getopt
 import logging
+import importlib
 #from raven import Client
-
 from logging.handlers import RotatingFileHandler
 
 
 #error_reporter = None
+LOCAL_DEBUG = False  # DO NOT OVERWRITE MANUALLY!!
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
-DEBUG = False # by default we run with DEBUG off
 
 FILE_USAGE_EXPLANATAION = """
     Usage:
-    python init.py -h  # displays this help message
-    python init.py -d  # run in debug - prints to console as well as to the lctk.log file
+    python init.py -h          # displays this help message
+    python init.py -d          # run in debug - prints to console as well as to the lctk.log file
+    python init.py -s <string> # specify a settings file other than the base - it is assumed that you
+                                 are importing base into your custom settings file. It won't work otherwise
 """
 
 
@@ -53,7 +55,7 @@ def init_logging():
     rotating_file_handler.setFormatter(logFormatter)
     logger.addHandler(rotating_file_handler)
     
-    if DEBUG:
+    if LOCAL_DEBUG:
         # print to stdout if we are debugging
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setFormatter(logFormatter)
@@ -63,21 +65,26 @@ def parse_cmd_line_opts(argv):
     """
     Attempt to use the cmd line options, if any are given
     """
-    if argv is None:
-        return
-    
+    using_custom_settings = False
+    global LOCAL_DEBUG
     try:
-        opts, args = getopt.getopt(argv, 'hd:')
+        opts, args = getopt.getopt(argv, 'hds:')
         for opt, arg in opts:
             if opt == '-h':
                 print(FILE_USAGE_EXPLANATAION)
                 sys.exit()
             elif opt == '-d':
                 print('Running LCTK with DEBUG set to True')
-                global DEBUG
-                DEBUG = True
+                LOCAL_DEBUG = True
+            elif opt == '-s':
+                custom_settings = importlib.import_module(arg)
+                LOCAL_DEBUG = custom_settings.DEBUG
+                
     except getopt.GetoptError:
-        print('Unrecognized option; running LCTK with DEBUG set to False')
+        print('Unrecognized option terminating LCTK execution')
+
+    if not using_custom_settings:
+        base = importlib.import_module('settings.base')
 
 def execute_lctk(argv):
     """
