@@ -11,14 +11,11 @@ class rows_max :
 
     def run(self):
         """Run the transformation"""
-        map(lambda x: x.read(),self.inputs)
         output = self.inputs[0].get_data()
         output -= output.min()
         output /= output.max()
         self.outputs[0].set_data(output) 
-        map(lambda x: x.write(),self.outputs)
         verbose("%s -> %s" % (self.inputs,self.outputs), context(__name__))
-        self.check()
 
     def check(self):
         """Check the transformation output"""
@@ -37,14 +34,11 @@ class rows_sum :
 
     def run(self):
         """Run the transformation"""
-        map(lambda x: x.read(),self.inputs)
         output = self.inputs[0].get_data()
         output -= output.min()
         output /= output.sum()
         self.outputs[0].set_data(output) 
-        map(lambda x: x.write(),self.outputs)
         verbose("%s -> %s" % (self.inputs,self.outputs), context(__name__))
-        self.check()
 
     def check(self):
         """Check the transformation output"""
@@ -62,11 +56,8 @@ class max :
 
     def run(self):
         """Run the transformation"""
-        map(lambda x: x.read(),self.inputs)
-        # TODO
-        map(lambda x: x.write(),self.outputs)
+        # TODO: not implemented yet
         verbose("%s -> %s" % (self.inputs,self.outputs), context(__name__))
-        self.check()
 
     def check(self):
         """Check the transformation output"""

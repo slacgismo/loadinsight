@@ -1,0 +1,25 @@
+{
+	"version": 1,
+	"application": "loadinsight",
+	"name" : "RBSA",
+	"command" : "curl",
+	"arguments":
+	{
+		"path": "https://neea.org/img/uploads/",
+		"files" : [
+			"2011-rbsa-single-family-database.zip",
+			"rbsa_final_mh-database_04-19-13.zip",
+			"2011-rbsa-multifamily-unit-database.zip",
+			"2011-rbsa-multifamily-building-database.zip",
+			"rbsam_y1_part-1-of-4.zip",
+			"rbsam_y1_part-2-of-4.zip",
+			"rbsam_y1_part-3-of-4.zip",
+			"rbsam_y1_part-4-of-4.zip",
+			"rbsam_y2_part-1-of-5.zip",
+			"rbsam_y2_part-2-of-5.zip",
+			"rbsam_y2_part-3-of-5.zip",
+			"rbsam_y2_part-4-of-5.zip",
+			"rbsam_y2_part-5-of-5.zip"
+		]
+	}
+}

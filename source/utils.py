@@ -1,6 +1,7 @@
 import os
 import inspect
 import pandas as pd
+import json
 
 from utils import *
 
@@ -83,20 +84,23 @@ def remote_path(name,extension=".csv"):
         os.makedirs(path,exist_ok=True)
     return path+name+extension
 
-def config_reader(name):
+def config_reader(name,force=False):
     """Reader for config data"""
-    # TODO
+    pathname = config.CONFIG_PATH + name + ".json"
+    with open(pathname,"r") as fh:
+        spec = json.load(fh)
     return pd.DataFrame()
     
-def csv_reader(name):
+def csv_reader(name,force=False):
     """Default CSV reader"""
     global cache
     if config.USE_CACHE:
         import copy
         return copy.deepcopy(cache[name]["data"])
-    filename = local_path(cache[name]["hash"])
-    verbose("reading %s" % (filename), context(__name__))
-    return pd.read_csv(filename)
+    else:
+        filename = local_path(cache[name]["hash"])
+        verbose("reading %s" % (filename), context(__name__))
+        return pd.read_csv(filename)
 
 def csv_writer(name,data):
     """Default CSV writer"""
@@ -104,12 +108,25 @@ def csv_writer(name,data):
     datahash = hash_data(data)
     verbose("datahash(%s) is %s" % (name,datahash), context(__name__))
     filename = local_path(datahash)
-    verbose("writing %s to %s" % (name,filename), context(__name__))
-    data.to_csv(filename)
+    if not os.path.exists(filename):
+        verbose("writing %s to %s" % (name,filename), context(__name__))
+        data.to_csv(filename)
     if config.USE_CACHE:
         cache[name] = {"hash":datahash, "data":data}
     else:
         cache[name] = {"hash":datahash}
+
+def setall(datalist,value):
+    for item in datalist:
+        item.set_data(value)
+
+def readall(readlist,force=False):
+    for item in readlist:
+        item.read(force)
+
+def writeall(writelist):
+    for item in writelist:
+        item.write()
 
 class data:
     """Data artifact container"""
@@ -119,31 +136,27 @@ class data:
                  writer = csv_writer):
         self.name = name
         self.df = None
+        self.reader = reader
+        self.writer = writer
+
+    def __str__(self):
+        return "%s"%{"name":self.name,"df":self.df,"reader":self.reader,"writer":self.writer}
 
     def __repr__(self):
         return self.name
 
     def set_data(self,data) :
-        if data is pd.core.frame.DataFrame:
-            self.df = data
-        else:
-            self.df = pd.DataFrame(data)
-
-    def copy_data(self,data):
-        if data is pd.core.frameDataFrame:
-            self.df = deepcopy(data)
-        else:
-            self.df = pd.DataFrame(deepcopy(data))
+        self.df = pd.DataFrame(data)
 
     def get_data(self):
         return self.df
 
-    def read(self,reader=csv_reader,force=False):
+    def read(self,force=False):
         if self.df is None or force:
-            self.df = csv_reader(self.name)
+            self.df = self.reader(self.name,force)
 
-    def write(self,writer=csv_writer):
-        csv_writer(self.name,self.df)
+    def write(self):
+        self.writer(self.name,self.df)
 
     def plot(self,name,**kwargs):
         self.read()
