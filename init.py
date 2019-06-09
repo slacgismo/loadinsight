@@ -17,9 +17,9 @@ import importlib
 from logging.handlers import RotatingFileHandler
 
 #error_reporter = None
-LOCAL_DEBUG = False  # DO NOT OVERWRITE MANUALLY - this gets set via the config file!!
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
+LOCAL_DEBUG = False  # DO NOT OVERWRITE MANUALLY - this gets set via the config file!!
 FILE_USAGE_EXPLANATAION = """
     Usage:
     python init.py -h          # displays this help message
@@ -27,7 +27,6 @@ FILE_USAGE_EXPLANATAION = """
     python init.py -s <string> # specify a settings file other than the base - it is assumed that you
                                  are importing base into your custom settings file. It won't work otherwise
 """
-
 
 def init_error_reporting():
     """

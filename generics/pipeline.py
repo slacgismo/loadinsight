@@ -1,6 +1,10 @@
 import uuid
 from generics import task as t
 
+
+logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
+
+
 class Pipeline():
     """
     LCTK pipeline implementation.

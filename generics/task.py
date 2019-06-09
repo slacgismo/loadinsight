@@ -1,5 +1,9 @@
 from generics import data_manager
 
+
+logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
+
+
 class Task(data_manager.DataManager):
     """
     Generic task manager that implements a function and executes it on
