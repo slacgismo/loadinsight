@@ -40,6 +40,7 @@ def hash_data(data) :
     return h.hexdigest()
 
 class context:
+    """Build a context for verbose and warning messages"""
     def __init__(self, module_name=None, class_name=None, function_name=None):
         self.module_name = module_name
         self.class_name = class_name
@@ -121,14 +122,17 @@ def csv_writer(name,data):
         cache[name] = {"hash":datahash}
 
 def setall(datalist,value):
+    """Set all the values of a datalist"""
     for item in datalist:
         item.set_data(value)
 
 def readall(readlist,force=False):
+    """Read all the data in a datalist from local storage"""
     for item in readlist:
         item.read(force)
 
 def writeall(writelist):
+    """Write all the data in a datalist to local storage"""
     for item in writelist:
         item.write()
 
@@ -137,11 +141,13 @@ class data:
     # TODO: derive this from DataFrame so operators work on data directly instead of get/set values
     def __init__(self,name,
                  reader = csv_reader,
-                 writer = csv_writer):
+                 writer = csv_writer,
+                 check = None):
         self.name = name
         self.df = None
         self.reader = reader
         self.writer = writer
+        self.checker = check
 
     def __str__(self):
         return "%s"%{"name":self.name,"df":self.df,"reader":self.reader,"writer":self.writer}
@@ -150,19 +156,30 @@ class data:
         return self.name
 
     def set_data(self,data) :
+        """Set the data (must be a valid pandas DataFrame initialization)"""
         self.df = pd.DataFrame(data)
 
     def get_data(self):
+        """Get the data (return a pandas DataFrame)"""
         return self.df
 
     def read(self,force=False):
+        """Read the data from the reader"""
         if self.df is None or force:
             self.df = self.reader(self.name,force)
 
     def write(self):
+        """Write the data to the writer"""
+        if not self.checker is None:
+            try:
+                self.checker(self.df)
+            except:
+                print("ERROR: check of %s failed" % self.name)
+                raise
         self.writer(self.name,self.df)
 
     def plot(self,name,**kwargs):
+        """Plot the data"""
         self.read()
         if len(self.df) > 0:
             self.df.plot(**kwargs)

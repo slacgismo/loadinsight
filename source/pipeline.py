@@ -1,3 +1,18 @@
+"""Implement a task pipeline which operates on data objects
+
+Usage:
+    from utils import *
+    config = load_config("my_config")
+    import pipeline, check, task
+    my_pipe = pipeline.pipeline(name="selftest")
+    my_input = my_pipe.add_data(name="my_input")
+    my_input = my_pipe.add_data(name="my_input", check=check.my_data)
+    my_pipe.add_task(task.my_task(args={"inputs":[my_input],"outputs":[my_output]}))
+    my_pipe.run()
+    my_pipe.save()
+    my_pipe.cleanup()
+"""
+
 from utils import *
 
 config = load_config()
@@ -60,5 +75,6 @@ class pipeline:
             setall(task.outputs,pd.DataFrame())
             task.run()
             writeall(task.outputs)
-            task.check()
+            if hasattr(task,"check"):
+                task.check()
 

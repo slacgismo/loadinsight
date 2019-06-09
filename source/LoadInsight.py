@@ -1,11 +1,15 @@
+"""Implements the full LoadInsight pipeline for generation load compositions"""
+
 from utils import *
 import matplotlib.pyplot as plt
 
 config = load_config("config_test")
 
+import pipeline
+import check
+
 # load the require LI modules (TODO: make it a package)
 import external
-import pipeline
 import extract
 import clean
 import group

@@ -3,9 +3,11 @@ import matplotlib.pyplot as plt
 
 config = load_config("config_test")
 
+import pipeline
+import check
+
 import make
 import normalize
-import pipeline
 
 def selftest() :
     """Test the implementation"""
@@ -13,10 +15,10 @@ def selftest() :
         p = pipeline.pipeline(name="selftest")
 
         # create the data artifacts used by the pipelines tasks
-        random = p.add_data(name="random")
-        random_copy = p.add_data(name="random_copy")
-        normal_max = p.add_data(name="normal_max")
-        normal_sum = p.add_data(name="normal_sum")
+        random = p.add_data(name="random", check=check.random)
+        random_copy = p.add_data(name="random_copy", check=check.random)
+        normal_max = p.add_data(name="normal_max", check=check.normal_max_rows)
+        normal_sum = p.add_data(name="normal_sum", check=check.normal_sum_rows)
 
         # create the pipeline tasks
         p.add_task(make.random(args={"outputs":[random]}))
