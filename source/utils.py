@@ -17,29 +17,32 @@ def load_config(name=None):
         raise Exception("cannot load a different configuration (%s is already loaded)" % (config))
     return config
 
-# move cache to inside pipeline
 class safecache:
 
     cachelist = {}
     share = {}
 
-    def __init__(self,name = ""):
+    def __init__(self,name = "global"):
         self.name = name
         self.data = {}
         self.cachelist[name] = self
+        #print("safecache.cachelist['%s'] <- %s" % (name,repr(self)))
 
     def __repr__(self):
-        return "safecache(name='%s'): %s" % (self.name, json.dumps(self.cachelist[self.name].data))
+        return "safecache(name='%s') = %s" % (self.name, str(self.cachelist[self.name].data))
 
     def __str__(self):
         return self.name
 
-    def __setitem__(self,name,value):
-        verbose("safecache['%s'] <- %s" % (name,value), context=context(class_name="safecache"))
+    def get_path(self,root):
+        return root + self.name + "/"
+
+    def set_item(self,name,value):
+        #verbose("safecache.cachelist['%s']['%s'] <- %s" % (self.name,name,value), context=context(class_name="safecache"))
         self.cachelist[self.name].data[name] = value
 
-    def __getitem__(self,name):
-        verbose("safecache['%s'] -> %s" % (name,self.data[name]), context=context(class_name="safecache"))
+    def get_item(self,name):
+        #verbose("safecache.cachelist['%s']['%s'] -> %s" % (self.name,name,self.data[name]), context=context(class_name="safecache"))
         return self.cachelist[self.name].data[name]
 
     def items(self):
@@ -55,7 +58,7 @@ class safecache:
         return self.cachelist[self.name].data
 
     def clean(self, delete_local):
-        verbose("safecache['%s'] = %s" % (self.name,repr(self)), context=context(class_name="safecache"))
+        #verbose("safecache.cachelist['%s'] = %s" % (self.name,repr(self)), context=context(class_name="safecache"))
         for key,info in self.cachelist[self.name].data.items():
             filename = local_path(info["hash"])
             if delete_local and os.path.exists(filename):
@@ -118,14 +121,14 @@ def warning(msg,context=None):
 
 def local_path(name,extension=".csv"):
     """Get the local storage path for a named object"""
-    path = config.LOCAL_PATH + cache.name
+    path = cache.get_path(root=config.LOCAL_PATH)
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
     return path+name+extension
 
 def remote_path(name,extension=".csv"):
     """Get the remote storage path for a named object"""
-    path = config.REMOTE_PATH + cache.name
+    path = cache.get_path(root=config.REMOTE_PATH)
     if not os.path.exists(path):
         os.makedirs(path,exist_ok=True)
     return path+name+extension
@@ -145,7 +148,7 @@ def csv_reader(name,force=False):
     """Default CSV reader"""
     if config.USE_CACHE:
         import copy
-        return copy.deepcopy(cache[name]["data"])
+        return copy.deepcopy(cache.get_item(name)["data"])
     else:
         filename = local_path(cache[name]["hash"])
         verbose("reading %s" % (filename), context(__name__))
@@ -160,9 +163,9 @@ def csv_writer(name,data):
         verbose("writing %s to %s" % (name,filename), context(__name__))
         data.to_csv(filename)
     if config.USE_CACHE:
-        cache[name] = {"hash":datahash, "data":data}
+        cache.set_item(name,{"hash":datahash, "data":data})
     else:
-        cache[name] = {"hash":datahash}
+        cache.set_item(name,{"hash":datahash})
 
 def setall(datalist,value):
     """Set all the values of a datalist"""

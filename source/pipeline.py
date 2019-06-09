@@ -26,7 +26,7 @@ class pipeline:
         self.name = name
         self.tasklist = []
         self.datalist = {}
-        self.cache = safecache(name)
+        self.cache = safecache()
 
     def save(self):
         """Save the results from a pipeline run to the remote path"""
