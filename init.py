@@ -82,7 +82,7 @@ def parse_cmd_line_opts(argv):
                 LOCAL_DEBUG = custom_settings.DEBUG
                 
     except getopt.GetoptError:
-        print('Unrecognized option terminating LCTK execution')
+        logger.exc('Unrecognized option terminating LCTK execution')
 
     if not using_custom_settings:
         base = importlib.import_module('settings.base')
@@ -93,13 +93,13 @@ def execute_lctk(argv):
     """
     parse_cmd_line_opts(argv)
     init_logging()
-    init_error_reporting()
-    
-    # Begin Home Hub Specific Setup
     logger.info('Starting the LCTK main program')
 
 if __name__ == '__main__':
     try:
+        # before we even attempt to run the pipeline the error reporting
+        init_error_reporting()
+        # start the pipeline
         execute_lctk(sys.argv[1:])
     except Exception as exc:
         logging.exception(exc)
