@@ -5,6 +5,7 @@ config = load_config("config_test")
 
 import pipeline
 import check
+import plot
 
 import make
 import normalize
@@ -15,10 +16,14 @@ def selftest() :
         p = pipeline.pipeline(name="selftest")
 
         # create the data artifacts used by the pipelines tasks
-        random = p.add_data(name="random", check=check.random)
-        random_copy = p.add_data(name="random_copy", check=check.random)
-        normal_max = p.add_data(name="normal_max", check=check.normal_max_rows)
-        normal_sum = p.add_data(name="normal_sum", check=check.normal_sum_rows)
+        random = p.add_data(name="random", 
+            check=check.random, plot=plot.stack)
+        random_copy = p.add_data(name="random_copy", 
+            check=check.random, plot=plot.stack)
+        normal_max = p.add_data(name="normal_max", 
+            check=check.normal_max_rows, plot=plot.line)
+        normal_sum = p.add_data(name="normal_sum", 
+            check=check.normal_sum_rows, plot=plot.line)
 
         # create the pipeline tasks
         p.add_task(make.random(args={"outputs":[random]}))
@@ -29,11 +34,11 @@ def selftest() :
         # run the pipeline
         p.run()
 
-        # plot desired data artifacts
-        normal_sum.plot("normal_sum.png",kind='area')
-
         # transfer the data to the remote storage
         p.save()
+
+        # plot the results
+        p.plot()
 
     finally:
 

@@ -142,12 +142,14 @@ class data:
     def __init__(self,name,
                  reader = csv_reader,
                  writer = csv_writer,
-                 check = None):
+                 check = None,
+                 plot = None):
         self.name = name
         self.df = None
         self.reader = reader
         self.writer = writer
         self.checker = check
+        self.plotter = plot
 
     def __str__(self):
         return "%s"%{"name":self.name,"df":self.df,"reader":self.reader,"writer":self.writer}
@@ -182,8 +184,7 @@ class data:
         """Plot the data"""
         self.read()
         if len(self.df) > 0:
-            self.df.plot(**kwargs)
-            import matplotlib.pyplot as plt 
-            plt.savefig(remote_path(name,extension=""))
+            if not self.plotter is None:
+                self.plotter(filename=remote_path(name,extension=""),data=self.df,**kwargs)
         else:
             warning("dataframe is empty, %s.plot(%s) not generated" % (self.name,name), context(__name__))

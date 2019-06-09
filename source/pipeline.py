@@ -3,13 +3,14 @@
 Usage:
     from utils import *
     config = load_config("my_config")
-    import pipeline, check, task
+    import pipeline, task, check, plot
     my_pipe = pipeline.pipeline(name="selftest")
     my_input = my_pipe.add_data(name="my_input")
-    my_input = my_pipe.add_data(name="my_input", check=check.my_data)
+    my_input = my_pipe.add_data(name="my_input", check=check.my_data, plot=plot.my_plot)
     my_pipe.add_task(task.my_task(args={"inputs":[my_input],"outputs":[my_output]}))
     my_pipe.run()
     my_pipe.save()
+    my_pipe.plot() 
     my_pipe.cleanup()
 """
 
@@ -78,3 +79,6 @@ class pipeline:
             if hasattr(task,"check"):
                 task.check()
 
+    def plot(self,**kwargs):
+        for name,data in self.datalist.items():
+            data.plot(name,**kwargs)
