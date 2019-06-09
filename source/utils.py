@@ -1,9 +1,12 @@
+"""General LoadInsight utilities
+
+Note: many of these utilities cannot use `config` during module load and class init
+because the running configuration has not been loaded `load_config()`
+"""
 import os
 import inspect
 import pandas as pd
 import json
-
-from utils import *
 
 config = None
 def load_config(name=None):
@@ -18,15 +21,30 @@ def load_config(name=None):
     return config
 
 class safecache:
+    """Implement a shared cache for data artifacts
 
+    Each pipeline uses a private cache for its own data artifacts.
+    The 'global' cache is for any artifacts that are shared between pipelines.
+
+    Usage:
+        ifrom utils inport *
+        config = load_config("my_config")
+        global_cache = safecache()
+        my_cache = safecache("my_cache")
+        my_cache.set_item(hash,data)
+        print(my_cache.get_item(hash))
+        my_cache.cleanup()
+    """
     cachelist = {}
     share = {}
 
     def __init__(self,name = "global"):
         self.name = name
-        self.data = {}
-        self.cachelist[name] = self
-        #print("safecache.cachelist['%s'] <- %s" % (name,repr(self)))
+        if name in self.cachelist.keys():
+            self.data = self.cachelist[name].data
+        else:
+            self.data = {}
+            self.cachelist[name] = self
 
     def __repr__(self):
         return "safecache(name='%s') = %s" % (self.name, str(self.cachelist[self.name].data))
@@ -35,29 +53,37 @@ class safecache:
         return self.name
 
     def get_path(self,root):
+        """Returns the full path to where the cache data is stored"""
         return root + self.name + "/"
 
     def set_item(self,name,value):
+        """Sets an item in the cache"""
         #verbose("safecache.cachelist['%s']['%s'] <- %s" % (self.name,name,value), context=context(class_name="safecache"))
         self.cachelist[self.name].data[name] = value
 
     def get_item(self,name):
+        """Gets an item from the cache"""
         #verbose("safecache.cachelist['%s']['%s'] -> %s" % (self.name,name,self.data[name]), context=context(class_name="safecache"))
         return self.cachelist[self.name].data[name]
 
     def items(self):
+        """Returns tuples of items in the cache"""
         return self.cachelist[self.name].data.items()
 
     def keys(self):
+        """Returns a list of names in the cache"""
         return self.cachelist[self.name].data.keys()
 
     def values(self):
+        """Returns a list of values in the cache"""
         return self.cachelist[self.name].data.values()
 
     def to_dict(self):
+        """Returns the cache list as a dict"""
         return self.cachelist[self.name].data
 
     def clean(self, delete_local):
+        """Cleans up the cache after it is not longer needed"""
         #verbose("safecache.cachelist['%s'] = %s" % (self.name,repr(self)), context=context(class_name="safecache"))
         for key,info in self.cachelist[self.name].data.items():
             filename = local_path(info["hash"])
@@ -66,8 +92,7 @@ class safecache:
             if config.USE_CACHE and "data" in info.keys():
                 del info["data"]
 
-
-cache = safecache()
+cache = safecache("global")
 
 def hash_file(filename):
    """Return the SHA-1 hash of the file contents"""
@@ -189,13 +214,15 @@ class data:
                  reader = csv_reader,
                  writer = csv_writer,
                  check = None,
-                 plot = None):
+                 plot = None,
+                 scope = "global"):
         self.name = name
         self.df = None
         self.reader = reader
         self.writer = writer
         self.checker = check
         self.plotter = plot
+        self.cache = safecache(scope)
 
     def __str__(self):
         return "%s"%{"name":self.name,"df":self.df,"reader":self.reader,"writer":self.writer}
