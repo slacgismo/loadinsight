@@ -1,5 +1,26 @@
 {
 	"version": 1,
 	"application": "loadinsight",
-	"name": "GAS_FRACTIONS"
+	"name": "GAS_FRACTIONS",
+	"electrification" : {
+		"TODO": "add regions and fractions here",
+		"region1" : { 
+			"heating": 0.55, 
+			"cooking": 0.66,
+			"drying" : 0.77,
+			"hotwater" : 0.88
+		},
+		"region2" : {
+			"heating": 0.55,
+			"cooking": 0.66,
+			"drying" : 0.77,
+			"hotwater" : 0.88
+		},
+		"regionN" : {
+			"heating": 0.55,
+			"cooking": 0.66,
+			"drying" : 0.77,
+			"hotwater" : 0.88
+		}
+	}
 }

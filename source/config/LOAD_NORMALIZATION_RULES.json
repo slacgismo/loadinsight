@@ -1,5 +1,6 @@
 {
 	"version": 1,
 	"application": "loadinsight",
-	"name": "LOAD_NORMALIZATION_RULES"
+	"name": "LOAD_NORMALIZATION_RULES",
+	"TODO" : "add normalization rules used, if any"
 }

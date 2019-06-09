@@ -88,7 +88,11 @@ def config_reader(name,force=False):
     """Reader for config data"""
     pathname = config.CONFIG_PATH + name + ".json"
     with open(pathname,"r") as fh:
-        spec = json.load(fh)
+        try :
+            spec = json.load(fh)
+        except:
+            print("ERROR: unable to load '%s'" % pathname)
+            raise
     return pd.DataFrame()
     
 def csv_reader(name,force=False):

@@ -1,5 +1,35 @@
 {
 	"version": 1,
 	"application": "loadinsight",
-	"name": "DAYTYPE_DEFINITIONS"
+	"name": "DAYTYPE_DEFINITIONS",
+	"WECC" : {
+		"summer": "July 20",
+		"winter": "January 20",
+		"spring": "April 20"
+	},
+	"ERCOT" : {
+		"summer": "July 20",
+		"winter": "January 20",
+		"spring": "April 20"
+	},
+	"PJM" : {
+		"summer": "July 20",
+		"winter": "January 20",
+		"spring": "April 20"
+	},
+	"SERC" : {
+		"summer": "July 20",
+		"winter": "January 20",
+		"spring": "April 20"
+	},
+	"NPCC" : {
+		"summer": "July 20",
+		"winter": "January 20",
+		"spring": "April 20"
+	},
+	"MRO" : {
+		"summer": "July 20",
+		"winter": "January 20",
+		"spring": "April 20"
+	}
 }
