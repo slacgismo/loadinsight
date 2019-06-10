@@ -1,0 +1,20 @@
+{
+	"version": 1,
+	"application": "loadinsight",
+	"name" : "RBSA",
+	"command" : "curl",
+	"arguments":
+	{
+		"path": "https://neea.org/img/uploads/",
+		"files" : [
+			"2011-rbsa-single-family-database.zip",
+			"rbsa_final_mh-database_04-19-13.zip",
+			"2011-rbsa-multifamily-unit-database.zip",
+			"2011-rbsa-multifamily-building-database.zip"
+		],
+		"extract" : [
+			"something.csv",
+			"something2.csv"
+		]
+	}
+}
