@@ -100,9 +100,10 @@ class Pipeline():
         """
         Run the tasks in a pipeline
         """
-        for fn in self.tasklist:
-            result = fn.run()
-            logger.info(f'run result {result}')
+        for current_task in self.tasklist:
+            current_task.run()
+            result = current_task.run_result
+            logger.info(f'Result of task {current_task.name} is {result} and its execution time is {current_task.get_task_run_time()}')
         # todo: run them in dependency order, in parallel,
         #       and skip unneeded updates
         # for task in self.tasklist:
