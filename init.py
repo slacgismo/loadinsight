@@ -95,6 +95,11 @@ def execute_lctk(argv):
     init_logging()
     logger.info('Starting the LCTK main program')
 
+    ### PRIMARILY USING FOR DEBUG PURPOSES - WILL MOVE THIS TO AN ORCHESTRATION FILE
+    from pipelines.rbsa import rbsa
+    rbsa_pipeline = rbsa.RbsaPipeline()
+    rbsa_pipeline.execute()
+
 if __name__ == '__main__':
     try:
         # before we even attempt to run the pipeline the error reporting

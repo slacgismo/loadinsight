@@ -11,7 +11,7 @@ REMOTE_PATH = "remote/"
 CONFIG_PATH = "config/"
 
 # size of an experimental data array
-RANDOM_SIZE = [5,10]
+RANDOM_SIZE = [5, 10]
 
 # verbose output flag
 VERBOSE = True

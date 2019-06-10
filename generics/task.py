@@ -1,11 +1,11 @@
 import logging
-from generics import data_manager
+from generics import artifact
 
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
-class Task(data_manager.DataManager):
+class Task(artifact.ArtifactDataManager):
     """
     Generic task manager that implements a function and executes it on
     a set of given inputs and generates a set of outputs.
@@ -16,5 +16,5 @@ class Task(data_manager.DataManager):
     def __init__(self, name):
         self.name = name
 
-    def run():
+    def run(self):
         print(f'running task {self.name}')
