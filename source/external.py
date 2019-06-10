@@ -12,5 +12,13 @@ class load :
 
     def run(self):
         """Run the transformation"""
-        # TODO: not implemented yet
+        
+        # download zips
+
+        # extract zips contents
+
+        # load contents info dataframes
+
+        # save dataframes to outputs
+        
         verbose("%s -> %s" % (self.inputs,self.outputs), context(__name__,__class__.__name__))

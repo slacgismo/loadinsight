@@ -24,6 +24,9 @@ import project
 rbsa = pipeline.pipeline(name="rbsa")
 
 RBSA = rbsa.create_data(name="RBSA", reader=config_reader)
+rbsa_winter = rbsa.create_data(name="rbsa_winter", reader=config_reader)
+rbsa_spring = rbsa.create_data(name="rbsa_spring", reader=config_reader)
+rbsa_summer = rbsa.create_data(name="rbsa_summer", reader=config_reader)
 config_RBSA = rbsa.create_data(name="config_RBSA")
 RBSA_data = rbsa.create_data(name="RBSA_data")
 RBSA_loads = rbsa.create_data(name="RBSA_loads")
@@ -58,7 +61,7 @@ residential_composition = rbsa.create_data(name="residential_composition")
 # define the RBSA pipeline
 rbsa.set_tasks([
     external.load(args={"inputs": [RBSA],"outputs": [config_RBSA]}),
-    extract.rbsa(args={"inputs": [config_RBSA], "outputs": [RBSA_data]}),
+    extract.rbsa(args={"inputs": [config_RBSA], "outputs": [rbsa_winter,rbsa_spring,rbsa_spring]}),
     clean.rbsa(args={"inputs": [RBSA_data], "outputs": [RBSA_loads]}),
     external.load(args={"inputs": [DEVICE_MAP], "outputs": [device_map]}),
     group.devices(args={"inputs": [device_map,RBSA_loads], "outputs": [site_loads]}),

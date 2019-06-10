@@ -94,7 +94,7 @@ def config_reader(name,force=False):
         except:
             print("ERROR: unable to load '%s'" % pathname)
             raise
-    return pd.DataFrame()
+    return spec
     
 def csv_reader(name,force=False):
     """Default CSV reader"""
