@@ -15,6 +15,3 @@ class Task(artifact.ArtifactDataManager):
     """
     def __init__(self, name):
         self.name = name
-
-    def run(self):
-        print(f'running task {self.name}')

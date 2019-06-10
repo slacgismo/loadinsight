@@ -1,4 +1,5 @@
 import logging
+from pipelines.rbsa.tasks import normalize
 from generics import pipeline as p, task as t
 
 
@@ -10,9 +11,8 @@ class RbsaPipeline(p.Pipeline):
         self.create_tasks()
 
     def create_tasks(self):
-        # these will come from other defintions
-        fake_task = t.Task('fake_task')
-        self.pipeline.add_task(fake_task)
+        multiply_task = normalize.Normalizer('multiply_task')
+        self.pipeline.add_task(multiply_task)
 
     def execute(self):
         """
