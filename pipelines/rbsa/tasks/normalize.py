@@ -12,5 +12,6 @@ class Normalizer(t.Task):
         self.task_function = self._task
 
     def _task(self):
+        logger.info(self.data)
         return 2 * 10 * 50
     
