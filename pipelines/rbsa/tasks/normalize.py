@@ -9,9 +9,12 @@ class Normalizer(t.Task):
     def __init__(self, name):
         super().__init__(self)
         self.name = name
-        self.my_data_files = ['test.csv']
+        self.my_data_files = ['local_data/test.csv', 'config/DEVICE_MAP.json']
         self.task_function = self._task
         self.df = None
+
+    def _save_data(self):
+        self.save_data(self.df)
 
     def _get_data(self):
         self.df = self.load_data(self.my_data_files)

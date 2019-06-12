@@ -127,6 +127,18 @@ class SitesGrouper(t.Task):
 
         return df_add
 
+    def validate(self):
+        """ Validation
+        """
+        # if fd
+        #     err_msg = (f'File {filename} with extension {extension} is not a supported type.'
+        #               f'Please choose a file with one the following types: {self.supported_file_types}')
+        #     logger.exception(err_msg)
+
+        # raise ValueError('u')
+        return
+
+
 
 
 
