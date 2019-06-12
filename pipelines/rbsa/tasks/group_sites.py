@@ -11,17 +11,14 @@ class SitesGrouper(t.Task):
     def __init__(self, name):
         super().__init__(self)
         self.name = name
-        self.my_data_files = ['rbsa_cleandata.csv','rbsa_zipmap.csv']
+        self.my_data_files = ['local_data/rbsa_cleandata.csv','local_data/rbsa_zipmap.csv']
         self.task_function = self._task
         self.df = None
 
     def _get_data(self):
-        # self.df = self.load_data(self.my_data_files[0])
-        # self.map = self.load_data(self.my_data_files[1])
-
-        #override
-        self.df = pd.read_csv('local_data/rbsa_cleandata.csv')
-        self.map = pd.read_csv('local_data/rbsa_zipmap.csv')
+        artifacts = self.load_data(self.my_data_files)
+        self.df = artifacts['local_data/rbsa_cleandata.csv']
+        self.map = artifacts['local_data/rbsa_zipmap.csv']
 
     def _task(self):
         self._get_data()
@@ -37,7 +34,6 @@ class SitesGrouper(t.Task):
         # keys are sites, values are zipcodes
         site_zipmap = dict(zip(self.map['siteid'], self.map['postcode']))
 
-        zip_sitemap = self.get_zipsitemapping(allsites, site_zipmap)
         zipcode5map = self.get_zip5_dict(allsites, site_zipmap)
 
         # make dictionary of dataframes for each 3 digit zip
@@ -63,16 +59,18 @@ class SitesGrouper(t.Task):
             zip_df.insert(loc=0, column='zipcode', value=zip3)
 
             if initialization:
-                output_df = zip_df
+                area_loads = zip_df
             else:
-                output_df.append(zip_df,ignore_index=False, sort=False)
+                area_loads.append(zip_df,ignore_index=False, sort=False)
 
-        output_df.to_csv('local_data/output_sitemerge.csv')
+        self.validate(area_loads)
 
-        return output_df
+        area_loads.to_csv('local_data/area_loads.csv')
+
     
     def get_zipsitemapping(self, allsites, site_zipmap):
         """creates new dict that maps 3 digit zipcodes to sites in zipcode
+        Currenly unused
         """
 
         zip_sitemap = {}
@@ -127,19 +125,12 @@ class SitesGrouper(t.Task):
 
         return df_add
 
-    def validate(self):
+    def validate(self, df):
         """ Validation
         """
-        # if fd
-        #     err_msg = (f'File {filename} with extension {extension} is not a supported type.'
-        #               f'Please choose a file with one the following types: {self.supported_file_types}')
-        #     logger.exception(err_msg)
-
-        # raise ValueError('u')
-        return
-
-
-
-
+        if df.isnull().values.any():
+            err_msg = ('Error found during grouping of sites to zip codes.')
+            logger.exception(err_msg)
+            raise ValueError(err_msg)
 
 
