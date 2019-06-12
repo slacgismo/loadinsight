@@ -79,6 +79,7 @@ class load :
         for tbl in pandas_access.list_tables(filepath):
             try:
                 df = pandas_access.read_table(filepath, tbl)
+                df.to_csv(filepath[:-4]+"-"+tbl+".csv")
             except:
                 continue
 
