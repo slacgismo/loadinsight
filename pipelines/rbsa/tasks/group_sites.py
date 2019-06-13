@@ -1,28 +1,32 @@
 import logging
-from generics import task as t
 import pandas as pd
+from generics import task as t
+
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
 class SitesGrouper(t.Task):
-    """ This class is used to group sites into 3 digit zip codes
+    """ 
+    This class is used to group sites into 3 digit zip codes
     """
     def __init__(self, name):
         super().__init__(self)
         self.name = name
-        self.my_data_files = ['local_data/rbsa_cleandata.csv','local_data/rbsa_zipmap.csv']
+        self.input_artifact_clean_data = 'rbsa_cleandata.csv'
+        self.input_artifact_zip_map = 'rbsa_zipmap.csv'
+        self.output_artifact_area_load = 'area_loads.csv'
+        self.my_data_files = [self.input_artifact_clean_data, self.input_artifact_zip_map]
         self.task_function = self._task
-        self.df = None
 
     def _get_data(self):
-        artifacts = self.load_data(self.my_data_files)
-        self.df = artifacts['local_data/rbsa_cleandata.csv']
-        self.zip_map = artifacts['local_data/rbsa_zipmap.csv']
-
+        return self.load_data(self.my_data_files)
+        
     def _task(self):
-        self._get_data()
-        logger.info(self.df)
+        data_map = self._get_data()
+        
+        self.df = data_map[self.input_artifact_clean_data]
+        self.zip_map = data_map[self.input_artifact_zip_map]
 
         # guarantee dataframe correct types
         self.zip_map.siteid = self.zip_map.siteid.astype(str)
@@ -65,12 +69,11 @@ class SitesGrouper(t.Task):
                 area_loads = area_loads.append(zip_df)
 
         self.validate(area_loads)
-
-        area_loads.to_csv('local_data/area_loads.csv')
-
+        self.save_data({self.output_artifact_area_load: area_loads})
     
     def get_zipsitemapping(self, all_sites, site_zip_map):
-        """creates new dict that maps 3 digit zipcodes to sites in zipcode
+        """
+        Creates new dict that maps 3 digit zipcodes to sites in zipcode
         Currenly unused
         """
 
@@ -88,7 +91,8 @@ class SitesGrouper(t.Task):
         return zip_sitemap
 
     def get_zip5_dict(self, all_sites, site_zip_map):
-        """maps 3 digit zipcodes to list of 5 digit zipcodes, for correlation
+        """
+        Maps 3 digit zipcodes to list of 5 digit zipcodes, for correlation
         """   
 
         zipcode_dict = {}
@@ -105,7 +109,8 @@ class SitesGrouper(t.Task):
         return zipcode_dict
 
     def add_df(self, df1, df2):
-        """This function will add cell values of two dataframes.
+        """
+        This function will add cell values of two dataframes.
         """
 
         if (df1.index.min() < df2.index.min()) & (df1.index.max() >= df2.index.max()):
@@ -127,9 +132,15 @@ class SitesGrouper(t.Task):
         return df_add
 
     def validate(self, df):
-        """ Validation
         """
+        Validation
+        """
+        logger.info(f'Validating task {self.name}')
         if df.isnull().values.any():
-            err_msg = ('Error found during grouping of sites to zip codes.')
-            logger.exception(err_msg)
-            raise ValueError(err_msg)
+            logger.exception(f'Task {self.name} did not pass validation. Error found during grouping of sites to zip codes.')
+            self.did_task_pass_validation = False
+            self.on_failure()
+
+    def on_failure(self):
+        logger.info('Perform task cleanup because we failed')
+        super().on_failure()

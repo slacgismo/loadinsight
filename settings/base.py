@@ -2,7 +2,7 @@
 DEBUG = False 
 
 # path to the local copies of the data
-LOCAL_PATH = "local/"
+LOCAL_PATH = "local_data/"
 
 # path to the remove data store
 REMOTE_PATH = "remote/"

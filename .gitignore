@@ -336,7 +336,6 @@ GitHub.sublime-settings
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
-!.vscode/launch.json
 !.vscode/extensions.json
 
 ### VisualStudioCode Patch ###
@@ -371,5 +370,5 @@ $RECYCLE.BIN/
 # ignore CSV and PNG artifacts
 *.csv
 *.png
-
+*.log.*
 # End of https://www.gitignore.io/api/macos,django,python,windows,pycharm,sublimetext,visualstudiocode
