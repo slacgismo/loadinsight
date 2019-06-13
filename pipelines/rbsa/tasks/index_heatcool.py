@@ -44,11 +44,20 @@ class HeatcoolIndexer(t.Task):
 
     def _get_data(self):
         self.df = self.load_data(self.data_files)['local_data/area_loads.csv']
+        self.weather = self.load_data(self.noaa_files)
 
     def _task(self):
         self._get_data()
         logger.info(self.df)
 
-        print(self.df.zipcode.unique())
+        zipcodes = self.df.zipcode.unique()
+
+        for zipcode in zipcodes:
+            filename = 'local_data/rbsa_weather/'+str(zipcode)+'.csv'
+            zipcode_weather = self.weather[filename]
+            print(zipcode_weather.DATE.min())
+
+
+
         return 2 * 10 * 50
     
