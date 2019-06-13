@@ -27,7 +27,7 @@ class Task(artifact.ArtifactDataManager):
 
     def get_task_run_time(self):
         try:
-            return (self.task_end_time - self.task_start_time) / 60.
+            return round((self.task_end_time - self.task_start_time) / 60, 2)
         except TypeError as e:
             logger.warning('Could not deduce task run time, returning zero')
             return 0

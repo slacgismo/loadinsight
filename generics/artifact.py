@@ -54,12 +54,27 @@ class ArtifactDataManager(object):
         
         return df
 
+    def _write_file(self, filename, df):
+        extension = self._parse_type(filename)
+        full_local_file_path = f'{base.LOCAL_PATH}/{filename}'            
+            
+        if extension == self.csv_extension:
+            df.to_csv(full_local_file_path)
+        
+        elif extension == self.json_extension:
+            df.to_json(full_local_file_path)
+        
+        elif extension in [xls_extension, xlsx_extension]:
+            df.to_excel(full_local_file_path)
+
     def load_data(self, data_files):        
         for filename in data_files:
-            logger.info(f'loading {filename}')            
+            logger.info(f'Reading {filename}')            
             self.data_map[filename] = self._read_file(filename)
 
         return self.data_map
 
-    def save_data(self, df):
-        pass
+    def save_data(self, data_map):
+        for output_filename, data_frame in data_map:
+            logger.info(f'Writing {output_filename}')
+            self._write_file(output_filename, data_frame)

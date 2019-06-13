@@ -13,9 +13,10 @@ class SitesGrouper(t.Task):
     def __init__(self, name):
         super().__init__(self)
         self.name = name
-        self.file_clean_data = 'rbsa_cleandata.csv'
-        self.file_zip_map = 'rbsa_zipmap.csv'
-        self.my_data_files = [self.file_clean_data, self.file_zip_map]
+        self.input_artifact_clean_data = 'rbsa_cleandata.csv'
+        self.input_artifact_zip_map = 'rbsa_zipmap.csv'
+        self.output_artifact_area_load = 'area_loads.csv'
+        self.my_data_files = [self.input_artifact_clean_data, self.input_artifact_zip_map]
         self.task_function = self._task
 
     def _get_data(self):
@@ -24,8 +25,8 @@ class SitesGrouper(t.Task):
     def _task(self):
         data_map = self._get_data()
         
-        self.df = data_map[self.file_clean_data]
-        self.zip_map = data_map[self.file_zip_map]
+        self.df = data_map[self.input_artifact_clean_data]
+        self.zip_map = data_map[self.input_artifact_zip_map]
 
         # guarantee dataframe correct types
         self.zip_map.siteid = self.zip_map.siteid.astype(str)
@@ -67,8 +68,8 @@ class SitesGrouper(t.Task):
                 area_loads.append(zip_df,ignore_index=False, sort=False)
 
         self.validate(area_loads)
-
-        area_loads.to_csv('local_data/area_loads.csv')
+        self.save_data({self.output_artifact_filename: area_loads})
+        #area_loads.to_csv('local_data/area_loads.csv')
 
     
     def get_zipsitemapping(self, all_sites, site_zip_map):
