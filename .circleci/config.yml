@@ -7,9 +7,12 @@ jobs:
     working_directory: ~/loadinsight
     steps:
       - checkout
+      - run:
+          name: Install build dependencies
+          command: pip install -r ci-build-requirements.txt
       - run: 
           name: Run Unit Tests
-          command: python -m unittest  
+          command: python -m unittest
           
   deploy:
     docker:
