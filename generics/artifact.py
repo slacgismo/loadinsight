@@ -75,6 +75,6 @@ class ArtifactDataManager(object):
         return self.data_map
 
     def save_data(self, data_map):
-        for output_filename, data_frame in data_map:
+        for output_filename, data_frame in data_map.items():
             logger.info(f'Writing {output_filename}')
             self._write_file(output_filename, data_frame)

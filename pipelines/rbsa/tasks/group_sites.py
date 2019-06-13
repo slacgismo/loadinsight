@@ -68,9 +68,7 @@ class SitesGrouper(t.Task):
                 area_loads.append(zip_df,ignore_index=False, sort=False)
 
         self.validate(area_loads)
-        self.save_data({self.output_artifact_filename: area_loads})
-        #area_loads.to_csv('local_data/area_loads.csv')
-
+        self.save_data({self.output_artifact_area_load: area_loads})
     
     def get_zipsitemapping(self, all_sites, site_zip_map):
         """
