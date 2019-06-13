@@ -15,15 +15,12 @@ class RbsaPipeline(p.Pipeline):
         self.create_tasks()
 
     def create_tasks(self):
-        
+
         # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
         # self.pipeline.add_task(site_grouping_task)
 
         heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
         self.pipeline.add_task(heatcool_indexing_task)
-
-        site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
-        self.pipeline.add_task(site_grouping_task)
 
     def execute(self):
         """
