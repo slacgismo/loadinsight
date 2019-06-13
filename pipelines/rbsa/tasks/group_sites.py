@@ -18,38 +18,38 @@ class SitesGrouper(t.Task):
     def _get_data(self):
         artifacts = self.load_data(self.my_data_files)
         self.df = artifacts['local_data/rbsa_cleandata.csv']
-        self.map = artifacts['local_data/rbsa_zipmap.csv']
+        self.zip_map = artifacts['local_data/rbsa_zipmap.csv']
 
     def _task(self):
         self._get_data()
         logger.info(self.df)
 
         # guarantee dataframe correct types
-        self.map.siteid = self.map.siteid.astype(str)
-        self.map.postcode = self.map.postcode.astype(str)
+        self.zip_map.siteid = self.zip_map.siteid.astype(str)
+        self.zip_map.postcode = self.zip_map.postcode.astype(str)
         self.df.siteid = self.df.siteid.astype(str)
 
-        allsites = list(self.df['siteid'].unique())
+        all_sites = list(self.df['siteid'].unique())
 
         # keys are sites, values are zipcodes
-        site_zipmap = dict(zip(self.map['siteid'], self.map['postcode']))
+        site_zip_map = dict(zip(self.zip_map['siteid'], self.zip_map['postcode']))
 
-        zipcode5map = self.get_zip5_dict(allsites, site_zipmap)
+        zipcode_dict = self.get_zip5_dict(all_sites, site_zip_map)
 
         # make dictionary of dataframes for each 3 digit zip
         zipdf_dict = {}
 
-        for site in allsites:
-            zipcode = site_zipmap[site]
-            zipcode3digit = zipcode[:3]
+        for site in all_sites:
+            zipcode = site_zip_map[site]
+            zipcode_3digit = zipcode[:3]
             site_df = self.df.loc[self.df['siteid'] == site]
             site_df = site_df.set_index('time')
             site_df = site_df.drop(['siteid'], axis=1)
 
-            if zipcode3digit in zipdf_dict.keys(): 
-                zipdf_dict[zipcode3digit] = self.add_df(zipdf_dict[zipcode3digit], site_df)
+            if zipcode_3digit in zipdf_dict.keys(): 
+                zipdf_dict[zipcode_3digit] = self.add_df(zipdf_dict[zipcode_3digit], site_df)
             else:
-                zipdf_dict[zipcode3digit] = site_df
+                zipdf_dict[zipcode_3digit] = site_df
 
         # make single dataframe out op dictionary
         initialization = True
@@ -68,58 +68,58 @@ class SitesGrouper(t.Task):
         area_loads.to_csv('local_data/area_loads.csv')
 
     
-    def get_zipsitemapping(self, allsites, site_zipmap):
+    def get_zipsitemapping(self, all_sites, site_zip_map):
         """creates new dict that maps 3 digit zipcodes to sites in zipcode
         Currenly unused
         """
 
         zip_sitemap = {}
 
-        for site in allsites:
-            zipcode = site_zipmap[site]
-            zipcode3digit = zipcode[:3]
+        for site in all_sites:
+            zipcode = site_zip_map[site]
+            zipcode_3digit = zipcode[:3]
             
-            if zipcode3digit in zip_sitemap.keys(): 
-                zip_sitemap[zipcode3digit].append(site)
+            if zipcode_3digit in zip_sitemap.keys(): 
+                zip_sitemap[zipcode_3digit].append(site)
             else:
-                zip_sitemap[zipcode3digit] = [site]
+                zip_sitemap[zipcode_3digit] = [site]
 
         return zip_sitemap
 
-    def get_zip5_dict(self, allsites, site_zipmap):
+    def get_zip5_dict(self, all_sites, site_zip_map):
         """maps 3 digit zipcodes to list of 5 digit zipcodes, for correlation
         """   
 
-        zipcode5map = {}
+        zipcode_dict = {}
 
-        for site in allsites:
-            zipcode = site_zipmap[site]
-            zipcode3digit = zipcode[:3]
+        for site in all_sites:
+            zipcode = site_zip_map[site]
+            zipcode_3digit = zipcode[:3]
             
-            if zipcode3digit in zipcode5map.keys(): 
-                zipcode5map[zipcode3digit].append(zipcode)
+            if zipcode_3digit in zipcode_dict.keys(): 
+                zipcode_dict[zipcode_3digit].append(zipcode)
             else:
-                zipcode5map[zipcode3digit] = [zipcode]
+                zipcode_dict[zipcode_3digit] = [zipcode]
 
-        return zipcode5map
+        return zipcode_dict
 
     def add_df(self, df1, df2):
         """This function will add cell values of two dataframes.
         """
 
         if (df1.index.min() < df2.index.min()) & (df1.index.max() >= df2.index.max()):
-            df2= df2.reindex_like(df1).fillna(0)
+            df2 = df2.reindex_like(df1).fillna(0)
         elif (df1.index.min() <= df2.index.min()) & (df1.index.max() > df2.index.max()):
-            df2= df2.reindex_like(df1).fillna(0)
+            df2 = df2.reindex_like(df1).fillna(0)
 
         elif (df1.index.min() > df2.index.min()) & (df1.index.max() <= df2.index.max()):
-            df1= df1.reindex_like(df2).fillna(0)
+            df1 = df1.reindex_like(df2).fillna(0)
         elif (df1.index.min() >= df2.index.min()) & (df1.index.max() < df2.index.max()):
-            df1= df1.reindex_like(df2).fillna(0)
+            df1 = df1.reindex_like(df2).fillna(0)
 
         elif (df1.index.min() != df2.index.min()) & (df1.index.max() != df2.index.max()):
-            df1= df1.reindex_like(df2).fillna(0)
-            df2= df2.reindex_like(df1).fillna(0)
+            df1 = df1.reindex_like(df2).fillna(0)
+            df2 = df2.reindex_like(df1).fillna(0)
 
         df_add = df1.fillna(0) + df2.fillna(0)
 
@@ -132,5 +132,3 @@ class SitesGrouper(t.Task):
             err_msg = ('Error found during grouping of sites to zip codes.')
             logger.exception(err_msg)
             raise ValueError(err_msg)
-
-
