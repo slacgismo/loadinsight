@@ -1,12 +1,13 @@
 import uuid
 import logging
 from generics import task as t
+from abc import ABCMeta
 
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
-class Pipeline():
+class Pipeline(object):
     """
     LCTK pipeline implementation.
     Takes in a given number of Task objects and executes their function
@@ -14,6 +15,9 @@ class Pipeline():
     atomicity of the pipeline execution and the success/failure rollback 
     protocol, to include global setup and cleanup.
     """
+
+    __metaclass__ = ABCMeta
+
     def __init__(self, name=None):
         """
         Constructor for a generic pipeline
@@ -38,13 +42,21 @@ class Pipeline():
             self.tasklist.append(entry)
         else:
             raise TypeError('LCTK does not support pipeline execution of tasks that are not an instance of <Task>')
-
+    
     def run(self, **kwargs):
         """
         Run the tasks in a pipeline
         """
-        for fn in self.tasklist:
-            fn.run()
+        for pipeline_task in self.tasklist:
+            pipeline_task.run()
+            result = pipeline_task.run_result
+
+            logger.info(f'Result of task {pipeline_task.name} is {result} and its execution time is {pipeline_task.get_task_run_time()}')
+            logger.info(f'Task finished, is it valid? {str(pipeline_task.did_task_pass_validation)}')
+
+            if not pipeline_task.did_task_pass_validation:
+                raise ValueError(f'Validation Failed for task {pipeline_task.name}')
+
         # todo: run them in dependency order, in parallel,
         #       and skip unneeded updates
         # for task in self.tasklist:
@@ -79,9 +91,6 @@ class Pipeline():
         #     if config.USE_CACHE and "data" in info.keys():
         #         del info["data"]
 
-    def set_tasks(self, tasklist=[]):
-        self.tasklist = tasklist
-
     def add_data(self, **kwargs):
         item = data(**kwargs)
         self.datalist[kwargs["name"]] = item
@@ -95,25 +104,6 @@ class Pipeline():
 
     def get_data(self,name):
         return self.datalist[name]
-
-    def run(self,**kwargs):
-        """
-        Run the tasks in a pipeline
-        """
-        for current_task in self.tasklist:
-            current_task.run()
-            result = current_task.run_result
-            logger.info(f'Result of task {current_task.name} is {result} and its execution time is {current_task.get_task_run_time()}')
-        # todo: run them in dependency order, in parallel,
-        #       and skip unneeded updates
-        # for task in self.tasklist:
-        #     if hasattr(task,"inputs"):
-        #         readall(task.inputs)
-        #     setall(task.outputs,pd.DataFrame())
-        #     task.run()
-        #     writeall(task.outputs)
-        #     if hasattr(task,"check"):
-        #         task.check()
 
     # def plot(self,**kwargs):
     #     for name,data in self.datalist.items():

@@ -20,6 +20,7 @@ class Task(artifact.ArtifactDataManager):
         self.task_function = None
         self.task_end_time = None
         self.task_start_time = None
+        self.did_task_pass_validation = True
 
     def _get_time(self):
         return time()
@@ -28,7 +29,7 @@ class Task(artifact.ArtifactDataManager):
         try:
             return (self.task_end_time - self.task_start_time) / 60.
         except TypeError as e:
-            logger.exception('Could not deduce task run time')
+            logger.warning('Could not deduce task run time, returning zero')
             return 0
 
     def run(self):
@@ -44,3 +45,5 @@ class Task(artifact.ArtifactDataManager):
         # set the end time for this run
         self.task_end_time = self._get_time()
 
+    def on_failure(self):
+        logger.info('Cleanup at the task level')
