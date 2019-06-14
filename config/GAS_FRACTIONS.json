@@ -2,6 +2,7 @@
 	"version": 1,
 	"application": "loadinsight",
 	"name": "GAS_FRACTIONS",
+	"info": "electric/total ratio",
 	"electrification" : {
 		"SEC" : { 
 			"Heating": 0.69, 
@@ -48,6 +49,21 @@
 			"WaterHeating": 0.35,
 			"Cooking": 0.58
 		},
+		"NWI" : { 
+			"Heating": 0.27, 
+			"WaterHeating": 0.26,
+			"Cooking": 0.80
+		},
+		"RMN" : { 
+			"Heating": 0.27, 
+			"WaterHeating": 0.26,
+			"Cooking": 0.80
+		},
+		"NCV" : { 
+			"Heating": 0.27, 
+			"WaterHeating": 0.26,
+			"Cooking": 0.80
+		},
 		"SCC" : { 
 			"Heating": 0.48, 
 			"WaterHeating": 0.35,
@@ -63,12 +79,12 @@
 			"WaterHeating": 0.50,
 			"Cooking": 0.78
 		},
-		"MRN" : { 
+		"MRS" : { 
 			"Heating": 0.38, 
 			"WaterHeating": 0.40,
 			"Cooking": 0.82
 		},
-		"MRS" : { 
+		"MRN" : { 
 			"Heating": 0.38, 
 			"WaterHeating": 0.40,
 			"Cooking": 0.82
@@ -78,12 +94,12 @@
 			"WaterHeating": 0.36,
 			"Cooking": 0.53
 		},
-		"RFW" : { 
+		"NPN" : { 
 			"Heating": 0.33, 
 			"WaterHeating": 0.35,
 			"Cooking": 0.59
 		},
-		"NPN" : { 
+		"RFW" : { 
 			"Heating": 0.33, 
 			"WaterHeating": 0.35,
 			"Cooking": 0.59
@@ -92,21 +108,6 @@
 			"Heating": 0.33, 
 			"WaterHeating": 0.35,
 			"Cooking": 0.59
-		},
-		"NWI" : { 
-			"Heating": 0.27, 
-			"WaterHeating": 0.26,
-			"Cooking": 0.80
-		},
-		"NCV" : { 
-			"Heating": 0.27, 
-			"WaterHeating": 0.26,
-			"Cooking": 0.80
-		},
-		"RMN" : { 
-			"Heating": 0.27, 
-			"WaterHeating": 0.26,
-			"Cooking": 0.80
 		}
 	}
 }
