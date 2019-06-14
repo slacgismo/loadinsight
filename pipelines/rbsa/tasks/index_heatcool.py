@@ -152,7 +152,7 @@ class HeatcoolIndexer(t.Task):
 
 
     def ventCol(self, row):
-        """Function used for seperating cool from heatcool
+        """Function used for seperating vent from heatcool
         """
 
         if row['Indexer'] == "Ventilation":
