@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
 from generics import task as t
+from generics.file_type_enum import SupportedFileReadType
 
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
@@ -13,11 +14,14 @@ class SitesGrouper(t.Task):
     def __init__(self, name):
         super().__init__(self)
         self.name = name
-        self.input_artifact_clean_data = 'rbsa_cleandata.csv'
+        self.task_function = self._task
         self.input_artifact_zip_map = 'rbsa_zipmap.csv'
         self.output_artifact_area_load = 'area_loads.csv'
-        self.my_data_files = [self.input_artifact_clean_data, self.input_artifact_zip_map]
-        self.task_function = self._task
+        self.input_artifact_clean_data = 'rbsa_cleandata.csv'
+        self.my_data_files = [
+            { 'name': self.input_artifact_clean_data, 'read_type': SupportedFileReadType.DATA }, 
+            { 'name': self.input_artifact_zip_map, 'read_type': SupportedFileReadType.DATA }
+        ]
 
     def _get_data(self):
         return self.load_data(self.my_data_files)
@@ -115,11 +119,13 @@ class SitesGrouper(t.Task):
 
         if (df1.index.min() < df2.index.min()) & (df1.index.max() >= df2.index.max()):
             df2 = df2.reindex_like(df1).fillna(0)
+        
         elif (df1.index.min() <= df2.index.min()) & (df1.index.max() > df2.index.max()):
             df2 = df2.reindex_like(df1).fillna(0)
 
         elif (df1.index.min() > df2.index.min()) & (df1.index.max() <= df2.index.max()):
             df1 = df1.reindex_like(df2).fillna(0)
+        
         elif (df1.index.min() >= df2.index.min()) & (df1.index.max() < df2.index.max()):
             df1 = df1.reindex_like(df2).fillna(0)
 

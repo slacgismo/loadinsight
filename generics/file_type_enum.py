@@ -4,9 +4,10 @@ class SupportedFileType(Enum):
     """
     Supported files the LoadInsight system will attempt to read.
     """
-    CSV = 1
-    JSON = 2
-    EXCEL = 3
+    CSV = '.csv'
+    XLS = '.xls'
+    XLSX = '.xlsx'
+    JSON = '.json'
 
 class SupportedFileReadType(Enum):
     """

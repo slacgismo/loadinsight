@@ -1,7 +1,8 @@
+import json
 import logging
 import pandas as pd
 from generics import task as t
-import json
+from generics.file_type_enum import SupportedFileReadType
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
@@ -16,10 +17,13 @@ class UndiscountGas(t.Task):
         self.input_artifact_enduse_loads = 'enduse_loads.csv'
         self.input_artifact_gas_fraction = 'GAS_FRACTIONS.json'
         self.input_artifact_zip_zone_map = 'ZIP_ZONE_MAP.json'
-        self.my_data_files = [self.input_artifact_enduse_loads] 
+        self.my_data_files = [
+            { 'name': self.input_artifact_enduse_loads, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_gas_fraction, 'read_type': SupportedFileReadType.CONFIG },
+            { 'name': self.input_artifact_gas_fraction, 'read_type': SupportedFileReadType.CONFIG },
+        ] 
 
         self.output_artifact_total_loads = 'total_loads.csv'
-        
         self.task_function = self._task
 
     def _get_data(self):
@@ -29,12 +33,8 @@ class UndiscountGas(t.Task):
         data_map = self._get_data()
 
         self.df = data_map[self.input_artifact_enduse_loads]
-
-        # TODO replace with json reader
-        with open('config/GAS_FRACTIONS.json') as json_file:  
-            self.gas_fraction = json.load(json_file) 
-        with open('config/ZIP_ZONE_MAP.json') as json_file:  
-            self.zip_zone_map = json.load(json_file) 
+        self.gas_fraction = data_map[self.input_artifact_gas_fraction]
+        self.zip_zone_map = data_map[self.input_artifact_zip_zone_map]
 
         # output dataframe initialization
         initialization = True
