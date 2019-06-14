@@ -40,6 +40,10 @@ class HeatcoolIndexer(t.Task):
         self.task_function = self._task
         self.df = None
 
+        # these should be read from config, they are different for RBSA and CEUS
+        self.theat = 15
+        self.tcool = 25
+
     def _save_data(self):
         self.save_data(self.df)
 
@@ -51,9 +55,8 @@ class HeatcoolIndexer(t.Task):
         self._get_data()
         logger.info(self.df)
 
+        print(self.df.columns)
         zipcodes = self.df.zipcode.unique()
-
-        print(self.df.head(10))
 
         for zipcode in zipcodes:
             print(zipcode)
@@ -68,7 +71,73 @@ class HeatcoolIndexer(t.Task):
                 self.did_task_pass_validation = False
                 self.on_failure()
 
-            
+            print('df', zipcode_df.shape)
+            print('weather1', zipcode_weather.shape)
+
+            start = zipcode_df.time.min()
+            end = zipcode_df.time.max()
+
+            zipcode_weather = zipcode_weather.loc[(zipcode_weather.DATE >= start) & (zipcode_weather.DATE <= end)]
+
+            print('weather2', zipcode_weather.shape)
+
+            load_df = pd.DataFrame(columns=['HeatCool','Temperature','Indexer','Heating','Cooling','Ventilation'])
+
+            load_df['HeatCool'] = zipcode_df['HeatCool']
+            load_df['Temperature'] = zipcode_weather['Temperature']
+            load_df['Indexer'] = zipcode_weather.apply(self.temp_dir, axis=1)
+            load_df['Heating'] = load_df.apply(self.heatCol, axis=1)
+            load_df['Cooling'] = load_df.apply(self.coolCol, axis=1)
+            load_df['Ventilation'] = load_df.apply(self.ventCol, axis=1)
+
+            print('load', load_df.shape)
+
+            print(load_df)
+
+    def temp_dir(self, row):
+        """Function used for seperating heatcool
+        """
+
+        if row['Temperature'] < self.theat:
+            val = "Heating"
+        elif row['Temperature'] > self.tcool:
+            val = "Cooling"
+        else:
+            val = "Ventilation"
+        return val         
+
+
+    def heatCol(self, row):
+        """Function used for seperating heat from heatcool
+        """
+
+        if row['Indexer'] == "Heating":
+            val = row['HeatCool']
+        else:
+            val = 0
+        return val  
+
+
+    def coolCol(self, row):
+        """Function used for seperating cool from heatcool
+        """
+
+        if row['Indexer'] == "Cooling":
+            val = row['HeatCool']
+        else:
+            val = 0
+        return val  
+
+
+    def ventCol(self, row):
+        """Function used for seperating cool from heatcool
+        """
+
+        if row['Indexer'] == "Ventilation":
+            val = row['HeatCool']
+        else:
+            val = 0
+        return val  
 
 
     def validate(self, df):
