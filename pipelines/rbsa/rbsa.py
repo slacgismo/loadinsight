@@ -15,8 +15,8 @@ class RbsaPipeline(p.Pipeline):
         self.create_tasks()
 
     def create_tasks(self):
-        # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
-        # self.pipeline.add_task(site_grouping_task)
+        site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
+        self.pipeline.add_task(site_grouping_task)
 
         undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
         self.pipeline.add_task(undiscount_gas_task)
