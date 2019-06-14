@@ -49,12 +49,22 @@
 			"WaterHeating": 0.39,
 			"Cooking": 0.70
 		},
-		"MRO" : { 
+		"MRS" : { 
 			"Heating": 0.38, 
 			"WaterHeating": 0.40,
 			"Cooking": 0.82
 		},
-		"TEXASRE" : { 
+		"MRN" : { 
+			"Heating": 0.38, 
+			"WaterHeating": 0.40,
+			"Cooking": 0.82
+		},
+		"TXI" : { 
+			"Heating": 0.62, 
+			"WaterHeating": 0.57,
+			"Cooking": 0.80
+		},
+		"TXG" : { 
 			"Heating": 0.62, 
 			"WaterHeating": 0.57,
 			"Cooking": 0.80
@@ -89,7 +99,7 @@
 			"WaterHeating": 0.74,
 			"Cooking": 0.87
 		},
-		"FRCC" : { 
+		"FRC" : { 
 			"Heating": 0.69, 
 			"WaterHeating": 0.74,
 			"Cooking": 0.87
