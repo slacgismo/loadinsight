@@ -2,6 +2,7 @@ import os
 import logging
 import pandas as pd
 from settings import base
+from file_type_enum import SupportedFileType, SupportedFileReadType
 
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
@@ -68,8 +69,8 @@ class ArtifactDataManager(object):
             df.to_excel(full_local_file_path)
 
     def load_data(self, data_files):        
-        for filename in data_files:
-            logger.info(f'Reading {filename}')            
+        for filename, file_type in data_files.items():
+            logger.info(f'Reading {filename}')
             self.data_map[filename] = self._read_file(filename)
 
         return self.data_map
