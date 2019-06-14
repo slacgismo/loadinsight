@@ -20,7 +20,7 @@ class UndiscountGas(t.Task):
         self.my_data_files = [
             { 'name': self.input_artifact_enduse_loads, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_gas_fraction, 'read_type': SupportedFileReadType.CONFIG },
-            { 'name': self.input_artifact_gas_fraction, 'read_type': SupportedFileReadType.CONFIG },
+            { 'name': self.input_artifact_zip_zone_map, 'read_type': SupportedFileReadType.CONFIG },
         ] 
 
         self.output_artifact_total_loads = 'total_loads.csv'

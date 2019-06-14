@@ -36,7 +36,7 @@ class ArtifactDataManager(object):
         if extension != SupportedFileType.JSON.value:
             raise ValueError('We currently do not support configurations files that are not .json')
 
-        with open(filename) as json_file:  
+        with open(f'{base.CONFIG_PATH}/{filename}') as json_file:  
             config_data = json.load(json_file)
             return config_data
 
@@ -63,7 +63,7 @@ class ArtifactDataManager(object):
 
     def _write_file(self, filename, df):
         extension = self._parse_extension(filename)
-        full_local_file_path = f'{base.LOCAL_PATH}/{filename}'            
+        full_local_file_path = f'{base.LOCAL_PATH}/{filename}'
             
         if extension == SupportedFileType.CSV.value:
             df.to_csv(full_local_file_path)
@@ -76,7 +76,7 @@ class ArtifactDataManager(object):
 
     def load_data(self, data_files):
         data_dict = {}
-        
+
         for entry in data_files:
             filename = entry['name']
             file_read_type = entry['read_type']
