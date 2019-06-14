@@ -108,4 +108,4 @@ if __name__ == '__main__':
         execute_lctk(sys.argv[1:])
     except Exception as exc:
         logging.exception(exc)
-        #error_reporter.captureException()
+        sys.exit(exc)

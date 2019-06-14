@@ -1,5 +1,5 @@
 import logging
-from pipelines.rbsa.tasks import normalize, group_sites, normalize_totals
+from pipelines.rbsa.tasks import normalize, group_sites, undiscount_gas, index_heatcool, normalize_totals
 from generics import pipeline as p, task as t
 
 
@@ -15,8 +15,16 @@ class RbsaPipeline(p.Pipeline):
         self.create_tasks()
 
     def create_tasks(self):
-        # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
-        # self.pipeline.add_task(site_grouping_task)
+
+        site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
+        self.pipeline.add_task(site_grouping_task)
+
+        heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
+        self.pipeline.add_task(heatcool_indexing_task)
+
+        undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
+        self.pipeline.add_task(undiscount_gas_task)
+
         normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
         self.pipeline.add_task(normalize_totals_task)
 

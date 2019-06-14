@@ -64,8 +64,9 @@ class SitesGrouper(t.Task):
 
             if initialization:
                 area_loads = zip_df
+                initialization = False
             else:
-                area_loads.append(zip_df,ignore_index=False, sort=False)
+                area_loads = area_loads.append(zip_df)
 
         self.validate(area_loads)
         self.save_data({self.output_artifact_area_load: area_loads})
