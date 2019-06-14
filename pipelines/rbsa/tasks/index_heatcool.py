@@ -38,6 +38,7 @@ class HeatcoolIndexer(t.Task):
                             ]
         self.data_files = ['area_loads.csv']
         self.task_function = self._task
+        self.output_artifact_enduse_loads = 'enduse_loads.csv'
         self.df = None
 
         # these should be read from config, they are different for RBSA and CEUS
@@ -55,12 +56,15 @@ class HeatcoolIndexer(t.Task):
         self._get_data()
         logger.info(self.df)
 
-        print(self.df.columns)
+        # output dataframe initialization
+        initialization = True
+
         zipcodes = self.df.zipcode.unique()
 
         for zipcode in zipcodes:
-            print(zipcode)
+
             zipcode_df = self.df.loc[self.df.zipcode == zipcode]
+            zipcode_df = zipcode_df.reset_index()
             
             filename = 'rbsa_noaa/'+str(zipcode)+'.csv'
             zipcode_weather = self.weather[filename]
@@ -71,18 +75,15 @@ class HeatcoolIndexer(t.Task):
                 self.did_task_pass_validation = False
                 self.on_failure()
 
-            print('df', zipcode_df.shape)
-            print('weather1', zipcode_weather.shape)
-
+            # make start and end dates of weather data match load
             start = zipcode_df.time.min()
             end = zipcode_df.time.max()
 
             zipcode_weather = zipcode_weather.loc[(zipcode_weather.DATE >= start) & (zipcode_weather.DATE <= end)]
 
-            print('weather2', zipcode_weather.shape)
-
             load_df = pd.DataFrame(columns=['HeatCool','Temperature','Indexer','Heating','Cooling','Ventilation'])
 
+            # apply indexing
             load_df['HeatCool'] = zipcode_df['HeatCool']
             load_df['Temperature'] = zipcode_weather['Temperature']
             load_df['Indexer'] = zipcode_weather.apply(self.temp_dir, axis=1)
@@ -90,9 +91,30 @@ class HeatcoolIndexer(t.Task):
             load_df['Cooling'] = load_df.apply(self.coolCol, axis=1)
             load_df['Ventilation'] = load_df.apply(self.ventCol, axis=1)
 
-            print('load', load_df.shape)
+            self.validate(load_df)
 
-            print(load_df)
+            enduses_updated = ['Heating','Cooling','Ventilation']
+
+            # zipcode_df['Ventilation'] = 0 # no ventilation coming in
+
+            # apply changes
+            for enduse in enduses_updated:
+                zipcode_df[enduse] = zipcode_df[enduse] + load_df[enduse]
+
+            # output dataframe 
+            if initialization:
+                enduse_loads = zipcode_df
+                initialization = False
+            else:
+                enduse_loads = enduse_loads.append(zipcode_df)
+
+        enduse_loads = enduse_loads.drop('HeatCool', axis=1)
+        enduse_loads = enduse_loads.set_index('time')
+        enduse_loads = enduse_loads.drop('index', axis=1)
+
+        self.validate(enduse_loads)
+        self.save_data({self.output_artifact_enduse_loads: enduse_loads})
+
 
     def temp_dir(self, row):
         """Function used for seperating heatcool
