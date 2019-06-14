@@ -35,11 +35,18 @@ class NormalizeTotals(t.Task):
 
             zipcode_df = self.df.loc[self.df.zipcode == zipcode]
 
+            if zipcode_df.columns[0] == 'Unnamed: 0':
+                zipcode_df = zipcode_df.drop('Unnamed: 0', axis=1)
+
+            self.enduse_cols = list(zipcode_df.columns)
+            self.enduse_cols.remove('time')
+            self.enduse_cols.remove('zipcode')
+
             # get enduse columns
-            print(zipcode_df.columns)
+            normalization_val = self.get_normalization_val(zipcode_df)
 
             # Normalize by peak total
-            zipcode_df = zipcode_df/electric_percentage[enduse]
+            zipcode_df[self.enduse_cols] = zipcode_df[self.enduse_cols]/normalization_val
         
             # output dataframe 
             if initialization:
@@ -49,19 +56,40 @@ class NormalizeTotals(t.Task):
                 normal_loads = normal_loads.append(zipcode_df)
 
         self.validate(normal_loads)
-        self.save_data({self.output_artifact_total_loads: normal_loads})
+        self.save_data({self.output_artifact_normal_loads: normal_loads})
 
+
+    def get_normalization_val(self, zipcode_df):
+        """
+        returns peak total
+        """        
+
+        totals = zipcode_df[self.enduse_cols].sum(axis=1)
+        totals.index = zipcode_df['time']
+        normalization_val = totals.max() # can be adjusted if normalizing for summer peak
+
+        # can check here for totals.idxmax() month to confirm summer/winter
+
+        return normalization_val
 
     def validate(self, df):
         """
         Validation
         """
         logger.info(f'Validating task {self.name}')
+
         if df.isnull().values.any():
             logger.exception(f'Task {self.name} did not pass validation. Error found during grouping of sites to zip codes.')
             self.did_task_pass_validation = False
             self.on_failure()
 
+        totals = df[self.enduse_cols].sum(axis=1)
+
+        if totals.max() > 1:
+            logger.exception(f'Task {self.name} did not pass validation. Error found during grouping of sites to zip codes.')
+            self.did_task_pass_validation = False
+            self.on_failure()
+            
     def on_failure(self):
         logger.info('Perform task cleanup because we failed')
         super().on_failure()
