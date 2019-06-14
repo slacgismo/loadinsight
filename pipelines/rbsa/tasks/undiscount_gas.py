@@ -44,7 +44,6 @@ class UndiscountGas(t.Task):
         for zipcode in zipcodes:
 
             zipcode_df = self.df.loc[self.df.zipcode == zipcode]
-            zipcode_df = zipcode_df.reset_index()
 
             zone = self.zip_zone_map['mapping'][str(zipcode)]
             electric_percentage = self.gas_fraction['electrification'][zone]   
