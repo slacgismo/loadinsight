@@ -87,9 +87,9 @@ class HeatcoolIndexer(t.Task):
             load_df['HeatCool'] = zipcode_df['HeatCool']
             load_df['Temperature'] = zipcode_weather['Temperature']
             load_df['Indexer'] = zipcode_weather.apply(self.temp_dir, axis=1)
-            load_df['Heating'] = load_df.apply(self.heatCol, axis=1)
-            load_df['Cooling'] = load_df.apply(self.coolCol, axis=1)
-            load_df['Ventilation'] = load_df.apply(self.ventCol, axis=1)
+            load_df['Heating'] = load_df.apply(self.heat_method, axis=1)
+            load_df['Cooling'] = load_df.apply(self.cool_method, axis=1)
+            load_df['Ventilation'] = load_df.apply(self.vent_method, axis=1)
 
             self.validate(load_df)
 
@@ -129,7 +129,7 @@ class HeatcoolIndexer(t.Task):
         return val         
 
 
-    def heatCol(self, row):
+    def heat_method(self, row):
         """Function used for seperating heat from heatcool
         """
 
@@ -140,7 +140,7 @@ class HeatcoolIndexer(t.Task):
         return val  
 
 
-    def coolCol(self, row):
+    def cool_method(self, row):
         """Function used for seperating cool from heatcool
         """
 
@@ -151,7 +151,7 @@ class HeatcoolIndexer(t.Task):
         return val  
 
 
-    def ventCol(self, row):
+    def vent_method(self, row):
         """Function used for seperating vent from heatcool
         """
 
