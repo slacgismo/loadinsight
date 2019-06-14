@@ -33,7 +33,6 @@ class UndiscountGas(t.Task):
         # TODO replace with json reader
         with open('config/GAS_FRACTIONS.json') as json_file:  
             self.gas_fraction = json.load(json_file) 
-
         with open('config/ZIP_ZONE_MAP.json') as json_file:  
             self.zip_zone_map = json.load(json_file) 
 
@@ -44,21 +43,25 @@ class UndiscountGas(t.Task):
 
         for zipcode in zipcodes:
 
-            print(zipcode)
-
             zipcode_df = self.df.loc[self.df.zipcode == zipcode]
             zipcode_df = zipcode_df.reset_index()
 
             zone = self.zip_zone_map['mapping'][str(zipcode)]
-            electric_percentage = self.gas_fraction['electrification'][zone]
+            electric_percentage = self.gas_fraction['electrification'][zone]   
 
-            print(electric_percentage)
-
-
+            # add gas fraction
+            for enduse in electric_percentage.keys():
+                zipcode_df[enduse] = zipcode_df[enduse]/electric_percentage[enduse]
         
+            # output dataframe 
+            if initialization:
+                total_loads = zipcode_df
+                initialization = False
+            else:
+                total_loads = total_loads.append(zipcode_df)
 
-        # self.validate(total_loads)
-        # self.save_data({self.output_artifact_total_loads: total_loads})
+        self.validate(total_loads)
+        self.save_data({self.output_artifact_total_loads: total_loads})
 
     def validate(self, df):
         """
