@@ -91,6 +91,8 @@ class HeatcoolIndexer(t.Task):
             load_df['Cooling'] = load_df.apply(self.cool_method, axis=1)
             load_df['Ventilation'] = load_df.apply(self.vent_method, axis=1)
 
+            load_df = load_df.fillna(0)
+
             self.validate(load_df)
 
             enduses_updated = ['Heating','Cooling','Ventilation']

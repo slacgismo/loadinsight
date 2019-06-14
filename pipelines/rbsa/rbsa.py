@@ -1,5 +1,5 @@
 import logging
-from pipelines.rbsa.tasks import normalize, group_sites, index_heatcool
+from pipelines.rbsa.tasks import normalize, group_sites, undiscount_gas, index_heatcool
 from generics import pipeline as p, task as t
 
 
@@ -21,6 +21,9 @@ class RbsaPipeline(p.Pipeline):
 
         heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
         self.pipeline.add_task(heatcool_indexing_task)
+
+        undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
+        self.pipeline.add_task(undiscount_gas_task)
 
     def execute(self):
         """
