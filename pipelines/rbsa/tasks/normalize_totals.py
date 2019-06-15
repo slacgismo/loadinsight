@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
 from generics import task as t
+from generics.file_type_enum import SupportedFileReadType
 
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
@@ -15,7 +16,7 @@ class NormalizeTotals(t.Task):
         self.name = name
         self.input_artifact_total_loads = 'total_loads.csv'
         self.output_artifact_normal_loads = 'normal_loads.csv'
-        self.my_data_files = [self.input_artifact_total_loads]
+        self.my_data_files = [{ 'name': self.input_artifact_total_loads, 'read_type': SupportedFileReadType.DATA }]
         self.task_function = self._task
 
     def _get_data(self):
@@ -47,13 +48,15 @@ class NormalizeTotals(t.Task):
 
             # Normalize by peak total
             zipcode_df[self.enduse_cols] = zipcode_df[self.enduse_cols]/normalization_val
-        
+
             # output dataframe 
             if initialization:
                 normal_loads = zipcode_df
                 initialization = False
             else:
                 normal_loads = normal_loads.append(zipcode_df)
+
+        print(normal_loads[self.enduse_cols].sum(axis=1).max())
 
         self.validate(normal_loads)
         self.save_data({self.output_artifact_normal_loads: normal_loads})
@@ -85,7 +88,7 @@ class NormalizeTotals(t.Task):
 
         totals = df[self.enduse_cols].sum(axis=1)
 
-        if totals.max() > 1:
+        if round(totals.max(),3) > 1:
             logger.exception(f'Task {self.name} did not pass validation. Error found during grouping of sites to zip codes.')
             self.did_task_pass_validation = False
             self.on_failure()
