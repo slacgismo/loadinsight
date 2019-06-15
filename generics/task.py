@@ -40,7 +40,7 @@ class Task(artifact.ArtifactDataManager):
         if self.task_function:
             self.run_result = self.task_function()
         else:
-            raise TypeError(f'Task {self.name} does not implement a function that this pipeline can execute')
+            raise TypeError(f'{self.name} does not implement a function that this <Task> can execute')
 
         # set the end time for this run
         self.task_end_time = self._get_time()

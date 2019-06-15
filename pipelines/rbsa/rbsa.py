@@ -1,18 +1,27 @@
 import logging
-from pipelines.rbsa.tasks import group_sites, undiscount_gas, index_heatcool, normalize_totals
 from generics import pipeline as p, task as t
+
+from pipelines.rbsa.tasks import (
+    group_sites, 
+    undiscount_gas, 
+    index_heatcool, 
+    normalize_totals
+)
 
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
 class RbsaPipeline(p.Pipeline):
-    def __init__(self):
+    def __init__(self, pipeline_configuration=None):
         self.name = 'lctk_rbsa_pipeline'
         self.pipeline = p.Pipeline(self.name)
         
-        # FIXME: we can likely pull this from a config...
-        self.create_tasks()
+        if pipeline_configuration:
+            # TODO: establish a configuration scheme for this to run dynamically
+            pass
+        else:
+            self.create_tasks()
 
     def create_tasks(self):
         site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
