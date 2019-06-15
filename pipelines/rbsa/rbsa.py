@@ -12,7 +12,7 @@ from pipelines.rbsa.tasks import (
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
-class RbsaPipeline(p.Pipeline):
+class RbsaPipeline():
     def __init__(self, pipeline_configuration=None):
         self.name = 'lctk_rbsa_pipeline'
         self.pipeline = p.Pipeline(self.name)
@@ -42,6 +42,7 @@ class RbsaPipeline(p.Pipeline):
         """
         try:
             self.pipeline.run()
+            logger.info(self.pipeline.result_map)
         except ValueError as ve:
             logger.exception(f'{self.name} failed its pipeline execution. Cleaning up and exiting')
             self.on_failure()

@@ -60,7 +60,7 @@ class UndiscountGas(t.Task):
                 total_loads = total_loads.append(zipcode_df)
 
         self.validate(total_loads)
-        self.save_data({self.output_artifact_total_loads: total_loads})
+        self.on_complete({self.output_artifact_total_loads: total_loads})
 
     def validate(self, df):
         """

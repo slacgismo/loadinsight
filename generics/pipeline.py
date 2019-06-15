@@ -1,7 +1,6 @@
 import uuid
 import logging
 from generics import task as t
-from abc import ABCMeta
 
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
@@ -15,9 +14,6 @@ class Pipeline(object):
     atomicity of the pipeline execution and the success/failure rollback 
     protocol, to include global setup and cleanup.
     """
-
-    __metaclass__ = ABCMeta
-
     def __init__(self, name=None):
         """
         Constructor for a generic pipeline
@@ -29,8 +25,8 @@ class Pipeline(object):
         else:
             # we currently don't mitigate name conflicts 
             self.name = name 
-        self.tasklist = []
-        self.datalist = {}
+        self.tasks = []
+        self.result_map = {}
         # global cachename
         # cachename = name + "/"
 
@@ -39,15 +35,15 @@ class Pipeline(object):
         Add a task to the pipeline
         """
         if isinstance(entry, t.Task):
-            self.tasklist.append(entry)
+            self.tasks.append(entry)
         else:
-            raise TypeError('LCTK does not support pipeline execution of tasks that are not an instance of <Task>')
+            raise TypeError('LoadInsight does not support pipeline execution of tasks that are not an instance of <Task>')
     
     def run(self, **kwargs):
         """
         Run the tasks in a pipeline
         """
-        for pipeline_task in self.tasklist:
+        for pipeline_task in self.tasks:
             pipeline_task.run()
             result = pipeline_task.run_result
 
@@ -56,10 +52,11 @@ class Pipeline(object):
 
             if not pipeline_task.did_task_pass_validation:
                 raise ValueError(f'Validation Failed for task {pipeline_task.name}')
-
+            
+            self.result_map[pipeline_task.name] = pipeline_task.task_results
         # todo: run them in dependency order, in parallel,
         #       and skip unneeded updates
-        # for task in self.tasklist:
+        # for task in self.tasks:
         #     if hasattr(task,"inputs"):
         #         readall(task.inputs)
         #     setall(task.outputs,pd.DataFrame())

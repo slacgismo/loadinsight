@@ -57,7 +57,7 @@ class NormalizeTotals(t.Task):
                 normal_loads = normal_loads.append(zipcode_df)
 
         self.validate(normal_loads)
-        self.save_data({self.output_artifact_normal_loads: normal_loads})
+        self.on_complete({self.output_artifact_normal_loads: normal_loads})
 
     def get_normalization_val(self, zipcode_df):
         """

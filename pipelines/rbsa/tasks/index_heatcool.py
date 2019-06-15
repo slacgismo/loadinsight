@@ -120,7 +120,7 @@ class HeatcoolIndexer(t.Task):
         enduse_loads = enduse_loads.drop('index', axis=1)
 
         self.validate(enduse_loads)
-        self.save_data({self.output_artifact_enduse_loads: enduse_loads})
+        self.on_complete({self.output_artifact_enduse_loads: enduse_loads})
 
     def temp_dir(self, row):
         """

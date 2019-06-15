@@ -21,6 +21,7 @@ class Task(artifact.ArtifactDataManager):
         self.task_end_time = None
         self.task_start_time = None
         self.did_task_pass_validation = True
+        self.task_results = None
 
     def _get_time(self):
         return time()
@@ -44,6 +45,58 @@ class Task(artifact.ArtifactDataManager):
 
         # set the end time for this run
         self.task_end_time = self._get_time()
+
+    def on_complete(self, data_map):
+        """
+        Given a dictionary of filenames and dataframes, we'll generate hashes for these entities
+        Perform a conflict resolution and save the output when necessary
+        input:
+            { filename: df, filename_2: df_2, ... }
+        output:
+            [{
+                'output_artifact': filename,
+                'output_data_hash': df,
+            }]
+        """
+        results = []
+        for output_filename, data_frame in data_map.items():
+            new_filename = None
+            new_file_contents_hex_digest = None
+            existing_file_contents_hex_digest = None
+            # get the hash of the pandas data frame
+            df_hex_digest = self.get_data_frame_hash(data_frame)
+            
+            logger.info(f'Existing df hash {df_hex_digest}')
+            
+            # determine if the file we want to write already exists and if so, compare hashes with the
+            # file we're about to write. We can't assume data hashes will match for the same data frame
+            # when it gets loaded from a file...
+            if self.does_file_exist(output_filename):
+                logger.info(f'Checking hash of file that already exists {output_filename}')
+                existing_file_contents_hex_digest = self.check_file_contents_hash(output_filename)
+                # ...therefore we'll temporarily write a file based on the data hash
+                # and determine its file content's hash
+                new_filename = f'{output_filename}__{df_hex_digest}__.csv'
+                self.save_data(new_filename, data_frame)
+                new_file_contents_hex_digest = self.check_file_contents_hash(new_filename)
+
+                if new_file_contents_hex_digest == existing_file_contents_hex_digest:
+                    logger.info('The hashes matched, deleting file...')
+                    # since they are the same, we don't do anything, just cleanup
+                    self.delete_file(new_filename)
+                    new_filename = None
+                    new_file_contents_hex_digest = None
+            else:
+                self.save_data(output_filename, data_frame)
+
+            results.append({
+                'output_filename': output_filename,
+                'data_frame_hash': df_hex_digest,
+                'existing_file_hash': existing_file_contents_hex_digest,
+                'new_filename': new_filename,
+                'new_file_hash': new_file_contents_hex_digest
+            })
+        self.task_results = results
 
     def on_failure(self):
         logger.info('Cleanup at the task level')
