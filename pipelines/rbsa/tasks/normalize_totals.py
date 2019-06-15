@@ -56,11 +56,8 @@ class NormalizeTotals(t.Task):
             else:
                 normal_loads = normal_loads.append(zipcode_df)
 
-        print(normal_loads[self.enduse_cols].sum(axis=1).max())
-
         self.validate(normal_loads)
         self.save_data({self.output_artifact_normal_loads: normal_loads})
-
 
     def get_normalization_val(self, zipcode_df):
         """
@@ -82,14 +79,14 @@ class NormalizeTotals(t.Task):
         logger.info(f'Validating task {self.name}')
 
         if df.isnull().values.any():
-            logger.exception(f'Task {self.name} did not pass validation. Error found during grouping of sites to zip codes.')
+            logger.exception(f'Task {self.name} did not pass validation. DataFrame contains null values when it should not.')
             self.did_task_pass_validation = False
             self.on_failure()
 
         totals = df[self.enduse_cols].sum(axis=1)
 
-        if round(totals.max(),3) > 1:
-            logger.exception(f'Task {self.name} did not pass validation. Error found during grouping of sites to zip codes.')
+        if round(totals.max(), 3) > 1:
+            logger.exception(f'Task {self.name} did not pass validation. Peak total greater than 1.')
             self.did_task_pass_validation = False
             self.on_failure()
             
