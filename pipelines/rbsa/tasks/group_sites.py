@@ -18,6 +18,7 @@ class SitesGrouper(t.Task):
         self.input_artifact_zip_map = 'rbsa_zipmap.csv'
         self.output_artifact_area_load = 'area_loads.csv'
         self.input_artifact_clean_data = 'rbsa_cleandata.csv'
+        self.output_artifact_full_zipcodes = 'full_zipcodes.csv'
         self.my_data_files = [
             { 'name': self.input_artifact_clean_data, 'read_type': SupportedFileReadType.DATA }, 
             { 'name': self.input_artifact_zip_map, 'read_type': SupportedFileReadType.DATA }
@@ -42,14 +43,16 @@ class SitesGrouper(t.Task):
         # keys are sites, values are zipcodes
         site_zip_map = dict(zip(self.zip_map['siteid'], self.zip_map['postcode']))
 
-        zipcode_dict = self.get_zip5_dict(all_sites, site_zip_map)
-
         # make dictionary of dataframes for each 3 digit zip
         zipdf_dict = {}
+
+        full_zipcodes = set()
 
         for site in all_sites:
             zipcode = site_zip_map[site]
             zipcode_3digit = zipcode[:3]
+            full_zipcodes.add(site)
+
             site_df = self.df.loc[self.df['siteid'] == site]
             site_df = site_df.set_index('time')
             site_df = site_df.drop(['siteid'], axis=1)
@@ -58,6 +61,8 @@ class SitesGrouper(t.Task):
                 zipdf_dict[zipcode_3digit] = self.add_df(zipdf_dict[zipcode_3digit], site_df)
             else:
                 zipdf_dict[zipcode_3digit] = site_df
+
+        full_zipcodes = pd.DataFrame(full_zipcodes, columns=['zipcodes'])
 
         # make single dataframe out op dictionary
         initialization = True
@@ -74,6 +79,7 @@ class SitesGrouper(t.Task):
 
         self.validate(area_loads)
         self.save_data({self.output_artifact_area_load: area_loads})
+        self.save_data({self.output_artifact_full_zipcodes: full_zipcodes}) 
     
     def get_zipsitemapping(self, all_sites, site_zip_map):
         """
@@ -94,23 +100,6 @@ class SitesGrouper(t.Task):
 
         return zip_sitemap
 
-    def get_zip5_dict(self, all_sites, site_zip_map):
-        """
-        Maps 3 digit zipcodes to list of 5 digit zipcodes, for correlation
-        """   
-
-        zipcode_dict = {}
-
-        for site in all_sites:
-            zipcode = site_zip_map[site]
-            zipcode_3digit = zipcode[:3]
-            
-            if zipcode_3digit in zipcode_dict.keys(): 
-                zipcode_dict[zipcode_3digit].append(zipcode)
-            else:
-                zipcode_dict[zipcode_3digit] = [zipcode]
-
-        return zipcode_dict
 
     def add_df(self, df1, df2):
         """
