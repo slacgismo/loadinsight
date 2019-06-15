@@ -2,13 +2,13 @@
 DEBUG = False 
 
 # path to the local copies of the data
-LOCAL_PATH = "local_data/"
+LOCAL_PATH = 'local_data'
 
 # path to the remove data store
-REMOTE_PATH = "remote/"
+REMOTE_PATH = 'remote'
 
 # path to config files
-CONFIG_PATH = "config/"
+CONFIG_PATH = 'config'
 
 # size of an experimental data array
 RANDOM_SIZE = [5, 10]

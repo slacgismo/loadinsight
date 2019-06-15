@@ -120,7 +120,7 @@ class HeatcoolIndexer(t.Task):
         enduse_loads = enduse_loads.drop('index', axis=1)
 
         self.validate(enduse_loads)
-        self.save_data({self.output_artifact_enduse_loads: enduse_loads})
+        self.on_complete({self.output_artifact_enduse_loads: enduse_loads})
 
     def temp_dir(self, row):
         """
@@ -162,7 +162,7 @@ class HeatcoolIndexer(t.Task):
         """
         logger.info(f'Validating task {self.name}')
         if df.isnull().values.any():
-            logger.exception(f'Task {self.name} did not pass validation. Error found during grouping of sites to zip codes.')
+            logger.exception(f'Task {self.name} did not pass validation. DataFrame contains null values when it should not.')
             self.did_task_pass_validation = False
             self.on_failure()
 

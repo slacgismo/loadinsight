@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import hashlib
 import pandas as pd
 from settings import base
 from generics.file_type_enum import SupportedFileType, SupportedFileReadType
@@ -61,7 +62,7 @@ class ArtifactDataManager(object):
         
         return df
 
-    def _write_file(self, filename, df):
+    def save_data(self, filename, df):
         extension = self._parse_extension(filename)
         full_local_file_path = f'{base.LOCAL_PATH}/{filename}'
             
@@ -73,6 +74,9 @@ class ArtifactDataManager(object):
         
         elif extension in [SupportedFileType.XLS.value, SupportedFileType.XLSX.value]:
             df.to_excel(full_local_file_path)
+
+    def does_file_exist(self, filename):
+        return os.path.isfile(f'{base.LOCAL_PATH}/{filename}')
 
     def load_data(self, data_files):
         data_dict = {}
@@ -94,7 +98,22 @@ class ArtifactDataManager(object):
 
         return data_dict
 
-    def save_data(self, data_map):
-        for output_filename, data_frame in data_map.items():
-            logger.info(f'Writing {output_filename}')
-            self._write_file(output_filename, data_frame)
+    def delete_file(self, filename):
+        os.remove(f'{base.LOCAL_PATH}/{filename}')
+
+    def get_data_frame_hash(self, df):
+        if isinstance(df, pd.DataFrame):
+            return hashlib.sha1(df.to_csv().encode()).hexdigest()
+        raise TypeError('Artifact Data Manager expected a DataFrame during hashing and did not receive it')
+
+    def check_file_contents_hash(self, filename):
+        """
+        Return the SHA-1 hash of the file contents
+        """
+        h = hashlib.sha1()
+        with open(f'{base.LOCAL_PATH}/{filename}', 'rb') as file:
+            chunk = 0
+            while chunk != b'':
+                chunk = file.read(1024)
+                h.update(chunk)
+        return h.hexdigest()

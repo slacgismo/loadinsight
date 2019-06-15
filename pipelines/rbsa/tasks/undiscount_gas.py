@@ -60,7 +60,7 @@ class UndiscountGas(t.Task):
                 total_loads = total_loads.append(zipcode_df)
 
         self.validate(total_loads)
-        self.save_data({self.output_artifact_total_loads: total_loads})
+        self.on_complete({self.output_artifact_total_loads: total_loads})
 
     def validate(self, df):
         """
@@ -68,7 +68,7 @@ class UndiscountGas(t.Task):
         """
         logger.info(f'Validating task {self.name}')
         if df.isnull().values.any():
-            logger.exception(f'Task {self.name} did not pass validation. Error found during grouping of sites to zip codes.')
+            logger.exception(f'Task {self.name} did not pass validation. DataFrame contains null values when it should not.')
             self.did_task_pass_validation = False
             self.on_failure()
 
