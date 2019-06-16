@@ -5,16 +5,10 @@ DEBUG = False
 LOCAL_PATH = 'local_data'
 
 # path to the remove data store
-REMOTE_PATH = 'remote'
+REMOTE_PATH = 'lctk.data'
 
 # path to config files
 CONFIG_PATH = 'config'
-
-# size of an experimental data array
-RANDOM_SIZE = [5, 10]
-
-# verbose output flag
-VERBOSE = True
 
 # flag to enable use of the memory cache for data
 USE_CACHE = True

@@ -1,7 +1,10 @@
 import os
 import json
+import uuid
+import boto3
 import logging
 import hashlib
+import botocore
 import pandas as pd
 from settings import base
 from generics.file_type_enum import SupportedFileType, SupportedFileReadType
@@ -45,6 +48,13 @@ class ArtifactDataManager(object):
         extension = self._parse_extension(filename)
         full_local_file_path = f'{base.LOCAL_PATH}/{filename}'
         
+        # let's ensure first that the file exists locally
+        if not self.does_file_exist(filename):
+            # otherwise, let's try to grab it from s3
+            logger.info(f'Attempting to load {filename} from S3')
+            self._read_from_s3(filename)
+        
+        # if no exception is thrown, we can safely attempt to read the file
         try:            
             if extension == SupportedFileType.CSV.value:
                 df = pd.read_csv(full_local_file_path)
@@ -57,10 +67,22 @@ class ArtifactDataManager(object):
         
         except FileNotFoundError as fe:
             logger.exception(f'Could not find the file {filename} in the local system at local_data/')
-            logger.info(f'Attempting to load {filename} from S3')
             raise fe
         
         return df
+
+    def _read_from_s3(self, filename):
+        try:
+            temp_filename = str(uuid.uuid4())
+            s3 = boto3.client('s3')
+            s3.download_file(base.REMOTE_PATH, f'rbsa/{filename}', temp_filename)
+            os.rename(temp_filename, f'{base.LOCAL_PATH}/{filename}')
+        except botocore.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                logger.exception(f'File {filename} does not exist in S3 under {base.REMOTE_PATH}')
+            else:
+                logger.exception(e)
+            raise e
 
     def save_data(self, filename, df):
         extension = self._parse_extension(filename)

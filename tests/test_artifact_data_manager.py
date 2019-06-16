@@ -1,5 +1,6 @@
 import json
 import unittest
+import pandas as pd
 from settings import base
 from unittest.mock import patch, mock_open
 from generics.artifact import ArtifactDataManager
@@ -38,3 +39,20 @@ class TestLctkArtifactDataManager(unittest.TestCase):
     def test_read_config_raises_on_non_json(self):
         with self.assertRaises(TypeError):
             self.adm._read_config('random.notjson')
+
+    def test_get_hash_raises_when_not_data_frame(self):
+        with self.assertRaises(TypeError):
+            self.adm.get_data_frame_hash({'random': 'object'})
+        
+    def test_get_data_frame_hash(self):
+        df_1 = pd.DataFrame({'a': [0], 'b': [1]})
+        df_2 = pd.DataFrame({'a': [0], 'b': [1]})
+
+        hash_1 = self.adm.get_data_frame_hash(df_1)
+        hash_2 = self.adm.get_data_frame_hash(df_2)
+
+        self.assertEqual(hash_1, hash_2)
+
+    def test_load_data_raises_with_unsupported_read_type(self):
+        with self.assertRaises(ValueError):
+            self.adm.load_data([{'name': 'random', 'read_type': 'a random read type'}])
