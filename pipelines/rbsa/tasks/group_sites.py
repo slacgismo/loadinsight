@@ -51,7 +51,7 @@ class SitesGrouper(t.Task):
         for site in all_sites:
             zipcode = site_zip_map[site]
             zipcode_3digit = zipcode[:3]
-            full_zipcodes.add(site)
+            full_zipcodes.add(zipcode)
 
             site_df = self.df.loc[self.df['siteid'] == site]
             site_df = site_df.set_index('time')
