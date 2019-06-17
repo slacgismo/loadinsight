@@ -59,11 +59,14 @@ class Task(artifact.ArtifactDataManager):
             }]
         """
         results = []
+
         for output_filename, data_frame in data_map.items():
             new_filename = None
             new_file_contents_hex_digest = None
             existing_file_contents_hex_digest = None
-            # get the hash of the pandas data frame
+            
+            # get the hash of the pandas data frame 
+            # this will be used as the name for the temp file if needed
             df_hex_digest = self.get_data_frame_hash(data_frame)
             
             logger.info(f'Existing df hash {df_hex_digest}')
@@ -74,6 +77,7 @@ class Task(artifact.ArtifactDataManager):
             if self.does_file_exist(output_filename):
                 logger.info(f'Checking hash of file that already exists {output_filename}')
                 existing_file_contents_hex_digest = self.check_file_contents_hash(output_filename)
+                
                 # ...therefore we'll temporarily write a file based on the data hash
                 # and determine its file content's hash
                 new_filename = f'{output_filename}__{df_hex_digest}__.csv'
@@ -81,8 +85,8 @@ class Task(artifact.ArtifactDataManager):
                 new_file_contents_hex_digest = self.check_file_contents_hash(new_filename)
 
                 if new_file_contents_hex_digest == existing_file_contents_hex_digest:
-                    logger.info('The hashes matched, deleting file...')
                     # since they are the same, we don't do anything, just cleanup
+                    logger.info('The hashes matched, deleting file...')
                     self.delete_file(new_filename)
                     new_filename = None
                     new_file_contents_hex_digest = None
@@ -96,6 +100,7 @@ class Task(artifact.ArtifactDataManager):
                 'new_filename': new_filename,
                 'new_file_hash': new_file_contents_hex_digest
             })
+
         self.task_results = results
 
     def on_failure(self):
