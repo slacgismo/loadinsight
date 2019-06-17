@@ -1,4 +1,5 @@
 import logging
+import datetime
 from time import time
 from generics import artifact
 
@@ -62,6 +63,7 @@ class Task(artifact.ArtifactDataManager):
 
         for output_filename, data_frame in data_map.items():
             new_filename = None
+            versioned_name = None
             new_file_contents_hex_digest = None
             existing_file_contents_hex_digest = None
             
@@ -80,7 +82,7 @@ class Task(artifact.ArtifactDataManager):
                 
                 # ...therefore we'll temporarily write a file based on the data hash
                 # and determine its file content's hash
-                new_filename = f'{output_filename}__{df_hex_digest}__.csv'
+                new_filename = f'__{df_hex_digest}__{output_filename}'
                 self.save_data(new_filename, data_frame)
                 new_file_contents_hex_digest = self.check_file_contents_hash(new_filename)
 
@@ -90,15 +92,22 @@ class Task(artifact.ArtifactDataManager):
                     self.delete_file(new_filename)
                     new_filename = None
                     new_file_contents_hex_digest = None
+                else:
+                    logger.info('The hashes did not match. Preserving the old file and using the new one as the latest.')
+                    # the old existing file gets prepended with a timestamp
+                    versioned_name = f'{datetime.datetime.now()}{output_filename}'
+                    os.rename(f'{base.LOCAL_PATH}/{output_filename}', f'{base.LOCAL_PATH}/{versioned_name}')
+                    # the new file gets renamed to whatever the output needs to be
+                    os.rename(f'{base.LOCAL_PATH}/{new_filename}', f'{base.LOCAL_PATH}/{output_filename}')
             else:
                 self.save_data(output_filename, data_frame)
 
             results.append({
+                'output_df_hash': df_hex_digest,
                 'output_filename': output_filename,
-                'data_frame_hash': df_hex_digest,
-                'existing_file_hash': existing_file_contents_hex_digest,
-                'new_filename': new_filename,
-                'new_file_hash': new_file_contents_hex_digest
+                'versioned_filename': versioned_name,
+                'new_file_hash': new_file_contents_hex_digest,
+                'old_file_hash': existing_file_contents_hex_digest
             })
 
         self.task_results = results
