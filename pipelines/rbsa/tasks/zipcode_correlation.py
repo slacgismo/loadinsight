@@ -28,9 +28,6 @@ class ZipcodeCorrelation(t.Task):
         self.data_map = None
         self.df = None
 
-    def _save_data(self):
-        self.save_data(self.df)
-
     def _get_data(self):
         self.pre_data_map = self.load_data(self.pre_data_files) 
         self.full_zipcodes = list(self.pre_data_map['full_zipcodes.csv']['zipcodes'])  
@@ -56,8 +53,8 @@ class ZipcodeCorrelation(t.Task):
         for base in self.full_zipcodes:
             for target in self.projection_locations:
 
-                base_filename = 'tmy_base/'+str(base)+'.csv'
-                target_filename = 'tmy_target/'+str(target)+'.csv'
+                base_filename = f'tmy_base/{str(base)}.csv'
+                target_filename = f'tmy_target/{str(target)}.csv'
 
                 base_weather = self.data_map[base_filename]
                 target_weather = self.data_map[target_filename]
@@ -66,15 +63,15 @@ class ZipcodeCorrelation(t.Task):
                 target_weather = target_weather.set_index(target_weather.columns[0])
 
                 if base_weather.shape != target_weather.shape:
-                    logger.exception(f'Task {self.name} did not pass validation. TMY weather data sizes do not match for {base} and {target}.')
+                    logger.warning(f'Task {self.name} did not pass validation. TMY weather data sizes do not match for {base} and {target}.')
                     continue
 
                 correlation_vals = []
                 for metric in correlation_metrics:       
                     correlation_vals.append(np.ma.corrcoef(base_weather[metric], target_weather[metric])[0][1])
 
-                correlation = sum(correlation_vals)/len(correlation_vals)
-                correlation_matrix.ix[target,base] = correlation
+                correlation = sum(correlation_vals) / len(correlation_vals)
+                correlation_matrix.ix[target, base] = correlation
 
         correlation_matrix = self.convert_coef_3digit(correlation_matrix)
 
