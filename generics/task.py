@@ -1,5 +1,7 @@
 import logging
 import datetime
+import os
+from settings import base
 from time import time
 from generics import artifact
 

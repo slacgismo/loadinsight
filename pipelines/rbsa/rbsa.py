@@ -5,9 +5,9 @@ from pipelines.rbsa.tasks import (
     group_sites, 
     undiscount_gas, 
     index_heatcool, 
-    normalize_totals
+    normalize_totals,
+    zipcode_correlation
 )
-
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
@@ -24,17 +24,20 @@ class RbsaPipeline():
             self.create_tasks()
 
     def create_tasks(self):
-        # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
-        # self.pipeline.add_task(site_grouping_task)
+        site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
+        self.pipeline.add_task(site_grouping_task)
 
         heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
         self.pipeline.add_task(heatcool_indexing_task)
 
-        # undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
-        # self.pipeline.add_task(undiscount_gas_task)
+        undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
+        self.pipeline.add_task(undiscount_gas_task)
 
-        # normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
-        # self.pipeline.add_task(normalize_totals_task)
+        normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
+        self.pipeline.add_task(normalize_totals_task)
+
+        correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
+        self.pipeline.add_task(correlation_task)
 
     def execute(self):
         """

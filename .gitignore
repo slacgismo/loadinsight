@@ -273,6 +273,7 @@ fabric.properties
 # PyBuilder
 
 # Jupyter Notebook
+*.ipynb
 
 # IPython
 
