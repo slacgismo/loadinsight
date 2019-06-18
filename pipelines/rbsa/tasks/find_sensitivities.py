@@ -57,6 +57,7 @@ class FindSensitivities(t.Task):
         
         self.df = data_map[self.input_artifact_normal_loads]
         self.df = self.df.set_index(['time'])
+        self.df.index = pd.to_datetime(self.df.index)
 
         if self.df.columns[0] == 'Unnamed: 0':
             self.df = self.df.drop('Unnamed: 0', axis=1)
@@ -65,33 +66,50 @@ class FindSensitivities(t.Task):
 
         zipcodes = self.df.zipcode.unique()
 
+        loadshapes = pd.DataFrame(columns=list(self.df.columns))
+        print(loadshapes.columns)
+
         for zipcode in zipcodes:
 
-            weather_file = 'noaa/'+str(zipcode)+'.csv'
+            weather_file = f'noaa/{str(zipcode)}.csv'
             weather = data_map[weather_file]
             weather = weather.set_index(['DATE'])
             weather.index = pd.to_datetime(weather.index)
 
             zipcode_df = self.df.loc[self.df.zipcode == zipcode]
 
+            if weather.shape[0] > zipcode_df.shape[0]:
+                weather = weather.reindex_like(zipcode_df).fillna(0)
+
             self.enduse_cols = list(zipcode_df.columns)
             self.enduse_cols.remove('zipcode')
 
             A_nonsensitive = self.get_nonsensitive_A(weather)
 
-            print(A_nonsensitive.min())
+            zipcode_loadshapes = pd.DataFrame(columns=self.enduse_cols)
 
             for enduse in self.enduse_cols:
                 enduse_df = zipcode_df[enduse]
+                x = self.get_baseload(enduse_df, A_nonsensitive) # to create dummy output
 
-                if enduse == 'Heating':
-                    # get sensitivity
-                    continue
-                elif enduse == 'Cooling':
-                    continue
-                else:
-                    x = self.get_baseload(enduse_df, A_nonsensitive)
-                    # print(enduse, x)
+                # if enduse == 'Heating':
+                #     # get sensitivity
+                #     continue
+                # elif enduse == 'Cooling':
+                #     continue
+                # else:
+                #     continue
+                #     # x = self.get_baseload(enduse_df, A_nonsensitive)
+                #     # print(enduse, x)
+
+                zipcode_loadshapes[enduse] = x
+
+            zipcode_loadshapes.insert(loc=0, column='zipcode', value=zipcode)
+
+            # print(zipcode_loadshapes.head(4))
+
+
+            loadshapes = loadshapes.append(zipcode_loadshapes)
 
         self.validate(loadshapes)
         self.on_complete({self.output_artifact_loadshapes: loadshapes})
@@ -103,7 +121,7 @@ class FindSensitivities(t.Task):
         At = A.transpose()
         y = np.asarray(df).transpose()
         M = np.matmul(np.linalg.inv(np.matmul(At,A)),At)
-        print(M.min())
+        # print(M.min()) 
         x = np.matmul(M,y)
 
         return x
