@@ -5,7 +5,8 @@ from pipelines.rbsa.tasks import (
     group_sites, 
     undiscount_gas, 
     index_heatcool, 
-    normalize_totals
+    normalize_totals,
+    find_sensitivities
 )
 
 
@@ -27,14 +28,17 @@ class RbsaPipeline():
         # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
         # self.pipeline.add_task(site_grouping_task)
 
-        heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
-        self.pipeline.add_task(heatcool_indexing_task)
+        # heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
+        # self.pipeline.add_task(heatcool_indexing_task)
 
         # undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
         # self.pipeline.add_task(undiscount_gas_task)
 
         # normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
         # self.pipeline.add_task(normalize_totals_task)
+
+        find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
+        self.pipeline.add_task(find_sensitivities_task)
 
     def execute(self):
         """
