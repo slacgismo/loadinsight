@@ -49,6 +49,9 @@ class FindSensitivities(t.Task):
         ]
         self.task_function = self._task
 
+        self.theat = 15
+        self.tcool = 25
+
     def _get_data(self):
         return self.load_data(self.my_data_files)
         
@@ -67,7 +70,6 @@ class FindSensitivities(t.Task):
         zipcodes = self.df.zipcode.unique()
 
         loadshapes = pd.DataFrame(columns=list(self.df.columns))
-        print(loadshapes.columns)
 
         for zipcode in zipcodes:
 
@@ -79,28 +81,42 @@ class FindSensitivities(t.Task):
             zipcode_df = self.df.loc[self.df.zipcode == zipcode]
 
             if weather.shape[0] > zipcode_df.shape[0]:
-                weather = weather.reindex_like(zipcode_df).fillna(0)
+                weather = weather.loc[weather.index.isin(zipcode_df.index)]
 
             self.enduse_cols = list(zipcode_df.columns)
             self.enduse_cols.remove('zipcode')
 
-            A_nonsensitive = self.get_nonsensitive_A(weather)
+            A = self.get_A(weather)
 
             zipcode_loadshapes = pd.DataFrame(columns=self.enduse_cols)
 
             for enduse in self.enduse_cols:
                 enduse_df = zipcode_df[enduse]
-                x = self.get_baseload(enduse_df, A_nonsensitive) # to create dummy output
 
-                # if enduse == 'Heating':
-                #     # get sensitivity
-                #     continue
-                # elif enduse == 'Cooling':
-                #     continue
-                # else:
-                #     continue
-                #     # x = self.get_baseload(enduse_df, A_nonsensitive)
-                #     # print(enduse, x)
+                if enduse == 'Heating':
+                    A_heat = A[:,:-1]
+                    x = self.get_baseload(enduse_df, A_heat)
+                    x = np.append(x, [0])
+
+                elif enduse == 'Cooling':
+                    A_cool = np.delete(A, -2, 1)
+                    x = self.get_baseload(enduse_df, A_cool)
+                    cooling_sensitivity = x[-1]
+                    x = np.append(x[:-1], [0])
+                    x = np.append(x, [cooling_sensitivity])
+
+                else:
+                    A_base = A[:,:-2]
+                    x = self.get_baseload(enduse_df, A_base)
+                    x = np.append(x, [0])
+                    x = np.append(x, [0])
+
+                heat_sens = x[-2]
+                cool_sens = x[-1]
+
+                # adjust x by first value
+                x = np.append(x[0],x[1:48]+x[0])
+                x = np.append(x,[heat_sens, cool_sens])
 
                 zipcode_loadshapes[enduse] = x
 
@@ -121,7 +137,6 @@ class FindSensitivities(t.Task):
         At = A.transpose()
         y = np.asarray(df).transpose()
         M = np.matmul(np.linalg.inv(np.matmul(At,A)),At)
-        # print(M.min()) 
         x = np.matmul(M,y)
 
         return x
@@ -146,6 +161,32 @@ class FindSensitivities(t.Task):
 
             ts += dt
 
+        return A
+
+    def get_A(self, weather):
+        """constructs A matrix for non weather sensitive loads
+        """
+
+        A = np.zeros((len(weather.index),50),float)
+
+        ts = datetime.datetime(weather.index[0].year,1,1,0,0,0)
+        dt = datetime.timedelta(hours=1) 
+
+        for h in range(len(weather.index)):
+            A[h][0] = 1
+            hh = h%24
+            
+            if weather.index[h].weekday() < 5:
+                A[h][hh] = 1.0
+            else:
+                A[h][hh+24] = 1.0
+
+            if weather['Temperature'][h] < self.theat:
+                A[h][(24*2)] = weather['Temperature'][h]-self.theat
+            elif weather['Temperature'][h] > self.tcool:
+                A[h][(24*2)+1] = weather['Temperature'][h]-self.tcool
+
+            ts += dt
         return A
 
     def validate(self, df):
