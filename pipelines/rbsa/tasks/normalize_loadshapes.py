@@ -65,7 +65,7 @@ class NormalizeLoadshapes(t.Task):
         returns peak total, if summer is True returns peak summer 
         """        
 
-        if summer: # TODO add summer definitions to json config
+        if summer:
             city_df = city_df.loc[(city_df.index.month>5) & (city_df.index.month<9)]
 
         totals = city_df[self.enduse_cols].sum(axis=1)
