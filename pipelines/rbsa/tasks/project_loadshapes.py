@@ -26,6 +26,9 @@ class ProjectLoadshapes(t.Task):
         self.output_artifact_total_loadshapes = 'total_loadshapes.csv'
         self.task_function = self._task
 
+        self.theat = 15
+        self.tcool = 25
+
     def _get_data(self):
         return self.load_data(self.my_data_files)
         
@@ -60,7 +63,7 @@ class ProjectLoadshapes(t.Task):
 
             target_loadshapes = pd.DataFrame(columns=self.enduse_cols)
 
-            A = self.get_nonsensitive_A(weather)
+            A = self.get_A(weather)
 
             for enduse in self.enduse_cols:
                 x = np.array(base_loadshapes[enduse])
@@ -76,11 +79,11 @@ class ProjectLoadshapes(t.Task):
         self.validate(total_loadshapes)
         self.on_complete({self.output_artifact_total_loadshapes: total_loadshapes})
 
-    def get_nonsensitive_A(self, weather):
+    def get_A(self, weather):
         """constructs A matrix for non weather sensitive loads
         """
 
-        A = np.zeros((len(weather.index),48),float)
+        A = np.zeros((len(weather.index),50),float)
 
         ts = datetime.datetime(weather.index[0].year,1,1,0,0,0)
         dt = datetime.timedelta(hours=1) 
@@ -94,8 +97,12 @@ class ProjectLoadshapes(t.Task):
             else:
                 A[h][hh+24] = 1.0
 
-            ts += dt
+            if weather[h] < self.theat:
+                A[h][(24*2)] = weather[h]-self.theat
+            elif weather[h] > self.tcool:
+                A[h][(24*2)+1] = weather[h]-self.tcool
 
+            ts += dt
         return A
 
     def validate(self, df):
