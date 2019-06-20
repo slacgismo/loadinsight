@@ -43,6 +43,9 @@ class NormalizeTotals(t.Task):
             self.enduse_cols.remove('time')
             self.enduse_cols.remove('zipcode')
 
+            min_val = zipcode_df[self.enduse_cols].min().min()
+            zipcode_df[self.enduse_cols] = zipcode_df[self.enduse_cols] - min_val
+            
             # get enduse columns
             normalization_val = self.get_normalization_val(zipcode_df)
 
