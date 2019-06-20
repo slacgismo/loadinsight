@@ -18,6 +18,7 @@ class ProjectLoadshapes(t.Task):
 
         self.input_artifact_loadshapes = 'loadshapes.csv'
         self.input_artifact_correlation_matrix = 'correlation_matrix.csv'
+        
         self.my_data_files = [
             { 'name': self.input_artifact_loadshapes, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_correlation_matrix, 'read_type': SupportedFileReadType.DATA },
