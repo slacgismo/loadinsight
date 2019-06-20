@@ -7,7 +7,8 @@ from pipelines.rbsa.tasks import (
     index_heatcool, 
     normalize_totals,
     find_sensitivities,
-    zipcode_correlation
+    zipcode_correlation,
+    project_loadshapes
 )
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
@@ -42,6 +43,9 @@ class RbsaPipeline():
 
         find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
         self.pipeline.add_task(find_sensitivities_task)
+
+        project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
+        self.pipeline.add_task(project_loadshapes_task)
 
     def execute(self):
         """
