@@ -92,8 +92,8 @@ class ProjectLoadshapes(t.Task):
                 target_loadshapes[enduse] = y
 
             target_loadshapes.insert(loc=0, column='target', value=target)
-            target_loadshapes.insert(loc=1, column='time', value=list(range(24))*3)
-            target_loadshapes.insert(loc=2, column='daytype', value=(['winter_peak']*24) + (['spring_light']*24) + (['summer_peak']*24))
+            target_loadshapes.insert(loc=1, column='time', value=list(range(24)) * 3)
+            target_loadshapes.insert(loc=2, column='daytype', value=(['winter_peak'] * 24) + (['spring_light'] * 24) + (['summer_peak'] * 24))
 
             total_loadshapes = total_loadshapes.append(target_loadshapes)
 
@@ -104,17 +104,16 @@ class ProjectLoadshapes(t.Task):
         """constructs A matrix for non weather sensitive loads
         """
 
-        A = np.zeros((len(weather.index),50),float)
+        A = np.zeros((len(weather.index), 50), float)
 
         for h in range(len(weather.index)):
             A[h][0] = 1
-            hh = h%24
-            A[h][hh] = 1.0
+            A[h][h % 24] = 1.0
 
             if weather[h] < self.theat:
-                A[h][(24*2)] = weather[h]-self.theat
+                A[h][(24 * 2)] = weather[h] - self.theat
             elif weather[h] > self.tcool:
-                A[h][(24*2)+1] = weather[h]-self.tcool
+                A[h][(24 * 2) + 1] = weather[h] - self.tcool
 
         return A
 
