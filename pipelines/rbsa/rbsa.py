@@ -8,7 +8,8 @@ from pipelines.rbsa.tasks import (
     normalize_totals,
     find_sensitivities,
     zipcode_correlation,
-    project_loadshapes
+    project_loadshapes,
+    discount_gas
 )
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
@@ -46,6 +47,9 @@ class RbsaPipeline():
 
         project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
         self.pipeline.add_task(project_loadshapes_task)
+
+        discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
+        self.pipeline.add_task(discount_gas_task)
 
     def execute(self):
         """
