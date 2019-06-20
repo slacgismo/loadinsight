@@ -6,6 +6,7 @@ from pipelines.rbsa.tasks import (
     undiscount_gas, 
     index_heatcool, 
     normalize_totals,
+    find_sensitivities,
     zipcode_correlation
 )
 
@@ -38,6 +39,9 @@ class RbsaPipeline():
 
         correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
         self.pipeline.add_task(correlation_task)
+
+        find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
+        self.pipeline.add_task(find_sensitivities_task)
 
     def execute(self):
         """
