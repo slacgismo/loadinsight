@@ -54,7 +54,7 @@ class DiscountGas(t.Task):
 
             # add gas fraction
             for enduse in electric_percentage.keys():
-                city_df[enduse] = city_df[enduse]*city_df[enduse]
+                city_df[enduse] = city_df[enduse] * city_df[enduse]
         
             # output dataframe 
             if initialization:
