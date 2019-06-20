@@ -62,8 +62,6 @@ class FindSensitivities(t.Task):
         self.theat = self.sensitivity_temperatures['theat']
         self.tcool = self.sensitivity_temperatures['tcool']
 
-        print(self.theat)
-
         self.df = data_map[self.input_artifact_normal_loads]
         self.df = self.df.set_index(['time'])
         self.df.index = pd.to_datetime(self.df.index)
@@ -121,8 +119,8 @@ class FindSensitivities(t.Task):
                 cool_sens = x[-1]
 
                 # adjust x by first value
-                x = np.append(x[0],x[1:48]+x[0])
-                x = np.append(x,[heat_sens, cool_sens])
+                x = np.append(x[0], x[1:48] + x[0])
+                x = np.append(x, [heat_sens, cool_sens])
 
                 zipcode_loadshapes[enduse] = x
 
@@ -138,8 +136,8 @@ class FindSensitivities(t.Task):
 
         At = A.transpose()
         y = np.asarray(df).transpose()
-        M = np.matmul(np.linalg.inv(np.matmul(At,A)),At)
-        x = np.matmul(M,y)
+        M = np.matmul(np.linalg.inv(np.matmul(At, A)), At)
+        x = np.matmul(M, y)
 
         return x
 
