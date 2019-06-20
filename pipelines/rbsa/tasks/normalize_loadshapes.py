@@ -44,6 +44,9 @@ class NormalizeLoadshapes(t.Task):
             self.enduse_cols.remove('target')
             self.enduse_cols.remove('daytype')
 
+            min_val = city_df[self.enduse_cols].min().min()
+            city_df[self.enduse_cols] = city_df[self.enduse_cols] - min_val
+
             # get enduse columns
             normalization_val = self.get_normalization_val(city_df, summer=True)
 
