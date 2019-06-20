@@ -48,7 +48,7 @@ class NormalizeLoadshapes(t.Task):
             normalization_val = self.get_normalization_val(city_df, summer=True)
 
             # Normalize by peak total
-            city_df[self.enduse_cols] = city_df[self.enduse_cols]/normalization_val
+            city_df[self.enduse_cols] = city_df[self.enduse_cols] / normalization_val
 
             # output dataframe 
             if initialization:
@@ -68,9 +68,7 @@ class NormalizeLoadshapes(t.Task):
             city_df = city_df.loc[city_df['daytype'] == 'summer_peak']
 
         totals = city_df[self.enduse_cols].sum(axis=1)
-        normalization_val = totals.max() # can be adjusted if normalizing for summer peak
-
-        # can check here for totals.idxmax() month to confirm summer/winter
+        normalization_val = totals.max() 
 
         return normalization_val
 
