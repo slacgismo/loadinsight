@@ -15,7 +15,7 @@ class NormalizeLoadshapes(t.Task):
         super().__init__(self)
         self.name = name
         self.input_artifact_enduse_loadshapes = 'enduse_loadshapes.csv'
-        self.output_artifact_total_loadshapes = 'total_loadshapes.csv'
+        self.output_artifact_normal_loadshapes = 'normal_loadshapes.csv'
         self.my_data_files = [{ 'name': self.input_artifact_enduse_loadshapes, 'read_type': SupportedFileReadType.DATA }]
         self.task_function = self._task
 
@@ -39,10 +39,10 @@ class NormalizeLoadshapes(t.Task):
 
             city_df = self.df.loc[self.df.target == city]
             city_df = city_df.set_index('time')
-            city_df.index = pd.to_datetime(city_df.index)
 
             self.enduse_cols = list(city_df.columns)
             self.enduse_cols.remove('target')
+            self.enduse_cols.remove('daytype')
 
             # get enduse columns
             normalization_val = self.get_normalization_val(city_df, summer=True)
@@ -52,21 +52,20 @@ class NormalizeLoadshapes(t.Task):
 
             # output dataframe 
             if initialization:
-                total_loadshapes = city_df
+                normal_loadshapes = city_df
                 initialization = False
             else:
-                total_loadshapes = total_loadshapes.append(city_df)
+                normal_loadshapes = normal_loadshapes.append(city_df)
 
-        self.validate(total_loadshapes)
-        self.on_complete({self.output_artifact_total_loadshapes: total_loadshapes})
+        self.validate(normal_loadshapes)
+        self.on_complete({self.output_artifact_normal_loadshapes: normal_loadshapes})
 
     def get_normalization_val(self, city_df, summer):
         """
         returns peak total, if summer is True returns peak summer 
         """        
-
         if summer:
-            city_df = city_df.loc[(city_df.index.month>5) & (city_df.index.month<9)]
+            city_df = city_df.loc[city_df['daytype'] == 'summer_peak']
 
         totals = city_df[self.enduse_cols].sum(axis=1)
         normalization_val = totals.max() # can be adjusted if normalizing for summer peak
