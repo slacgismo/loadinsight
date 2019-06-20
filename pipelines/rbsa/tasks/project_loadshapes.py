@@ -18,7 +18,7 @@ class ProjectLoadshapes(t.Task):
 
         self.input_artifact_loadshapes = 'loadshapes.csv'
         self.input_artifact_correlation_matrix = 'correlation_matrix.csv'
-        
+
         self.my_data_files = [
             { 'name': self.input_artifact_loadshapes, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_correlation_matrix, 'read_type': SupportedFileReadType.DATA },
@@ -47,33 +47,53 @@ class ProjectLoadshapes(t.Task):
         self.enduse_cols = list(self.loadshapes.columns)
         self.enduse_cols.remove('zipcode')
 
-        total_loadshapes = pd.DataFrame(columns=['target', 'time'] + self.enduse_cols)
+        total_loadshapes = pd.DataFrame(columns=['target', 'time', 'daytype'] + self.enduse_cols)
 
         target_locations = self.correlation_matrix.index 
+
+        use_adjusted = False # can be made True to use adjusted weather
 
         for target in target_locations:
             base = self.correlation_matrix.loc[target,:].idxmax()
             base_loadshapes = self.loadshapes.loc[self.loadshapes['zipcode'] == int(base)]
 
-            # to be replaced with 90% weather
-            weather_file = [{ 'name': f'tmy_target/{str(target)}.csv', 'read_type': SupportedFileReadType.DATA }] 
-            weather = self.load_data(weather_file)[f'tmy_target/{str(target)}.csv']
-            weather = weather.set_index(weather.columns[0])
-            weather.index = pd.to_datetime(weather.index)
-            weather = weather['Temperature']
+            try:
+                weather_file = [{ 'name': f'target_weather/{str(target)}.csv', 'read_type': SupportedFileReadType.DATA }] 
+                weather = self.load_data(weather_file)[f'target_weather/{str(target)}.csv']
+            except:
+                logger.warning(f'In task {self.name}, weather data for {target} not found')
+                continue
+
+            if use_adjusted:
+                winter = weather['winter_adjusted']
+                spring = weather['spring_adjusted']
+                summer = weather['summer_Adjusted']
+            else:
+                winter = weather['winter']
+                spring = weather['spring']
+                summer = weather['summer']
+
+            A_winter = self.get_A(winter)
+            A_spring = self.get_A(spring)
+            A_summer = self.get_A(summer)
 
             target_loadshapes = pd.DataFrame(columns=self.enduse_cols)
 
-            A = self.get_A(weather)
-
             for enduse in self.enduse_cols:
+
                 x = np.array(base_loadshapes[enduse])
-                y = np.matmul(A, x)
+
+                y_winter = np.matmul(A_winter, x)
+                y_spring = np.matmul(A_spring, x)
+                y_summer = np.matmul(A_summer, x)
+
+                y = np.concatenate((y_winter, y_spring, y_summer), axis=0)
 
                 target_loadshapes[enduse] = y
 
             target_loadshapes.insert(loc=0, column='target', value=target)
-            target_loadshapes.insert(loc=1, column='time', value=weather.index)
+            target_loadshapes.insert(loc=1, column='time', value=list(range(24))*3)
+            target_loadshapes.insert(loc=2, column='daytype', value=(['winter_peak']*24) + (['spring_light']*24) + (['summer_peak']*24))
 
             total_loadshapes = total_loadshapes.append(target_loadshapes)
 
@@ -86,24 +106,16 @@ class ProjectLoadshapes(t.Task):
 
         A = np.zeros((len(weather.index),50),float)
 
-        ts = datetime.datetime(weather.index[0].year,1,1,0,0,0)
-        dt = datetime.timedelta(hours=1) 
-
         for h in range(len(weather.index)):
             A[h][0] = 1
             hh = h%24
-            
-            if weather.index[h].weekday() < 5:
-                A[h][hh] = 1.0
-            else:
-                A[h][hh+24] = 1.0
+            A[h][hh] = 1.0
 
             if weather[h] < self.theat:
                 A[h][(24*2)] = weather[h]-self.theat
             elif weather[h] > self.tcool:
                 A[h][(24*2)+1] = weather[h]-self.tcool
 
-            ts += dt
         return A
 
     def validate(self, df):
