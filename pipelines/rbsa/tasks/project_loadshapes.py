@@ -18,23 +18,27 @@ class ProjectLoadshapes(t.Task):
 
         self.input_artifact_loadshapes = 'loadshapes.csv'
         self.input_artifact_correlation_matrix = 'correlation_matrix.csv'
+        self.input_artifact_sensitivity_temperatures = 'SENSITIVITY_TEMPERATURES.json'
 
         self.my_data_files = [
             { 'name': self.input_artifact_loadshapes, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_correlation_matrix, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_sensitivity_temperatures, 'read_type': SupportedFileReadType.CONFIG }
         ] 
 
         self.output_artifact_total_loadshapes = 'total_loadshapes.csv'
         self.task_function = self._task
-
-        self.theat = 15
-        self.tcool = 25
 
     def _get_data(self):
         return self.load_data(self.my_data_files)
         
     def _task(self):
         data_map = self._get_data()
+
+        self.sensitivity_temperatures = data_map[self.input_artifact_sensitivity_temperatures]['residential']
+
+        self.theat = self.sensitivity_temperatures['theat']
+        self.tcool = self.sensitivity_temperatures['tcool']
 
         self.loadshapes = data_map[self.input_artifact_loadshapes]
         self.correlation_matrix = data_map[self.input_artifact_correlation_matrix]
