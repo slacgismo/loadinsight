@@ -1,0 +1,9 @@
+{
+	"version": 1,
+	"application": "loadinsight",
+	"name": "SENSITIVITY_TEMPERATURES",
+	"residential" : {
+		"theat":15,
+		"tcool":25
+	}
+}

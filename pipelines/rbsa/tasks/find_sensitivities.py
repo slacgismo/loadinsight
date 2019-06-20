@@ -17,9 +17,11 @@ class FindSensitivities(t.Task):
         super().__init__(self)
         self.name = name
         self.input_artifact_normal_loads = 'normal_loads.csv'
+        self.input_artifact_sensitivity_temperatures = 'SENSITIVITY_TEMPERATURES.json'
         self.output_artifact_loadshapes = 'loadshapes.csv'
         self.my_data_files = [
             { 'name': self.input_artifact_normal_loads, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_sensitivity_temperatures, 'read_type': SupportedFileReadType.CONFIG },
             { 'name': 'noaa/594.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': 'noaa/596.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': 'noaa/597.csv', 'read_type': SupportedFileReadType.DATA },
@@ -49,15 +51,19 @@ class FindSensitivities(t.Task):
         ]
         self.task_function = self._task
 
-        self.theat = 15
-        self.tcool = 25
-
     def _get_data(self):
         return self.load_data(self.my_data_files)
         
     def _task(self):
         data_map = self._get_data()
         
+        self.sensitivity_temperatures = data_map[self.input_artifact_sensitivity_temperatures]['residential']
+
+        self.theat = self.sensitivity_temperatures['theat']
+        self.tcool = self.sensitivity_temperatures['tcool']
+
+        print(self.theat)
+
         self.df = data_map[self.input_artifact_normal_loads]
         self.df = self.df.set_index(['time'])
         self.df.index = pd.to_datetime(self.df.index)
@@ -121,10 +127,6 @@ class FindSensitivities(t.Task):
                 zipcode_loadshapes[enduse] = x
 
             zipcode_loadshapes.insert(loc=0, column='zipcode', value=zipcode)
-
-            # print(zipcode_loadshapes.head(4))
-
-
             loadshapes = loadshapes.append(zipcode_loadshapes)
 
         self.validate(loadshapes)
@@ -145,19 +147,19 @@ class FindSensitivities(t.Task):
         """constructs A matrix for non weather sensitive loads
         """
 
-        A = np.zeros((len(weather.index),48),float)
+        A = np.zeros((len(weather.index), 48), float)
 
-        ts = datetime.datetime(weather.index[0].year,1,1,0,0,0)
+        ts = datetime.datetime(weather.index[0].year, 1, 1, 0, 0, 0)
         dt = datetime.timedelta(hours=1) 
 
         for h in range(len(weather.index)):
             A[h][0] = 1
-            hh = h%24
+            hh = h % 24
             
             if weather.index[h].weekday() < 5:
                 A[h][hh] = 1.0
             else:
-                A[h][hh+24] = 1.0
+                A[h][hh + 24] = 1.0
 
             ts += dt
 
@@ -167,24 +169,24 @@ class FindSensitivities(t.Task):
         """constructs A matrix for non weather sensitive loads
         """
 
-        A = np.zeros((len(weather.index),50),float)
+        A = np.zeros((len(weather.index), 50), float)
 
-        ts = datetime.datetime(weather.index[0].year,1,1,0,0,0)
+        ts = datetime.datetime(weather.index[0].year, 1, 1, 0, 0, 0)
         dt = datetime.timedelta(hours=1) 
 
         for h in range(len(weather.index)):
             A[h][0] = 1
-            hh = h%24
+            hh = h % 24
             
             if weather.index[h].weekday() < 5:
                 A[h][hh] = 1.0
             else:
-                A[h][hh+24] = 1.0
+                A[h][hh + 24] = 1.0
 
             if weather['Temperature'][h] < self.theat:
-                A[h][(24*2)] = weather['Temperature'][h]-self.theat
+                A[h][(24 * 2)] = weather['Temperature'][h] - self.theat
             elif weather['Temperature'][h] > self.tcool:
-                A[h][(24*2)+1] = weather['Temperature'][h]-self.tcool
+                A[h][(24 * 2) + 1] = weather['Temperature'][h] - self.tcool
 
             ts += dt
         return A
