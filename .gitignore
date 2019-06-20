@@ -275,6 +275,9 @@ fabric.properties
 # Jupyter Notebook
 *.ipynb
 
+# Excel
+*.xlsx
+
 # IPython
 
 # pyenv
