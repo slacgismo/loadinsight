@@ -23,7 +23,7 @@ conda deactivate
 ## Running LCTK
 ```
 # runs with DEBUG=True
-python -d init.py 
+python init.py -d
 ```
 
 ## Executing tests locally
