@@ -26,6 +26,7 @@ class Pipeline(object):
             self.name = name 
         self.tasks = []
         self.result_map = {}
+        self.total_pipeline_run_time = 0
 
     def add_task(self, entry):
         """
@@ -43,15 +44,16 @@ class Pipeline(object):
         for pipeline_task in self.tasks:
             pipeline_task.run()
             result = pipeline_task.run_result
+            task_run_time = pipeline_task.get_task_run_time()
 
-            logger.info(f'Result of task {pipeline_task.name} is {result} and its execution time is {pipeline_task.get_task_run_time()}')
+            logger.info(f'Result of task {pipeline_task.name} is {result} and its execution time is {task_run_time}')
             logger.info(f'Task finished, is it valid? {str(pipeline_task.did_task_pass_validation)}')
 
             if not pipeline_task.did_task_pass_validation:
                 raise ValueError(f'Validation Failed for task {pipeline_task.name}')
             
             self.result_map[pipeline_task.name] = pipeline_task.task_results
-        logging.info('PIPELINE RUN IS DONE')
+            self.total_pipeline_run_time += task_run_time
 
     def save(self):
         """

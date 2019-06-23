@@ -76,7 +76,6 @@ class FindSensitivities(t.Task):
         loadshapes = pd.DataFrame(columns=list(self.df.columns))
 
         for zipcode in zipcodes:
-
             weather_file = f'noaa/{str(zipcode)}.csv'
             weather = data_map[weather_file]
             weather = weather.set_index(['DATE'])
@@ -98,7 +97,7 @@ class FindSensitivities(t.Task):
                 enduse_df = zipcode_df[enduse]
 
                 if enduse == 'Heating':
-                    A_heat = A[:,:-1]
+                    A_heat = A[:, :-1]
                     x = self.get_baseload(enduse_df, A_heat)
                     x = np.append(x, [0])
 
@@ -110,7 +109,7 @@ class FindSensitivities(t.Task):
                     x = np.append(x, [cooling_sensitivity])
 
                 else:
-                    A_base = A[:,:-2]
+                    A_base = A[:, :-2]
                     x = self.get_baseload(enduse_df, A_base)
                     x = np.append(x, [0])
                     x = np.append(x, [0])
@@ -133,7 +132,6 @@ class FindSensitivities(t.Task):
     def get_baseload(self, df, A):
         """ This function gets baseload for non weather sensitive enduses
         """
-
         At = A.transpose()
         y = np.asarray(df).transpose()
         M = np.matmul(np.linalg.inv(np.matmul(At, A)), At)
@@ -142,9 +140,9 @@ class FindSensitivities(t.Task):
         return x
 
     def get_nonsensitive_A(self, weather):
-        """constructs A matrix for non weather sensitive loads
         """
-
+        Constructs A matrix for non weather sensitive loads
+        """
         A = np.zeros((len(weather.index), 48), float)
 
         ts = datetime.datetime(weather.index[0].year, 1, 1, 0, 0, 0)
@@ -164,9 +162,9 @@ class FindSensitivities(t.Task):
         return A
 
     def get_A(self, weather):
-        """constructs A matrix for non weather sensitive loads
         """
-
+        Constructs A matrix for non weather sensitive loads
+        """
         A = np.zeros((len(weather.index), 50), float)
 
         ts = datetime.datetime(weather.index[0].year, 1, 1, 0, 0, 0)

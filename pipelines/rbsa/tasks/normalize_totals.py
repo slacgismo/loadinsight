@@ -26,10 +26,8 @@ class NormalizeTotals(t.Task):
         data_map = self._get_data()
         
         self.df = data_map[self.input_artifact_total_loads]
-
-         # output dataframe initialization
-        initialization = True
-
+        
+        normal_loads = pd.DataFrame()
         zipcodes = self.df.zipcode.unique()
 
         for zipcode in zipcodes:
@@ -52,12 +50,7 @@ class NormalizeTotals(t.Task):
             # Normalize by peak total
             zipcode_df[self.enduse_cols] = zipcode_df[self.enduse_cols]/normalization_val
 
-            # output dataframe 
-            if initialization:
-                normal_loads = zipcode_df
-                initialization = False
-            else:
-                normal_loads = normal_loads.append(zipcode_df)
+            normal_loads = normal_loads.append(zipcode_df)
 
         self.validate(normal_loads)
         self.on_complete({self.output_artifact_normal_loads: normal_loads})

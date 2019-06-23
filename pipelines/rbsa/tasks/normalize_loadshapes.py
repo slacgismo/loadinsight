@@ -30,13 +30,10 @@ class NormalizeLoadshapes(t.Task):
         if self.df.columns[0] == 'Unnamed: 0':
              self.df = self.df.drop('Unnamed: 0', axis=1)
 
-         # output dataframe initialization
-        initialization = True
-
         city_list = self.df.target.unique()
+        normal_loadshapes = pd.DataFrame()
 
         for city in city_list:
-
             city_df = self.df.loc[self.df.target == city]
             city_df = city_df.set_index('time')
 
@@ -52,13 +49,8 @@ class NormalizeLoadshapes(t.Task):
 
             # Normalize by peak total
             city_df[self.enduse_cols] = city_df[self.enduse_cols] / normalization_val
-
-            # output dataframe 
-            if initialization:
-                normal_loadshapes = city_df
-                initialization = False
-            else:
-                normal_loadshapes = normal_loadshapes.append(city_df)
+            
+            normal_loadshapes = normal_loadshapes.append(city_df)
 
         self.validate(normal_loadshapes)
         self.on_complete({self.output_artifact_normal_loadshapes: normal_loadshapes})

@@ -36,28 +36,20 @@ class UndiscountGas(t.Task):
         self.gas_fraction = data_map[self.input_artifact_gas_fraction]
         self.zip_zone_map = data_map[self.input_artifact_zip_zone_map]
 
-        # output dataframe initialization
-        initialization = True
-
+        total_loads = pd.DataFrame()
         zipcodes = self.df.zipcode.unique()
 
         for zipcode in zipcodes:
-
-            zipcode_df = self.df.loc[self.df.zipcode == zipcode]
-
+            # force DF to be a copy so we don't have a warning on the assignment below
+            zipcode_df = self.df.loc[self.df.zipcode == zipcode].copy()
             zone = self.zip_zone_map['mapping'][str(zipcode)]
             electric_percentage = self.gas_fraction['electrification'][zone]   
 
             # add gas fraction
             for enduse in electric_percentage.keys():
-                zipcode_df[enduse] = zipcode_df[enduse]/electric_percentage[enduse]
-        
-            # output dataframe 
-            if initialization:
-                total_loads = zipcode_df
-                initialization = False
-            else:
-                total_loads = total_loads.append(zipcode_df)
+                zipcode_df[enduse] = zipcode_df[enduse] / electric_percentage[enduse]
+            
+            total_loads = total_loads.append(zipcode_df)
 
         self.validate(total_loads)
         self.on_complete({self.output_artifact_total_loads: total_loads})

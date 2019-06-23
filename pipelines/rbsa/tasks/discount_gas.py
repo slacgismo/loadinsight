@@ -40,28 +40,20 @@ class DiscountGas(t.Task):
         if self.df.columns[0] == 'Unnamed: 0':
             self.df = self.df.drop('Unnamed: 0', axis=1)
 
-        # output dataframe initialization
-        initialization = True
-
+        enduse_loadshapes = pd.DataFrame()
         city_list = self.df.target.unique()
 
         for city in city_list:
-
-            city_df = self.df.loc[self.df.target == city]
-
+            # force DF to be a copy so we don't have a warning on the assignment below
+            city_df = self.df.loc[self.df.target == city].copy()
             zone = self.projection_locations['cities'][city]
             electric_percentage = self.gas_fraction['electrification'][zone]   
 
             # add gas fraction
             for enduse in electric_percentage.keys():
                 city_df[enduse] = city_df[enduse] * city_df[enduse]
-        
-            # output dataframe 
-            if initialization:
-                enduse_loadshapes = city_df
-                initialization = False
-            else:
-                enduse_loadshapes = enduse_loadshapes.append(city_df)
+                
+            enduse_loadshapes = enduse_loadshapes.append(city_df)
 
         self.validate(enduse_loadshapes)
         self.on_complete({self.output_artifact_enduse_loadshapes: enduse_loadshapes})

@@ -66,10 +66,10 @@ class RbsaPipeline():
             logger.exception(f'Directory we attempted to create for {self.name} already exists')
 
     def _generate_result_plots(self):
-        logging.info('Start plot generation')
+        logger.info('Start plot generation')
         # loop through our results and generate the plots
         for key, value in self.pipeline.result_map.items():
-            logging.info(f'Generating plot for {key}')
+            logger.info(f'Generating plot for {key}')
             #value['data_frame'].plot()
 
 
@@ -80,7 +80,7 @@ class RbsaPipeline():
         try:
             self._create_results_storage()
             self.pipeline.run()
-            logging.info('PIPELINE RUN FINISHED')
+            logger.info(f'Total Pipeline Run Time: {self.pipeline.total_pipeline_run_time}')
             self._generate_result_plots()
         except ValueError as ve:
             logger.exception(f'{self.name} failed its pipeline execution. Cleaning up and exiting')

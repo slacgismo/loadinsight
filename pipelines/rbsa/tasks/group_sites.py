@@ -45,7 +45,6 @@ class SitesGrouper(t.Task):
 
         # make dictionary of dataframes for each 3 digit zip
         zipdf_dict = {}
-
         full_zipcodes = set()
 
         for site in all_sites:
@@ -63,19 +62,12 @@ class SitesGrouper(t.Task):
                 zipdf_dict[zipcode_3digit] = site_df
 
         full_zipcodes = pd.DataFrame(full_zipcodes, columns=['zipcodes'])
-
-        # make single dataframe out op dictionary
-        initialization = True
+        area_loads = pd.DataFrame()
 
         for zip3 in zipdf_dict.keys():
             zip_df = zipdf_dict[zip3]
             zip_df.insert(loc=0, column='zipcode', value=zip3)
-
-            if initialization:
-                area_loads = zip_df
-                initialization = False
-            else:
-                area_loads = area_loads.append(zip_df)
+            area_loads = area_loads.append(zip_df)
 
         self.validate(area_loads)
         self.on_complete({self.output_artifact_area_load: area_loads, self.output_artifact_full_zipcodes: full_zipcodes})  

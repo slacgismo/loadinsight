@@ -65,9 +65,9 @@ class HeatcoolIndexer(t.Task):
         initialization = True
 
         zipcodes = self.df.zipcode.unique()
+        enduse_loads = pd.DataFrame()
 
         for zipcode in zipcodes:
-
             zipcode_df = self.df.loc[self.df.zipcode == zipcode]
             zipcode_df = zipcode_df.reset_index()
             
@@ -108,12 +108,7 @@ class HeatcoolIndexer(t.Task):
             for enduse in enduses_updated:
                 zipcode_df[enduse] = zipcode_df[enduse] + load_df[enduse]
 
-            # output dataframe 
-            if initialization:
-                enduse_loads = zipcode_df
-                initialization = False
-            else:
-                enduse_loads = enduse_loads.append(zipcode_df)
+            enduse_loads = enduse_loads.append(zipcode_df)
 
         enduse_loads = enduse_loads.drop('HeatCool', axis=1)
         enduse_loads = enduse_loads.set_index('time')

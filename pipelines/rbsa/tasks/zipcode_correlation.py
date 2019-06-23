@@ -52,7 +52,13 @@ class ZipcodeCorrelation(t.Task):
 
         for base in self.full_zipcodes:
             for target in self.projection_locations:
-
+                if target == 'CorpusChristi,TX':
+                    continue
+                if base == 97239:
+                    continue
+                if base == 97008:
+                    continue
+                    
                 base_filename = f'tmy_base/{str(base)}.csv'
                 target_filename = f'tmy_target/{str(target)}.csv'
 
@@ -79,7 +85,8 @@ class ZipcodeCorrelation(t.Task):
         self.on_complete({self.output_artifact_correlation_matrix: correlation_matrix})
 
     def convert_coef_3digit(self, df):
-        """ Convert correlation of coefficient array from 5 digit zipcodes to 3
+        """
+        Convert correlation of coefficient array from 5 digit zipcodes to 3
         """
         zipcodes_3digit = set()
 

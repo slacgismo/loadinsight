@@ -68,14 +68,9 @@ class ProjectLoadshapes(t.Task):
                 logger.warning(f'In task {self.name}, weather data for {target} not found')
                 continue
 
-            if use_adjusted:
-                winter = weather['winter_adjusted']
-                spring = weather['spring_adjusted']
-                summer = weather['summer_Adjusted']
-            else:
-                winter = weather['winter']
-                spring = weather['spring']
-                summer = weather['summer']
+            winter = weather['winter'] if not use_adjusted else weather['winter_adjusted']
+            spring = weather['spring'] if not use_adjusted else weather['spring_adjusted']
+            summer = weather['summer'] if not use_adjusted else weather['summer_adjusted']
 
             A_winter = self.get_A(winter)
             A_spring = self.get_A(spring)
@@ -84,7 +79,6 @@ class ProjectLoadshapes(t.Task):
             target_loadshapes = pd.DataFrame(columns=self.enduse_cols)
 
             for enduse in self.enduse_cols:
-
                 x = np.array(base_loadshapes[enduse])
 
                 y_winter = np.matmul(A_winter, x)
@@ -107,7 +101,6 @@ class ProjectLoadshapes(t.Task):
     def get_A(self, weather):
         """constructs A matrix for non weather sensitive loads
         """
-
         A = np.zeros((len(weather.index), 50), float)
 
         for h in range(len(weather.index)):
