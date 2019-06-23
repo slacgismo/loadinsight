@@ -36,10 +36,10 @@ class ZipcodeCorrelation(t.Task):
         self.data_files = []
 
         for location in self.full_zipcodes:
-            self.data_files.append({ 'name': 'tmy_base/'+str(location)+'.csv', 'read_type': SupportedFileReadType.DATA })
+            self.data_files.append({ 'name': f'tmy_base/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
 
         for location in self.projection_locations:
-            self.data_files.append({ 'name': 'tmy_target/'+str(location)+'.csv', 'read_type': SupportedFileReadType.DATA })
+            self.data_files.append({ 'name': f'tmy_target/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
 
         self.data_map = self.load_data(self.data_files)       
 

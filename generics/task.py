@@ -1,7 +1,7 @@
 import os
 import logging
-from settings import base
 from time import time
+from settings import base
 from generics import artifact
 
 
@@ -108,7 +108,8 @@ class Task(artifact.ArtifactDataManager):
                 'output_filename': output_filename,
                 'versioned_filename': versioned_name,
                 'new_file_hash': new_file_contents_hex_digest,
-                'old_file_hash': existing_file_contents_hex_digest
+                'old_file_hash': existing_file_contents_hex_digest,
+                'data_frame': data_frame
             })
 
         self.task_results = results

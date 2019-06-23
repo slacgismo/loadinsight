@@ -1,4 +1,7 @@
+import os
 import logging
+from time import time
+from settings import base
 from generics import pipeline as p, task as t
 
 from pipelines.rbsa.tasks import (
@@ -18,8 +21,9 @@ logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 class RbsaPipeline():
     def __init__(self, pipeline_configuration=None):
-        self.name = 'lctk_rbsa_pipeline'
+        self.name = 'loadinsight_rbsa_pipeline'
         self.pipeline = p.Pipeline(self.name)
+        self.dir_name = f'{base.LOCAL_PATH}/{time()}__{self.name}'
         
         if pipeline_configuration:
             # TODO: establish a configuration scheme for this to run dynamically
@@ -55,13 +59,29 @@ class RbsaPipeline():
         normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
         self.pipeline.add_task(normalize_loadshapes_task)
 
+    def _create_results_storage(self):
+        try:
+            os.makedirs(self.dir_name)
+        except FileExistsError:
+            logger.exception(f'Directory we attempted to create for {self.name} already exists')
+
+    def _generate_result_plots(self):
+        logging.info('Start plot generation')
+        # loop through our results and generate the plots
+        for key, value in self.pipeline.result_map.items():
+            logging.info(f'Generating plot for {key}')
+            #value['data_frame'].plot()
+
+
     def execute(self):
         """
         Run all the tasks in this pipeline
         """
         try:
+            self._create_results_storage()
             self.pipeline.run()
-            logger.info(self.pipeline.result_map)
+            logging.info('PIPELINE RUN FINISHED')
+            self._generate_result_plots()
         except ValueError as ve:
             logger.exception(f'{self.name} failed its pipeline execution. Cleaning up and exiting')
             self.on_failure()

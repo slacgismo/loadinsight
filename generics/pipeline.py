@@ -51,6 +51,7 @@ class Pipeline(object):
                 raise ValueError(f'Validation Failed for task {pipeline_task.name}')
             
             self.result_map[pipeline_task.name] = pipeline_task.task_results
+        logging.info('PIPELINE RUN IS DONE')
 
     def save(self):
         """
