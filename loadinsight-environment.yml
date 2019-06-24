@@ -3,6 +3,7 @@ dependencies:
   - python=3.6
   - pandas
   - numpy
+  - matplotlib
   - pip:
     - boto3
     - requests

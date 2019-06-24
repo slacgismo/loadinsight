@@ -108,8 +108,7 @@ class Task(artifact.ArtifactDataManager):
                 'output_filename': output_filename,
                 'versioned_filename': versioned_name,
                 'new_file_hash': new_file_contents_hex_digest,
-                'old_file_hash': existing_file_contents_hex_digest,
-                'data_frame': data_frame
+                'old_file_hash': existing_file_contents_hex_digest
             })
 
         self.task_results = results
