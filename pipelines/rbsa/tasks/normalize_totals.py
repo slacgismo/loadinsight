@@ -85,6 +85,12 @@ class NormalizeTotals(t.Task):
             logger.exception(f'Task {self.name} did not pass validation. Peak total greater than 1.')
             self.did_task_pass_validation = False
             self.on_failure()
+
+        if df.min(numeric_only=True).min() < 0:
+            logger.exception(f'Task {self.name} did not pass validation. Negative value found.')
+            self.did_task_pass_validation = False
+            self.on_failure()
+
             
     def on_failure(self):
         logger.info('Perform task cleanup because we failed')

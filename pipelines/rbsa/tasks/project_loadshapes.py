@@ -59,6 +59,7 @@ class ProjectLoadshapes(t.Task):
 
         for target in target_locations:
             base = self.correlation_matrix.loc[target,:].idxmax()
+            print(base)
             base_loadshapes = self.loadshapes.loc[self.loadshapes['zipcode'] == int(base)]
 
             base_loadshapes["Ventilation"][:48] = base_loadshapes["Heating"][:48] + base_loadshapes["Cooling"][:48] + base_loadshapes["Ventilation"][:48]
@@ -128,7 +129,7 @@ class ProjectLoadshapes(t.Task):
             logger.exception(f'Task {self.name} did not pass validation. DataFrame contains null values when it should not.')
             self.did_task_pass_validation = False
             self.on_failure()
-
+        
     def on_failure(self):
         logger.info('Perform task cleanup because we failed')
         super().on_failure()
