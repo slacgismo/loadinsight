@@ -99,10 +99,15 @@ def execute_lctk(argv):
     from pipelines.rbsa import rbsa
     rbsa_pipeline = rbsa.RbsaPipeline()
     rbsa_pipeline.execute()
+    
     # IF YOU WANT TO JUST RUN THE PLOTS UN-COMMENT THE NEXT TWO LINES AND DON'T EXECUTE
     # THIS IS FOR DEBUG PURPOSES ONLY
     # rbsa_pipeline._create_results_storage()
     # rbsa_pipeline.generate_result_plots()
+    
+    # from utilities import image_stitcher
+    # image_stitcher.stitch('local_data/1561344334.884546__loadinsight_rbsa_pipeline/normal_loadshapes/', 'normalized_loadshapes.png')
+    # image_stitcher.stitch('local_data/1561344334.884546__loadinsight_rbsa_pipeline/total_loadshapes/', 'total_loadshapes.png')
 
 if __name__ == '__main__':
     try:
