@@ -61,6 +61,11 @@ class ProjectLoadshapes(t.Task):
             base = self.correlation_matrix.loc[target,:].idxmax()
             base_loadshapes = self.loadshapes.loc[self.loadshapes['zipcode'] == int(base)]
 
+            base_loadshapes["Ventilation"][:48] = base_loadshapes["Heating"][:48] + base_loadshapes["Cooling"][:48] + base_loadshapes["Ventilation"][:48]
+
+            base_loadshapes["Heating"][:48] = 0
+            base_loadshapes["Cooling"][:48] = 0
+
             try:
                 weather_file = [{ 'name': f'target_weather/{str(target)}.csv', 'read_type': SupportedFileReadType.DATA }] 
                 weather = self.load_data(weather_file)[f'target_weather/{str(target)}.csv']
