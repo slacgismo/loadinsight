@@ -373,3 +373,5 @@ $RECYCLE.BIN/
 *.log.*
 # End of https://www.gitignore.io/api/macos,django,python,windows,pycharm,sublimetext,visualstudiocode
 ~*
+nercmap/tl_2017_us_state.zip
+nercmap/tl_2017_us_zcta510.zip
