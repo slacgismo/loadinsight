@@ -8,3 +8,4 @@ dependencies:
     - boto3
     - requests
     - Pillow
+    - awscli

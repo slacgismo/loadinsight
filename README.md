@@ -20,6 +20,11 @@ conda activate venv_loadinsight
 conda deactivate
 ```
 
+## Setting up the aws credentials
+```
+aws configure  # follow the prompts and input your credetials
+```
+
 ## Running LCTK
 ```
 # runs with DEBUG=True
