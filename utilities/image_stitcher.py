@@ -6,9 +6,9 @@ logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 def stitch(directory_path, output_name, cols=3):
     """
-    Given a directory, get all available png's and collate them in row x column setup 
-    with the supplied number of columns. The rows are deduced as a fn of number of pngs
-    in the directory divided by the given number of columns.
+    Given a directory, get all available png's and collate them in a row x column setup 
+    with the supplied number of columns. The rows are deduced as a fn of the number of 
+    pngs in the directory, divided by the given number of columns.
     Assumptions:
     - All images are the same size - we are simply getting the first image in the dir
       and using its width and height for all subsequent calculations
