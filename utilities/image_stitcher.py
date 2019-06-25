@@ -30,8 +30,7 @@ def stitch(directory_path, output_name, cols=3):
             # png's in dir. We can account for this later.
             logger.info('Encountered an image other than .png, skipping processing...')
             continue
-
-        logger.info(f'Working with image {plot_image_filename}')
+            
         img = Image.open(f'{directory_path}{plot_image_filename}')
 
         if i == 0:
@@ -42,12 +41,10 @@ def stitch(directory_path, output_name, cols=3):
             # determine the final collage's dimensions
             final_image_width = img_width * cols
             final_image_height = img_height * (int(number_of_images / cols))
-            logger.info(f'creating a new final image with width {str(final_image_width)} and height {str(final_image_height)}')
             final_image = Image.new('RGB', (final_image_width, final_image_height))
         
         x_position = int(i / cols)
         y_position = i % cols
-        logger.info(f'collating image at x {str(x_position)} and y {str(y_position)}')
         final_image.paste(img, (img_width * y_position, img_height * x_position))
 
     if final_image:
