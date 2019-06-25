@@ -1,76 +1,54 @@
 import os
+import logging
 from PIL import Image
 
-def merge_images(file1, file2, direction):
-    """Merge two images into one, displayed side by side
-    :param file1: path to first image file
-    :param file2: path to second image file
-    :return: the merged Image object
+logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
+
+def stitch(directory_path, output_name, cols=3):
     """
-    try:
-        image1 = Image.open(file1)
-    except:
-        image1 = file1
-    image2 = Image.open(file2)
+    Given a directory, get all available png's and collate them in row x column setup 
+    with the supplied number of columns. The rows are deduced as a fn of number of pngs
+    in the directory divided by the given number of columns.
+    Assumptions:
+    - All images are the same size - we are simply getting the first image in the dir
+      and using its width and height for all subsequent calculations
+    """
+    img_width = 0
+    img_height = 0
+    final_image = None
+    plots = sorted(os.listdir(directory_path))
+    number_of_images = len(plots)
 
-    (width1, height1) = image1.size
-    (width2, height2) = image2.size
+    logger.info(f'Stitching {str(number_of_images)} images in a {str(cols)}x{str(int(number_of_images / cols))} collage')
 
-    if direction == 'horizontal':
-        result_width = width1 + width2
-        result_height = max(height1, height2)
-    else:
-        result_width = max(width1, width2)
-        result_height = height1 + height2
-
-    result = Image.new('RGB', (result_width, result_height))
-    result.paste(im=image1, box=(0, 0))
-
-    if direction == 'horizontal':
-        result.paste(im=image2, box=(width1, 0))
-    else:
-        result.paste(im=image2, box=(0, height1))
-
-    return result
-
-def stitch(directory_path, output_name):
-    # FIXME: remove this while loop and leverage the directory listing appropriately
-    plots = os.listdir(directory_path)
-
-    x = 0
-    image = None
-    new_row = True
-
-    while new_row:
-        y = 0
-        image_h = None
-        new_column = True
+    for i in range(number_of_images):
+        plot_image_filename = os.fsdecode(plots[i])
         
-        while new_column:
-            file = f'{str(x)}_{str(y)}.png'
-            filepath = f'{directory_path}{file}'
+        if not plot_image_filename.endswith('.png'):
+            # FIXME: this should raise an exception otherwise it'll screw up the image collage
+            # since it assumes height based on total number of files in dir, vs total number of
+            # png's in dir. We can account for this later.
+            logger.info('Encountered an image other than .png, skipping processing...')
+            continue
 
-            if image_h:
-                if file in plots:
-                    image_h = merge_images(image_h, filepath, 'horizontal')
-                else:
-                    new_column = False
-            elif file in plots:
-                image_h = Image.open(filepath)
-            else:
-                new_row = False
-                break
+        logger.info(f'Working with image {plot_image_filename}')
+        img = Image.open(f'{directory_path}{plot_image_filename}')
 
-            mid_path = f'{directory_path}{str(x)}.png'
-            image_h.save(mid_path) 
+        if i == 0:
+            # this is the first iteration. We need to create the new image where all
+            # the others will be collated. This is determined by the relative dimensions
+            # of the first available image in the directory
+            (img_width, img_height) = img.size
+            # determine the final collage's dimensions
+            final_image_width = img_width * cols
+            final_image_height = img_height * (int(number_of_images / cols))
+            logger.info(f'creating a new final image with width {str(final_image_width)} and height {str(final_image_height)}')
+            final_image = Image.new('RGB', (final_image_width, final_image_height))
+        
+        x_position = int(i / cols)
+        y_position = i % cols
+        logger.info(f'collating image at x {str(x_position)} and y {str(y_position)}')
+        final_image.paste(img, (img_width * y_position, img_height * x_position))
 
-            y += 1
-
-        if image:
-            image = merge_images(image, mid_path, 'vertical')
-        else:
-            image = image_h
-
-        x += 1
-
-    image.save(output_name)
+    if final_image:
+        final_image.save(f'{directory_path}{output_name}')

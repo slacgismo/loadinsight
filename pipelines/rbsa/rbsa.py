@@ -16,6 +16,7 @@ from pipelines.rbsa.tasks import (
     normalize_loadshapes
 )
 
+
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
@@ -32,29 +33,29 @@ class RbsaPipeline():
             self.create_tasks()
 
     def create_tasks(self):
-        site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
-        self.pipeline.add_task(site_grouping_task)
+        # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
+        # self.pipeline.add_task(site_grouping_task)
 
-        heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
-        self.pipeline.add_task(heatcool_indexing_task)
+        # heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
+        # self.pipeline.add_task(heatcool_indexing_task)
 
-        undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
-        self.pipeline.add_task(undiscount_gas_task)
+        # undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
+        # self.pipeline.add_task(undiscount_gas_task)
 
-        normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
-        self.pipeline.add_task(normalize_totals_task)
+        # normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
+        # self.pipeline.add_task(normalize_totals_task)
 
-        correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
-        self.pipeline.add_task(correlation_task)
+        # correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
+        # self.pipeline.add_task(correlation_task)
 
-        find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
-        self.pipeline.add_task(find_sensitivities_task)
+        # find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
+        # self.pipeline.add_task(find_sensitivities_task)
 
-        project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
-        self.pipeline.add_task(project_loadshapes_task)
+        # project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
+        # self.pipeline.add_task(project_loadshapes_task)
 
-        discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
-        self.pipeline.add_task(discount_gas_task)
+        # discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
+        # self.pipeline.add_task(discount_gas_task)
 
         normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
         self.pipeline.add_task(normalize_loadshapes_task)
@@ -69,8 +70,6 @@ class RbsaPipeline():
             logger.exception(f'Directory we attempted to create for {self.name} already exists')
 
     def generate_result_plots(self):
-        logger.info('Start plot generation - CURRENTLY ONLY DOING NORMALIZE LOADSHAPES!!')
-
         ######## FOR DEBUG PURPOSES!
         import numpy as np
         import matplotlib.pyplot as plt
@@ -111,6 +110,7 @@ class RbsaPipeline():
 
         logger.info('GENERATING NORMAL LOADSHAPE PLOTS')
 
+        image_index = 0
         for idx, city in enumerate(normal_loads.target.unique()):
             city_df = normal_loads.loc[normal_loads.target == city]
             
@@ -121,11 +121,14 @@ class RbsaPipeline():
                 day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                 plot = day_df[['Heating','Cooling','Baseload']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['red','blue','black'])
                 fig = plot.get_figure()
-                fig.savefig(f'{normal_plots_dir}/{str(idx)}_{str(ydx)}.png')
+                image_index_based_name = '{0:0=2d}'.format(image_index)
+                fig.savefig(f'{normal_plots_dir}/{image_index_based_name}.png')
+                image_index += 1
 
 
         logger.info('GENERATING TOTAL LOADSHAPE PLOTS')
 
+        image_index = 0
         for idx, city in enumerate(total_loadshapes.target.unique()):
             city_df = total_loadshapes.loc[total_loadshapes.target == city]
             
@@ -136,7 +139,9 @@ class RbsaPipeline():
                 day_df['Baseload'] = day_df[total_base_enduses].sum(axis=1)
                 plot = day_df[['Heating','Cooling','Baseload']].plot(title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['red','blue','black'])
                 fig = plot.get_figure()
-                fig.savefig(f'{total_plots_dir}/{str(idx)}_{str(ydx)}.png')
+                image_index_based_name = '{0:0=2d}'.format(image_index)
+                fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
+                image_index += 1
         
 
     def execute(self):
