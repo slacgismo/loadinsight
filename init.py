@@ -106,6 +106,7 @@ def execute_lctk(argv):
     image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/enduse_loadshapes/', 'enduse_loadshapes.png')
     image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/total_loadshapes/', 'total_loadshapes.png')
     image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/loadshapes/', 'loadshapes.png')
+    image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/components/', 'components.png')
 
 if __name__ == '__main__':
     try:
