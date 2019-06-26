@@ -11,7 +11,7 @@ from pipelines.ceus.tasks import (
     fcz_correlation,
     project_loadshapes,
     discount_gas,
-    normalize_loadshapes
+    apply_roa
 )
 
 
@@ -52,6 +52,9 @@ class CeusPipeline():
         normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
         self.pipeline.add_task(normalize_loadshapes_task)
 
+        apply_roa_task = apply_roa.ApplyRoa('apply_roa_task')
+        self.pipeline.add_task(apply_roa_task)
+
     def _create_results_storage(self, storage_name=None):
         try:
             if storage_name:
@@ -74,13 +77,15 @@ class CeusPipeline():
             { 'name': 'ceus_normal_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': 'ceus_enduse_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': 'ceus_total_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_loadshapes.csv', 'read_type': SupportedFileReadType.DATA }
+            { 'name': 'ceus_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': 'ceus_components.csv', 'read_type': SupportedFileReadType.DATA }
         ])
 
         normal_loadshapes = df['ceus_normal_loadshapes.csv']
         enduse_loadshapes = df['ceus_enduse_loadshapes.csv']
         total_loadshapes = df['ceus_total_loadshapes.csv']
         loadshapes = df['ceus_loadshapes.csv']
+        components = df['ceus_components.csv']
 
         base_enduses = list(normal_loadshapes.columns)
         base_enduses.remove('time')
@@ -102,6 +107,11 @@ class CeusPipeline():
 
         loadshapes_plots_dir = f'{self.dir_name}/ceus_loadshapes'
         self._create_results_storage(loadshapes_plots_dir)
+
+        components_plots_dir = f'{self.dir_name}/ceus_components'
+        self._create_results_storage(components_plots_dir)
+
+        plotting_components = ['MotorA', 'MotorB', 'MotorC', 'MotorD', 'PE', 'Stat_P_Cur', 'Stat_P_Res']
 
         logger.info('GENERATING NORMAL LOADSHAPE PLOTS')
 
@@ -194,6 +204,28 @@ class CeusPipeline():
                 fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1    
+
+        logger.info('GENERATING COMPONENT PLOTS')
+
+        image_index = 0
+        for idx, city in enumerate(components.target.unique()):
+            city_df = components.loc[components.target == city]
+            for zdx, buildingtype in enumerate(loadshapes.buildingtype.unique()):
+                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
+                max_total = buildingtype_df[plotting_components].sum(axis=1).max()
+                max_val = 1 if max_total <= 1 else int(max_total) + 1
+                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
+                    title = f'{str(city)}-{buildingtype}-{str(daytype)}'
+                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
+                    day_df = day_df.reset_index()
+                    plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
+                    plt.xlabel('Hour-of-Day')
+                    plt.ylabel('Load (pu. summer total peak)')   
+                    fig = plot.get_figure()
+                    image_index_based_name = '{0:0=2d}'.format(image_index)
+                    fig.savefig(f'{components_plots_dir}/{image_index_based_name}.png')
+                    plt.close(fig)
+                    image_index += 1   
 
     def execute(self):
         """

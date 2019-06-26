@@ -112,6 +112,7 @@ def execute_lctk(argv):
     image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_enduse_loadshapes/', 'ceus_enduse_loadshapes.png')
     image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_total_loadshapes/', 'ceus_total_loadshapes.png')
     image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_loadshapes/', 'ceus_loadshapes.png')
+    image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_components/', 'ceus_components.png')
 
     # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/normal_loadshapes/', 'normalized_loadshapes.png')
     # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/enduse_loadshapes/', 'enduse_loadshapes.png')

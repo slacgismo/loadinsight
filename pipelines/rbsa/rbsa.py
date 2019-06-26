@@ -13,7 +13,8 @@ from pipelines.rbsa.tasks import (
     zipcode_correlation,
     project_loadshapes,
     discount_gas,
-    normalize_loadshapes
+    normalize_loadshapes,
+    apply_roa
 )
 
 
