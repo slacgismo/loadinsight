@@ -68,6 +68,131 @@ class CeusPipeline():
         from generics.artifact import ArtifactDataManager
         from generics.file_type_enum import SupportedFileReadType
 
+        adm = ArtifactDataManager()
+        
+        df =  adm.load_data([
+            { 'name': 'ceus_normal_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': 'ceus_enduse_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': 'ceus_total_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': 'ceus_loadshapes.csv', 'read_type': SupportedFileReadType.DATA }
+        ])
+
+        normal_loadshapes = df['ceus_normal_loadshapes.csv']
+        enduse_loadshapes = df['ceus_enduse_loadshapes.csv']
+        total_loadshapes = df['ceus_total_loadshapes.csv']
+        loadshapes = df['ceus_loadshapes.csv']
+
+        base_enduses = list(normal_loadshapes.columns)
+        base_enduses.remove('time')
+        base_enduses.remove('target')
+        base_enduses.remove('buildingtype')
+        base_enduses.remove('daytype')
+        base_enduses.remove('Heating')
+        base_enduses.remove('Cooling')
+        ticks = np.arange(0, 25, 3) 
+
+        normal_plots_dir = f'{self.dir_name}/ceus_normal_loadshapes'
+        self._create_results_storage(normal_plots_dir)
+
+        enduse_plots_dir = f'{self.dir_name}/ceus_enduse_loadshapes'
+        self._create_results_storage(enduse_plots_dir)
+
+        total_plots_dir = f'{self.dir_name}/ceus_total_loadshapes'
+        self._create_results_storage(total_plots_dir)
+
+        loadshapes_plots_dir = f'{self.dir_name}/ceus_loadshapes'
+        self._create_results_storage(loadshapes_plots_dir)
+
+        logger.info('GENERATING NORMAL LOADSHAPE PLOTS')
+
+        image_index = 0
+        for idx, city in enumerate(normal_loadshapes.target.unique()):
+            city_df = normal_loadshapes.loc[normal_loadshapes.target == city]
+            for zdx, buildingtype in enumerate(normal_loadshapes.buildingtype.unique()):
+                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
+                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+                if max_total <= 1: max_val = 1
+                else: max_val = int(max_total) + 1
+                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
+                    title = f'{str(city)}-{str(buildingtype)}-{str(daytype)}'
+                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
+                    day_df = day_df.append(day_df.iloc[0])
+                    day_df = day_df.reset_index()
+                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
+                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                    fig = plot.get_figure()
+                    image_index_based_name = '{0:0=2d}'.format(image_index)
+                    fig.savefig(f'{normal_plots_dir}/{image_index_based_name}.png')
+                    plt.close(fig)
+                    image_index += 1
+
+        logger.info('GENERATING ENDUSE LOADSHAPE PLOTS')
+
+        image_index = 0
+        for idx, city in enumerate(enduse_loadshapes.target.unique()):
+            city_df = enduse_loadshapes.loc[enduse_loadshapes.target == city]
+            for zdx, buildingtype in enumerate(enduse_loadshapes.buildingtype.unique()):
+                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
+                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+                if max_total <= 1: max_val = 1
+                else: max_val = int(max_total) + 1
+                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
+                    title = f'{str(city)}-{str(buildingtype)}-{str(daytype)}'
+                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
+                    day_df = day_df.append(day_df.iloc[0])
+                    day_df = day_df.reset_index()
+                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
+                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                    fig = plot.get_figure()
+                    image_index_based_name = '{0:0=2d}'.format(image_index)
+                    fig.savefig(f'{enduse_plots_dir}/{image_index_based_name}.png')
+                    plt.close(fig)
+                    image_index += 1
+
+        logger.info('GENERATING TOTAL LOADSHAPE PLOTS')
+
+        image_index = 0
+        for idx, city in enumerate(total_loadshapes.target.unique()):
+            city_df = total_loadshapes.loc[total_loadshapes.target == city]
+            for zdx, buildingtype in enumerate(total_loadshapes.buildingtype.unique()):
+                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
+                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+                if max_total <= 1: max_val = 1
+                else: max_val = int(max_total) + 1
+                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
+                    title = f'{str(city)}-{str(buildingtype)}-{str(daytype)}'
+                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
+                    day_df = day_df.append(day_df.iloc[0])
+                    day_df = day_df.reset_index()
+                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
+                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                    fig = plot.get_figure()
+                    image_index_based_name = '{0:0=2d}'.format(image_index)
+                    fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
+                    plt.close(fig)
+                    image_index += 1
+
+        logger.info('GENERATING LOADSHAPE PLOTS')
+
+        image_index = 0
+        for idx, city in enumerate(loadshapes.fcz.unique()):
+            city_df = loadshapes.loc[loadshapes.fcz == city]
+            for zdx, buildingtype in enumerate(loadshapes.buildingtype.unique()):
+                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
+                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+                if max_total <= 1: max_val = 1
+                else: max_val = int(max_total) + 1
+                title = f'{str(city)}-{str(buildingtype)}'
+                buildingtype_df['Baseload'] = buildingtype_df[base_enduses].sum(axis=1)
+                buildingtype_df = buildingtype_df.iloc[:24]
+                buildingtype_df = buildingtype_df.reset_index()
+                plot = buildingtype_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['black','red','blue'])
+                fig = plot.get_figure()
+                image_index_based_name = '{0:0=2d}'.format(image_index)
+                fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
+                plt.close(fig)
+                image_index += 1    
+
     def execute(self):
         """
         Run all the tasks in this pipeline
