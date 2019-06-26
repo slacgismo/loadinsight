@@ -13,7 +13,8 @@ from pipelines.rbsa.tasks import (
     zipcode_correlation,
     project_loadshapes,
     discount_gas,
-    normalize_loadshapes
+    normalize_loadshapes,
+    apply_roa
 )
 
 
@@ -59,6 +60,9 @@ class RbsaPipeline():
 
         normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
         self.pipeline.add_task(normalize_loadshapes_task)
+
+        apply_roa_task = apply_roa.ApplyRoa('apply_roa_task')
+        self.pipeline.add_task(apply_roa_task)
 
     def _create_results_storage(self, storage_name=None):
         try:
