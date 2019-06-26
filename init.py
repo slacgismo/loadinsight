@@ -96,14 +96,18 @@ def execute_lctk(argv):
     logger.info('Starting the LCTK main program')
 
     ### PRIMARILY USING FOR DEBUG PURPOSES - WILL MOVE THIS TO AN ORCHESTRATION FILE
-    from pipelines.rbsa import rbsa
-    rbsa_pipeline = rbsa.RbsaPipeline()
-    rbsa_pipeline.execute()
-    rbsa_pipeline.generate_result_plots()
+    # from pipelines.rbsa import rbsa
+    # rbsa_pipeline = rbsa.RbsaPipeline()
+    # rbsa_pipeline.execute()
+    # rbsa_pipeline.generate_result_plots()
     
-    from utilities import image_stitcher
-    image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/normal_loadshapes/', 'normalized_loadshapes.png')
-    image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/total_loadshapes/', 'total_loadshapes.png')
+    # from utilities import image_stitcher
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/normal_loadshapes/', 'normalized_loadshapes.png')
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/total_loadshapes/', 'total_loadshapes.png')
+
+    from pipelines.ceus import ceus
+    ceus_pipeline = ceus.CeusPipeline()
+    ceus_pipeline.execute()
 
 if __name__ == '__main__':
     try:

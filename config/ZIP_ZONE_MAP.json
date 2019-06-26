@@ -9,6 +9,10 @@
         "970":"NWC", "971":"NWV", "972":"NWC", "973":"NWV", "974":"NWC", 
         "980":"NWC", "981":"NWC", "982":"NWC", "983":"NWI", "984":"NWC", 
         "985":"NWI", "988":"NWI", "989":"NWI", 
-        "990":"NWI", "991":"NWI", "992":"NWI", "993":"NWI"    
+        "990":"NWI", "991":"NWI", "992":"NWI", "993":"NWI",
+        "FCZ01":"NCC", "FCZ02":"NCV", "FCZ03":"NCV", "FCZ04":"SCC", 
+        "FCZ05":"NCC", "FCZ06":"NCV", "FCZ07":"SCV", "FCZ08":"SCC", 
+        "FCZ09":"SCC", "FCZ10":"DSW", "FCZ11":"SCC", "FCZ12":"SCC",  
+        "FCZ13":"SCC", "FCZ14":"NCC", "FCZ15":"DSW",  
 	}
 }
