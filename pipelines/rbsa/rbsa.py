@@ -197,6 +197,7 @@ class RbsaPipeline():
             title = city
             city_df['Baseload'] = city_df[base_enduses].sum(axis=1)
             city_df = city_df.iloc[:24]
+            city_df = city_df.append(city_df.iloc[0])
             city_df = city_df.reset_index()
             plot = city_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
             plt.xlabel('Hour-of-Day')
@@ -217,6 +218,7 @@ class RbsaPipeline():
             for ydx, daytype in enumerate(city_df.daytype.unique()):
                 title = f'{str(city)}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
+                day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
