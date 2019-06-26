@@ -105,6 +105,10 @@ def execute_lctk(argv):
     ceus_pipeline = ceus.CeusPipeline()
     ceus_pipeline.execute()
     ceus_pipeline.generate_result_plots()
+
+    from pipelines.mix import mix
+    mix_pipeline = mix.MixPipeline()
+    mix_pipeline.execute()
     
     from utilities import image_stitcher
 
