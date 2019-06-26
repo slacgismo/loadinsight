@@ -52,15 +52,9 @@ class FczCorrelation(t.Task):
 
         for base in self.fcz_names:
             for target in self.projection_locations:
-                if target == 'CorpusChristi,TX':
-                    continue
-                if base == 97239:
-                    continue
-                if base == 97008:
-                    continue
                     
                 base_filename = f'ceus_tmy_base/{str(base)}.csv'
-                target_filename = f'ceus_tmy_base/{str(target)}.csv'
+                target_filename = f'ceus_tmy_target/{str(target)}.csv'
 
                 base_weather = self.data_map[base_filename]
                 target_weather = self.data_map[target_filename]
@@ -79,35 +73,8 @@ class FczCorrelation(t.Task):
                 correlation = sum(correlation_vals) / len(correlation_vals)
                 correlation_matrix.ix[target, base] = correlation
 
-        correlation_matrix = self.convert_coef_3digit(correlation_matrix)
-
         self.validate(correlation_matrix)
         self.on_complete({self.output_artifact_correlation_matrix: correlation_matrix})
-
-    def convert_coef_3digit(self, df):
-        """
-        Convert correlation of coefficient array from 5 digit zipcodes to 3
-        """
-        zipcodes_3digit = set()
-
-        for zipcode in self.fcz_names:
-            zipcodes_3digit.add(str(zipcode)[0:3])
-
-        new_coef = pd.DataFrame(columns=zipcodes_3digit, index=self.projection_locations)
-
-        for city in self.projection_locations:
-            row = df.loc[df.index == city].squeeze()
-            ordered_row = row.sort_values(ascending=False)
-
-            for index in ordered_row.index:
-                cell_val = new_coef.loc[city][str(index)[:3]]
-
-                if cell_val != cell_val:
-                    new_coef.at[city,str(index)[:3]] = ordered_row[index]
-
-        new_coef = new_coef.reindex(sorted(new_coef.columns), axis=1)
-
-        return new_coef
 
     def validate(self, df):
         """

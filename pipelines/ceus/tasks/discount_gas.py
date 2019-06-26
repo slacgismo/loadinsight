@@ -14,7 +14,7 @@ class DiscountGas(t.Task):
         super().__init__(self)
         self.name = name
 
-        self.input_artifact_total_loadshapes = 'total_loadshapes.csv'
+        self.input_artifact_total_loadshapes = 'ceus_total_loadshapes.csv'
         self.input_artifact_gas_fraction = 'GAS_FRACTIONS.json'
         self.input_artifact_projection_locations = 'PROJECTION_LOCATIONS.json'
         self.my_data_files = [
@@ -23,7 +23,7 @@ class DiscountGas(t.Task):
             { 'name': self.input_artifact_projection_locations, 'read_type': SupportedFileReadType.CONFIG },
         ] 
 
-        self.output_artifact_enduse_loadshapes = 'enduse_loadshapes.csv'
+        self.output_artifact_enduse_loadshapes = 'ceus_enduse_loadshapes.csv'
         self.task_function = self._task
 
     def _get_data(self):
