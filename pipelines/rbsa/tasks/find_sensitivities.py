@@ -119,9 +119,13 @@ class FindSensitivities(t.Task):
 
                 # adjust x by first value
                 x = np.append(x[0], x[1:48] + x[0])
+
+                if x[:48].min() < 0:
+                    x[:48] -= x[:48].min()
+
                 x = np.append(x, [heat_sens, cool_sens])
 
-                zipcode_loadshapes[enduse] = x
+                zipcode_loadshapes[enduse] = x 
 
             zipcode_loadshapes.insert(loc=0, column='zipcode', value=zipcode)
             loadshapes = loadshapes.append(zipcode_loadshapes)

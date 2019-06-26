@@ -56,12 +56,18 @@ class SitesGrouper(t.Task):
             site_df = site_df.set_index('time')
             site_df = site_df.drop(['siteid'], axis=1)
 
+            # removing one-off negatives
+            if site_df.min().min() < 0:
+                site_df[site_df < 0] = 0
+
             if zipcode_3digit in zipdf_dict.keys(): 
                 zipdf_dict[zipcode_3digit] = self.add_df(zipdf_dict[zipcode_3digit], site_df)
             else:
                 zipdf_dict[zipcode_3digit] = site_df
 
         full_zipcodes = pd.DataFrame(full_zipcodes, columns=['zipcodes'])
+        full_zipcodes = full_zipcodes.sort_values('zipcodes')
+        full_zipcodes = full_zipcodes.reset_index(drop=True)
         area_loads = pd.DataFrame()
 
         for zip3 in zipdf_dict.keys():
@@ -124,6 +130,11 @@ class SitesGrouper(t.Task):
         logger.info(f'Validating task {self.name}')
         if df.isnull().values.any():
             logger.exception(f'Task {self.name} did not pass validation. Error found during grouping of sites to zip codes.')
+            self.did_task_pass_validation = False
+            self.on_failure()
+
+        if df.min(numeric_only=True).min() < 0:
+            logger.exception(f'Task {self.name} did not pass validation. Negative value found during grouping of sites to zip codes.')
             self.did_task_pass_validation = False
             self.on_failure()
 
