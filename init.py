@@ -107,12 +107,16 @@ def execute_lctk(argv):
     ceus_pipeline.generate_result_plots()
     
     from utilities import image_stitcher
-    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/normal_loadshapes/', 'normalized_loadshapes.png')
-    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/total_loadshapes/', 'total_loadshapes.png')
+    
     image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_normal_loadshapes/', 'ceus_normal_loadshapes.png')
     image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_enduse_loadshapes/', 'ceus_enduse_loadshapes.png')
     image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_total_loadshapes/', 'ceus_total_loadshapes.png')
     image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_loadshapes/', 'ceus_loadshapes.png')
+
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/normal_loadshapes/', 'normalized_loadshapes.png')
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/enduse_loadshapes/', 'enduse_loadshapes.png')
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/total_loadshapes/', 'total_loadshapes.png')
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/loadshapes/', 'loadshapes.png')
 
 if __name__ == '__main__':
     try:
