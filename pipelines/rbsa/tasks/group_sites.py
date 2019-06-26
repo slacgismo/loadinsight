@@ -66,6 +66,8 @@ class SitesGrouper(t.Task):
                 zipdf_dict[zipcode_3digit] = site_df
 
         full_zipcodes = pd.DataFrame(full_zipcodes, columns=['zipcodes'])
+        full_zipcodes = full_zipcodes.sort_values('zipcodes')
+        full_zipcodes = full_zipcodes.reset_index(drop=True)
         area_loads = pd.DataFrame()
 
         for zip3 in zipdf_dict.keys():

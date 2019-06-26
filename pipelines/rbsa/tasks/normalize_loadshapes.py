@@ -27,7 +27,7 @@ class NormalizeLoadshapes(t.Task):
         
         self.df = data_map[self.input_artifact_enduse_loadshapes]
 
-        if self.df.columns[0] == 'Unnamed: 0':
+        if self.df.columns[0] == 'Unnamed: 0':  
              self.df = self.df.drop('Unnamed: 0', axis=1)
 
         city_list = self.df.target.unique()
