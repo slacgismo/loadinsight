@@ -75,7 +75,7 @@ class ArtifactDataManager(object):
         try:
             temp_filename = str(uuid.uuid4())
             s3 = boto3.client('s3')
-            s3.download_file(base.REMOTE_PATH, f'rbsa/{filename}', temp_filename)
+            s3.download_file(base.REMOTE_PATH, f'ceus/{filename}', temp_filename)
             os.rename(temp_filename, f'{base.LOCAL_PATH}/{filename}')
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] == "404":
