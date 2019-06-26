@@ -11,6 +11,7 @@ from pipelines.ceus.tasks import (
     fcz_correlation,
     project_loadshapes,
     discount_gas,
+    normalize_loadshapes,
     apply_roa
 )
 
