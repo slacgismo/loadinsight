@@ -218,6 +218,7 @@ class CeusPipeline():
                 for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
                     title = f'{str(city)}-{buildingtype}-{str(daytype)}'
                     day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
+                    day_df = day_df.append(day_df.iloc[0])
                     day_df = day_df.reset_index()
                     plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                     plt.xlabel('Hour-of-Day')
