@@ -51,7 +51,7 @@ class DiscountGas(t.Task):
 
             # add gas fraction
             for enduse in electric_percentage.keys():
-                city_df[enduse] = city_df[enduse] * city_df[enduse]
+                city_df[enduse] = city_df[enduse] * electric_percentage[enduse]
                 
             enduse_loadshapes = enduse_loadshapes.append(city_df)
 
