@@ -33,33 +33,32 @@ class RbsaPipeline():
             self.create_tasks()
 
     def create_tasks(self):
-        # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
-        # self.pipeline.add_task(site_grouping_task)
+        site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
+        self.pipeline.add_task(site_grouping_task)
 
-        # heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
-        # self.pipeline.add_task(heatcool_indexing_task)
+        heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
+        self.pipeline.add_task(heatcool_indexing_task)
 
-        # undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
-        # self.pipeline.add_task(undiscount_gas_task)
+        undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
+        self.pipeline.add_task(undiscount_gas_task)
 
-        # normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
-        # self.pipeline.add_task(normalize_totals_task)
+        normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
+        self.pipeline.add_task(normalize_totals_task)
 
-        # correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
-        # self.pipeline.add_task(correlation_task)
+        correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
+        self.pipeline.add_task(correlation_task)
 
-        # find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
-        # self.pipeline.add_task(find_sensitivities_task)
+        find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
+        self.pipeline.add_task(find_sensitivities_task)
 
-        # project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
-        # self.pipeline.add_task(project_loadshapes_task)
+        project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
+        self.pipeline.add_task(project_loadshapes_task)
 
-        # discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
-        # self.pipeline.add_task(discount_gas_task)
+        discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
+        self.pipeline.add_task(discount_gas_task)
 
-        # normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
-        # self.pipeline.add_task(normalize_loadshapes_task)
-        return
+        normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
+        self.pipeline.add_task(normalize_loadshapes_task)
 
     def _create_results_storage(self, storage_name=None):
         try:
@@ -188,7 +187,7 @@ class RbsaPipeline():
             city_df['Baseload'] = city_df[base_enduses].sum(axis=1)
             city_df = city_df.iloc[:24]
             city_df = city_df.reset_index()
-            plot = city_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['black','red','blue'])
+            plot = city_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
             plt.xlabel('Hour-of-Day')
             plt.ylabel('Load (pu. base total peak)')                 
             fig = plot.get_figure()
