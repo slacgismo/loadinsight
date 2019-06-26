@@ -36,20 +36,15 @@ class UndiscountGas(t.Task):
         self.gas_fraction = data_map[self.input_artifact_gas_fraction]
         self.zip_zone_map = data_map[self.input_artifact_zip_zone_map]
 
+        self.df = self.df.fillna(0)
+
         total_loads = pd.DataFrame()
         climate_zones = self.df.fcz.unique()
 
         for fcz in climate_zones:
-
-            print(fcz)
-
             fcz_df = self.df.loc[self.df.fcz == fcz].copy()
             zone = self.zip_zone_map['mapping'][str(fcz)]
             electric_percentage = self.gas_fraction['electrification'][zone]   
-
-            print(fcz_df)
-
-            print(electric_percentage)
 
             # add gas fraction
             for enduse in electric_percentage.keys():

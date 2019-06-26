@@ -6,10 +6,9 @@ from generics import pipeline as p, task as t
 
 from pipelines.ceus.tasks import (
     undiscount_gas, 
-    # index_heatcool, 
-    # normalize_totals,
+    normalize_totals,
     # find_sensitivities,
-    # zipcode_correlation,
+    fcz_correlation,
     # project_loadshapes,
     # discount_gas,
     # normalize_loadshapes
@@ -34,6 +33,24 @@ class CeusPipeline():
     def create_tasks(self):
         undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
         self.pipeline.add_task(undiscount_gas_task)
+
+        normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
+        self.pipeline.add_task(normalize_totals_task)
+
+        correlation_task = fcz_correlation.FczCorrelation('correlation_task')
+        self.pipeline.add_task(correlation_task)
+
+        # find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
+        # self.pipeline.add_task(find_sensitivities_task)
+
+        # project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
+        # self.pipeline.add_task(project_loadshapes_task)
+
+        # discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
+        # self.pipeline.add_task(discount_gas_task)
+
+        # normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
+        # self.pipeline.add_task(normalize_loadshapes_task)
 
     def _create_results_storage(self, storage_name=None):
         try:
