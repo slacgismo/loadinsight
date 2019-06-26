@@ -1,1 +1,1 @@
-# All real data files in this folder will be ignored from the vcs.
+# All real data files in this folder will be ignored from the vcs. However this is where we stash all the needed files for the RBSA pipeline

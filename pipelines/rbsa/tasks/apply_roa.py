@@ -51,7 +51,7 @@ class ApplyRoa(t.Task):
             for daytype in daytypes:
                 day_df = self.df.loc[(self.df.target == location) & (self.df.daytype == daytype)]
                 day_matrix = day_df[ROA_columns].values
-                component_matrix = np.matmul(day_matrix,roa_matrix.T)
+                component_matrix = np.matmul(day_matrix, roa_matrix.T)
                 components_day_df = pd.DataFrame(component_matrix, columns=self.roa.index)
                 components_day_df.insert(loc=0, column='target', value=location)
                 components_day_df.insert(loc=1, column='daytype', value=daytype)

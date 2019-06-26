@@ -34,35 +34,36 @@ class RbsaPipeline():
             self.create_tasks()
 
     def create_tasks(self):
-        site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
-        self.pipeline.add_task(site_grouping_task)
+        # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
+        # self.pipeline.add_task(site_grouping_task)
 
-        heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
-        self.pipeline.add_task(heatcool_indexing_task)
+        # heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
+        # self.pipeline.add_task(heatcool_indexing_task)
 
-        undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
-        self.pipeline.add_task(undiscount_gas_task)
+        # undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
+        # self.pipeline.add_task(undiscount_gas_task)
 
-        normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
-        self.pipeline.add_task(normalize_totals_task)
+        # normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
+        # self.pipeline.add_task(normalize_totals_task)
 
-        correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
-        self.pipeline.add_task(correlation_task)
+        # correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
+        # self.pipeline.add_task(correlation_task)
 
-        find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
-        self.pipeline.add_task(find_sensitivities_task)
+        # find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
+        # self.pipeline.add_task(find_sensitivities_task)
 
-        project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
-        self.pipeline.add_task(project_loadshapes_task)
+        # project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
+        # self.pipeline.add_task(project_loadshapes_task)
 
-        discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
-        self.pipeline.add_task(discount_gas_task)
+        # discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
+        # self.pipeline.add_task(discount_gas_task)
 
-        normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
-        self.pipeline.add_task(normalize_loadshapes_task)
+        # normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
+        # self.pipeline.add_task(normalize_loadshapes_task)
 
-        apply_roa_task = apply_roa.ApplyRoa('apply_roa_task')
-        self.pipeline.add_task(apply_roa_task)
+        # apply_roa_task = apply_roa.ApplyRoa('apply_roa_task')
+        # self.pipeline.add_task(apply_roa_task)
+        return
 
     def _create_results_storage(self, storage_name=None):
         try:
@@ -84,69 +85,149 @@ class RbsaPipeline():
         
         df =  adm.load_data([
             { 'name': 'normal_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'total_loadshapes.csv', 'read_type': SupportedFileReadType.DATA }
+            { 'name': 'enduse_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': 'total_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': 'loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': 'components.csv', 'read_type': SupportedFileReadType.DATA }
         ])
 
-        normal_loads = df['normal_loadshapes.csv']
+        normal_loadshapes = df['normal_loadshapes.csv']
+        enduse_loadshapes = df['enduse_loadshapes.csv']
         total_loadshapes = df['total_loadshapes.csv']
+        loadshapes = df['loadshapes.csv']
+        components = df['components.csv']
 
-        base_enduses = list(normal_loads.columns)
+        base_enduses = list(normal_loadshapes.columns)
         base_enduses.remove('time')
         base_enduses.remove('target')
         base_enduses.remove('daytype')
         base_enduses.remove('Heating')
         base_enduses.remove('Cooling')
-        
-        total_base_enduses = list(total_loadshapes.columns)
-        total_base_enduses.remove('time')
-        total_base_enduses.remove('target')
-        total_base_enduses.remove('daytype')
-        total_base_enduses.remove('Heating')
-        total_base_enduses.remove('Cooling')
-
         ticks = np.arange(0, 25, 3) 
+
+        plotting_components = ['MotorA', 'MotorB', 'MotorC', 'MotorD', 'PE', 'Stat_P_Cur', 'Stat_P_Res']
 
         normal_plots_dir = f'{self.dir_name}/normal_loadshapes'
         self._create_results_storage(normal_plots_dir)
 
+        enduse_plots_dir = f'{self.dir_name}/enduse_loadshapes'
+        self._create_results_storage(enduse_plots_dir)
+
         total_plots_dir = f'{self.dir_name}/total_loadshapes'
         self._create_results_storage(total_plots_dir)
+
+        loadshapes_plots_dir = f'{self.dir_name}/loadshapes'
+        self._create_results_storage(loadshapes_plots_dir)
+
+        components_plots_dir = f'{self.dir_name}/components'
+        self._create_results_storage(components_plots_dir)
 
         logger.info('GENERATING NORMAL LOADSHAPE PLOTS')
 
         image_index = 0
-        for idx, city in enumerate(normal_loads.target.unique()):
-            city_df = normal_loads.loc[normal_loads.target == city]
-            
+        for idx, city in enumerate(normal_loadshapes.target.unique()):
+            city_df = normal_loadshapes.loc[normal_loadshapes.target == city]
+            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
                 title = f'{str(city)}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
+                day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
                 day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                plot = day_df[['Heating','Cooling','Baseload']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['red','blue','black'])
+                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                plt.xlabel('Hour-of-Day')
+                plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{normal_plots_dir}/{image_index_based_name}.png')
+                plt.close(fig)
                 image_index += 1
 
+        logger.info('GENERATING ENDUSE LOADSHAPE PLOTS')
+
+        image_index = 0
+        for idx, city in enumerate(enduse_loadshapes.target.unique()):
+            city_df = enduse_loadshapes.loc[enduse_loadshapes.target == city]
+            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
+            for ydx, daytype in enumerate(city_df.daytype.unique()):
+                title = f'{str(city)}-{str(daytype)}'
+                day_df = city_df.loc[city_df.daytype == daytype]
+                day_df = day_df.append(day_df.iloc[0])
+                day_df = day_df.reset_index()
+                day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
+                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                plt.xlabel('Hour-of-Day')
+                plt.ylabel('Load (pu. base total peak)')               
+                fig = plot.get_figure()
+                image_index_based_name = '{0:0=2d}'.format(image_index)
+                fig.savefig(f'{enduse_plots_dir}/{image_index_based_name}.png')
+                plt.close(fig)
+                image_index += 1
 
         logger.info('GENERATING TOTAL LOADSHAPE PLOTS')
 
         image_index = 0
         for idx, city in enumerate(total_loadshapes.target.unique()):
             city_df = total_loadshapes.loc[total_loadshapes.target == city]
-            
+            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
+            for ydx, daytype in enumerate(city_df.daytype.unique()):
+                title = f'{str(city)}-{str(daytype)}'
+                day_df = city_df.loc[city_df.daytype == daytype]
+                day_df = day_df.append(day_df.iloc[0])
+                day_df = day_df.reset_index()
+                day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
+                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                plt.xlabel('Hour-of-Day')
+                plt.ylabel('Load (pu. base total peak)')              
+                fig = plot.get_figure()
+                image_index_based_name = '{0:0=2d}'.format(image_index)
+                fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
+                plt.close(fig)
+                image_index += 1
+
+        logger.info('GENERATING LOADSHAPE PLOTS')
+
+        image_index = 0
+        for idx, city in enumerate(loadshapes.zipcode.unique()):
+            city_df = loadshapes.loc[loadshapes.zipcode == city]
+            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
+            title = city
+            city_df['Baseload'] = city_df[base_enduses].sum(axis=1)
+            city_df = city_df.iloc[:24]
+            city_df = city_df.reset_index()
+            plot = city_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+            plt.xlabel('Hour-of-Day')
+            plt.ylabel('Load (pu. base total peak)')                 
+            fig = plot.get_figure()
+            image_index_based_name = '{0:0=2d}'.format(image_index)
+            fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
+            plt.close(fig)
+            image_index += 1      
+
+        logger.info('GENERATING COMPONENT PLOTS')
+
+        image_index = 0
+        for idx, city in enumerate(components.target.unique()):
+            city_df = components.loc[components.target == city]
+            max_total = city_df[plotting_components].sum(axis=1).max()
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
                 title = f'{str(city)}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.reset_index()
-                day_df['Baseload'] = day_df[total_base_enduses].sum(axis=1)
-                plot = day_df[['Heating','Cooling','Baseload']].plot(title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['red','blue','black'])
+                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
+                plt.xlabel('Hour-of-Day')
+                plt.ylabel('Load (pu. summer total peak)')   
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
-                image_index += 1
-        
+                fig.savefig(f'{components_plots_dir}/{image_index_based_name}.png')
+                plt.close(fig)
+                image_index += 1   
+
 
     def execute(self):
         """
