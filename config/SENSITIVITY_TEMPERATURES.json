@@ -5,5 +5,9 @@
 	"residential" :{
 		"theat": 15,
 		"tcool": 25
+	},
+	"commercial" :{
+		"theat": 15,
+		"tcool": 25
 	}
 }
