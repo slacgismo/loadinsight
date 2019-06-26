@@ -33,32 +33,33 @@ class RbsaPipeline():
             self.create_tasks()
 
     def create_tasks(self):
-        site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
-        self.pipeline.add_task(site_grouping_task)
+        # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
+        # self.pipeline.add_task(site_grouping_task)
 
-        heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
-        self.pipeline.add_task(heatcool_indexing_task)
+        # heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
+        # self.pipeline.add_task(heatcool_indexing_task)
 
-        undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
-        self.pipeline.add_task(undiscount_gas_task)
+        # undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
+        # self.pipeline.add_task(undiscount_gas_task)
 
-        normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
-        self.pipeline.add_task(normalize_totals_task)
+        # normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
+        # self.pipeline.add_task(normalize_totals_task)
 
-        correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
-        self.pipeline.add_task(correlation_task)
+        # correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
+        # self.pipeline.add_task(correlation_task)
 
-        find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
-        self.pipeline.add_task(find_sensitivities_task)
+        # find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
+        # self.pipeline.add_task(find_sensitivities_task)
 
-        project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
-        self.pipeline.add_task(project_loadshapes_task)
+        # project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
+        # self.pipeline.add_task(project_loadshapes_task)
 
-        discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
-        self.pipeline.add_task(discount_gas_task)
+        # discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
+        # self.pipeline.add_task(discount_gas_task)
 
-        normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
-        self.pipeline.add_task(normalize_loadshapes_task)
+        # normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
+        # self.pipeline.add_task(normalize_loadshapes_task)
+        return
 
     def _create_results_storage(self, storage_name=None):
         try:
@@ -116,8 +117,7 @@ class RbsaPipeline():
         for idx, city in enumerate(normal_loadshapes.target.unique()):
             city_df = normal_loadshapes.loc[normal_loadshapes.target == city]
             max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            if max_total <= 1: max_val = 1
-            else: max_val = int(max_total) + 1
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
                 title = f'{str(city)}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
@@ -125,6 +125,8 @@ class RbsaPipeline():
                 day_df = day_df.reset_index()
                 day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                 plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                plt.xlabel('Hour-of-Day')
+                plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{normal_plots_dir}/{image_index_based_name}.png')
@@ -137,8 +139,7 @@ class RbsaPipeline():
         for idx, city in enumerate(enduse_loadshapes.target.unique()):
             city_df = enduse_loadshapes.loc[enduse_loadshapes.target == city]
             max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            if max_total <= 1: max_val = 1
-            else: max_val = int(max_total) + 1
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
                 title = f'{str(city)}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
@@ -146,6 +147,8 @@ class RbsaPipeline():
                 day_df = day_df.reset_index()
                 day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                 plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                plt.xlabel('Hour-of-Day')
+                plt.ylabel('Load (pu. base total peak)')               
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{enduse_plots_dir}/{image_index_based_name}.png')
@@ -158,8 +161,7 @@ class RbsaPipeline():
         for idx, city in enumerate(total_loadshapes.target.unique()):
             city_df = total_loadshapes.loc[total_loadshapes.target == city]
             max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            if max_total <= 1: max_val = 1
-            else: max_val = int(max_total) + 1
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
                 title = f'{str(city)}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
@@ -167,6 +169,8 @@ class RbsaPipeline():
                 day_df = day_df.reset_index()
                 day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                 plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                plt.xlabel('Hour-of-Day')
+                plt.ylabel('Load (pu. base total peak)')              
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
@@ -179,13 +183,14 @@ class RbsaPipeline():
         for idx, city in enumerate(loadshapes.zipcode.unique()):
             city_df = loadshapes.loc[loadshapes.zipcode == city]
             max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            if max_total <= 1: max_val = 1
-            else: max_val = int(max_total) + 1
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
             title = city
             city_df['Baseload'] = city_df[base_enduses].sum(axis=1)
             city_df = city_df.iloc[:24]
             city_df = city_df.reset_index()
             plot = city_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['black','red','blue'])
+            plt.xlabel('Hour-of-Day')
+            plt.ylabel('Load (pu. base total peak)')                 
             fig = plot.get_figure()
             image_index_based_name = '{0:0=2d}'.format(image_index)
             fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
