@@ -104,27 +104,42 @@ class GetMixed(t.Task):
 
             for building in mix_chart.index:
                 
+                percent = mix_chart['Percent'][building]
+
                 try:
                     buildingtype = self.buildingtype_dict[building]
-                except:
-                    continue
+
+                    if buildingtype == 'RES':
+                        df = self.residential_components.loc[self.residential_components.target == location]
+                    else:
+                        df = self.commercial_components.loc[(self.commercial_components.target == location) & (self.commercial_components.buildingtype == buildingtype)]
                     
-                percent = mix_chart['Percent'][building]
-                peak = mix_chart['Peak Load (kW)'][building]
+                    df = df.reset_index() 
 
-                if buildingtype == 'RES':
-                    df = self.residential_components.loc[self.residential_components.target == location]
-                else:
-                    df = self.commercial_components.loc[(self.commercial_components.target == location) & (self.commercial_components.buildingtype == buildingtype)]
-                
-                df = df.reset_index() 
+                except:
+                    # if buildingtype doesn't exist
+                    df = pd.DataFrame(1, index=range(72), columns=self.components)
+                    df.insert(loc=0, column='target', value=location)
+                    df.insert(loc=1, column='daytype', value= (['winter_peak'] * 24) + (['spring_light'] * 24) + (['summer_peak'] * 24))
+                    df.insert(loc=2, column='time', value=list(range(24)) * 3)
 
-                new_df = df[self.components].fillna(0) * percent
+                winter_peak = df[self.components][:24].sum(axis=1).max()
+                spring_peak = df[self.components][24:48].sum(axis=1).max()
+                summer_peak = df[self.components][48:72].sum(axis=1).max()
+
+                total_peak = df[self.components].sum(axis=1).max()
+
+                new_df = df[self.components].fillna(0)
+
+                new_df[:24] = new_df[:24] * percent * (winter_peak / total_peak)
+                new_df[24:48] = new_df[24:48] * percent * (spring_peak / total_peak)
+                new_df[48:72] = new_df[48:72] * percent * (summer_peak / total_peak)
 
                 if initialization:
-                    mixed_df = mixed_df + new_df
+                    mixed_df = mixed_df.add(new_df)
                 else:
                     mixed_df = new_df
+                    initialization = True
             
             mixed_df.insert(loc=0, column='target', value=location)
             mixed_df.insert(loc=1, column='daytype', value=df.daytype)
