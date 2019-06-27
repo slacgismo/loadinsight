@@ -5,6 +5,7 @@ from settings import base
 from generics import pipeline as p, task as t
 
 from pipelines.mix.tasks import (
+    get_mixed
 )
 
 
@@ -24,8 +25,8 @@ class MixPipeline():
             self.create_tasks()
 
     def create_tasks(self):
-        # site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
-        # self.pipeline.add_task(site_grouping_task)
+        get_mixed_task = get_mixed.GetMixed('get_mixed_task')
+        self.pipeline.add_task(get_mixed_task)
 
     def _create_results_storage(self, storage_name=None):
         try:

@@ -1,0 +1,17 @@
+{
+	"version": 1,
+	"application": "loadinsight",
+	"name": "BUILDINGTYPE_DICT",
+    "Residential Homes":"RES", 
+    "Grocery (40 to 50 ksf)":"GROC",
+    "Box Retailers (50 to 75ksf)":"RETL", 
+    "Small Retail":"RETL", 
+    "Restaurants":"REST",
+    "Street Lights":"MISC", 
+    "Schools":"SCHL", 
+    "Warehouses":"AWHS",
+    "Large Office (>500ksft)":"LOFF", 
+    "Hotels/Condo":"LODG",
+    "Retail-Malls":"RETL",
+    "Smaller Office (50 to 75ksft)":"SOFF"
+}
