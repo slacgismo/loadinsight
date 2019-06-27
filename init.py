@@ -107,7 +107,7 @@ def execute_lctk(argv):
     ceus_pipeline.generate_result_plots()
 
     from pipelines.mix import mix
-    mix_pipeline = mix.MixPipeline()
+    mix_pipeline = mix.MixedFeederPipeline()
     mix_pipeline.execute()
     mix_pipeline.generate_result_plots()
     
@@ -129,7 +129,7 @@ def execute_lctk(argv):
     image_stitcher.stitch(f'{mix_pipeline.dir_name}/commercial_mix/', 'commercial_mix.png')
     image_stitcher.stitch(f'{mix_pipeline.dir_name}/mixed_mix/', 'mixed_mix.png')
     image_stitcher.stitch(f'{mix_pipeline.dir_name}/rural_mix/', 'rural_mix.png')
-    
+
 if __name__ == '__main__':
     try:
         # before we even attempt to run the pipeline the error reporting

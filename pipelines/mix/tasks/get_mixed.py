@@ -106,7 +106,7 @@ class GetMixed(t.Task):
                 
                 percent = mix_chart['Percent'][building]
 
-                try:
+                if building in self.buildingtype_dict.keys():
                     buildingtype = self.buildingtype_dict[building]
 
                     if buildingtype == 'RES':
@@ -116,7 +116,7 @@ class GetMixed(t.Task):
                     
                     df = df.reset_index() 
 
-                except:
+                else:
                     # if buildingtype doesn't exist
                     df = pd.DataFrame(1, index=range(72), columns=self.components)
                     df.insert(loc=0, column='target', value=location)

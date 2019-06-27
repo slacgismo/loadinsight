@@ -12,7 +12,7 @@ from pipelines.mix.tasks import (
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
-class MixPipeline():
+class MixedFeederPipeline():
     def __init__(self, pipeline_configuration=None):
         self.name = 'loadinsight_mix_pipeline'
         self.pipeline = p.Pipeline(self.name)

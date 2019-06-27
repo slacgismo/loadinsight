@@ -36,7 +36,6 @@ class DiscountGas(t.Task):
         self.gas_fraction = data_map[self.input_artifact_gas_fraction]
         self.projection_locations = data_map[self.input_artifact_projection_locations]
 
-
         if self.df.columns[0] == 'Unnamed: 0':
             self.df = self.df.drop('Unnamed: 0', axis=1)
 

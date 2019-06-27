@@ -1,7 +1,7 @@
 {
-	"version": 1,
-	"application": "loadinsight",
-	"name": "BUILDINGTYPE_DICT",
+    "version": 1,
+    "application": "loadinsight",
+    "name": "BUILDINGTYPE_DICT",
     "Residential Homes":"RES", 
     "Grocery (40 to 50 ksf)":"GROC",
     "Box Retailers (50 to 75ksf)":"RETL", 
