@@ -117,6 +117,12 @@ class FindSensitivities(t.Task):
                 heat_sens = x[-2]
                 cool_sens = x[-1]
 
+                if heat_sens > 0:
+                    heat_sens = 0
+
+                if cool_sens < 0:
+                    cool_sens = 0
+
                 # adjust x by first value
                 x = np.append(x[0], x[1:48] + x[0])
 
@@ -162,7 +168,6 @@ class FindSensitivities(t.Task):
                 A[h][hh + 24] = 1.0
 
             ts += dt
-
         return A
 
     def get_A(self, weather):

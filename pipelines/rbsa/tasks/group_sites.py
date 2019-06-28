@@ -50,11 +50,15 @@ class SitesGrouper(t.Task):
         for site in all_sites:
             zipcode = site_zip_map[site]
             zipcode_3digit = zipcode[:3]
-            full_zipcodes.add(zipcode)
 
             site_df = self.df.loc[self.df['siteid'] == site]
             site_df = site_df.set_index('time')
             site_df = site_df.drop(['siteid'], axis=1)
+
+            if site_df.min().min() < 0:
+                continue #skewed site
+
+            full_zipcodes.add(zipcode)
 
             # removing one-off negatives
             if site_df.min().min() < 0:
@@ -83,7 +87,6 @@ class SitesGrouper(t.Task):
         Creates new dict that maps 3 digit zipcodes to sites in zipcode
         Currenly unused
         """
-
         zip_sitemap = {}
 
         for site in all_sites:
@@ -102,7 +105,6 @@ class SitesGrouper(t.Task):
         """
         This function will add cell values of two dataframes.
         """
-
         if (df1.index.min() < df2.index.min()) & (df1.index.max() >= df2.index.max()):
             df2 = df2.reindex_like(df1).fillna(0)
         
