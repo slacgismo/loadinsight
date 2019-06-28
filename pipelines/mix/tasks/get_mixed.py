@@ -119,11 +119,18 @@ class GetMixed(t.Task):
                     df = df.reset_index() 
 
                 else:
-                    # if buildingtype doesn't exist
-                    df = pd.DataFrame(1, index=range(72), columns=self.components)
-                    df.insert(loc=0, column='target', value=location)
-                    df.insert(loc=1, column='daytype', value= (['winter_peak'] * 24) + (['spring_light'] * 24) + (['summer_peak'] * 24))
-                    df.insert(loc=2, column='time', value=list(range(24)) * 3)
+                    if building == 'Pumping':
+                        df = pd.DataFrame(0, index=range(72), columns=self.components)
+                        df['MotorC'] = 1
+                        df.insert(loc=0, column='target', value=location)
+                        df.insert(loc=1, column='daytype', value= (['winter_peak'] * 24) + (['spring_light'] * 24) + (['summer_peak'] * 24))
+                        df.insert(loc=2, column='time', value=list(range(24)) * 3)    
+                    else:
+                        # if buildingtype doesn't exist
+                        df = pd.DataFrame(1, index=range(72), columns=self.components)
+                        df.insert(loc=0, column='target', value=location)
+                        df.insert(loc=1, column='daytype', value= (['winter_peak'] * 24) + (['spring_light'] * 24) + (['summer_peak'] * 24))
+                        df.insert(loc=2, column='time', value=list(range(24)) * 3)
 
                 winter_peak = df[self.components][:24].sum(axis=1).max()
                 spring_peak = df[self.components][24:48].sum(axis=1).max()
