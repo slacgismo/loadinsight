@@ -98,7 +98,7 @@ class MixedFeederPipeline():
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
+                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. summer total peak)')   
                 fig = plot.get_figure()
@@ -119,7 +119,7 @@ class MixedFeederPipeline():
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
+                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. total peak)')   
                 fig = plot.get_figure()
@@ -140,7 +140,7 @@ class MixedFeederPipeline():
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
+                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. total peak)')   
                 fig = plot.get_figure()
@@ -161,7 +161,7 @@ class MixedFeederPipeline():
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
+                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. total peak)')   
                 fig = plot.get_figure()

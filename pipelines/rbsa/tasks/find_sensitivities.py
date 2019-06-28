@@ -127,6 +127,7 @@ class FindSensitivities(t.Task):
                 x = np.append(x[0], x[1:48] + x[0])
 
                 if x[:48].min() < 0:
+                    logger.warning(f'In RBSA task {self.name}, {zipcode}-{enduse} baseload negative values have been cleaned.')
                     x[:48] -= x[:48].min()
 
                 x = np.append(x, [heat_sens, cool_sens])

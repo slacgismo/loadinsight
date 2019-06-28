@@ -121,7 +121,7 @@ class RbsaPipeline():
         components_plots_dir = f'{self.dir_name}/components'
         self._create_results_storage(components_plots_dir)
 
-        logger.info('GENERATING NORMAL LOADSHAPE PLOTS')
+        logger.info('GENERATING RBSA NORMAL LOADSHAPE PLOTS')
 
         image_index = 0
         for idx, city in enumerate(normal_loadshapes.target.unique()):
@@ -143,7 +143,7 @@ class RbsaPipeline():
                 plt.close(fig)
                 image_index += 1
 
-        logger.info('GENERATING ENDUSE LOADSHAPE PLOTS')
+        logger.info('GENERATING RBSA ENDUSE LOADSHAPE PLOTS')
 
         image_index = 0
         for idx, city in enumerate(enduse_loadshapes.target.unique()):
@@ -165,7 +165,7 @@ class RbsaPipeline():
                 plt.close(fig)
                 image_index += 1
 
-        logger.info('GENERATING TOTAL LOADSHAPE PLOTS')
+        logger.info('GENERATING RBSA TOTAL LOADSHAPE PLOTS')
 
         image_index = 0
         for idx, city in enumerate(total_loadshapes.target.unique()):
@@ -187,7 +187,7 @@ class RbsaPipeline():
                 plt.close(fig)
                 image_index += 1
 
-        logger.info('GENERATING LOADSHAPE PLOTS')
+        logger.info('GENERATING RBSA LOADSHAPE PLOTS')
 
         image_index = 0
         for idx, city in enumerate(loadshapes.zipcode.unique()):
@@ -208,7 +208,7 @@ class RbsaPipeline():
             plt.close(fig)
             image_index += 1      
 
-        logger.info('GENERATING COMPONENT PLOTS')
+        logger.info('GENERATING RBSA COMPONENT PLOTS')
 
         image_index = 0
         for idx, city in enumerate(components.target.unique()):

@@ -56,7 +56,7 @@ class SitesGrouper(t.Task):
             site_df = site_df.drop(['siteid'], axis=1)
 
             if site_df.min().min() < 0:
-                continue #skewed site
+                continue
 
             full_zipcodes.add(zipcode)
 

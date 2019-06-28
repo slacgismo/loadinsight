@@ -78,10 +78,6 @@ class ProjectLoadshapes(t.Task):
             multiplier_spring = self.get_multiplier(spring)
             multiplier_summer = self.get_multiplier(summer)
 
-            A_winter = self.get_A(winter)
-            A_spring = self.get_A(spring)
-            A_summer = self.get_A(summer)
-
             for buildingtype in buildingtypes:
                 base_loadshapes = self.loadshapes.loc[(self.loadshapes['fcz'] == base) & (self.loadshapes['buildingtype'] == buildingtype)].copy()
 
@@ -94,10 +90,6 @@ class ProjectLoadshapes(t.Task):
 
                 for enduse in self.enduse_cols:
                     x = np.array(base_loadshapes[enduse])
-
-                    # y_winter = np.matmul(A_winter, x)
-                    # y_spring = np.matmul(A_spring, x)
-                    # y_summer = np.matmul(A_summer, x)
 
                     y_winter = []
                     y_spring = []
@@ -140,22 +132,6 @@ class ProjectLoadshapes(t.Task):
 
         self.validate(total_loadshapes)
         self.on_complete({self.output_artifact_total_loadshapes: total_loadshapes})
-
-    # def get_A(self, weather):
-    #     """constructs A matrix for non weather sensitive loads
-    #     """
-    #     A = np.zeros((len(weather.index), 50), float)
-
-    #     for h in range(len(weather.index)):
-    #         A[h][0] = 1
-    #         A[h][h % 24] = 1.0
-
-    #         if weather[h] < self.theat:
-    #             A[h][(24 * 2)] = weather[h] - self.theat
-    #         elif weather[h] > self.tcool:
-    #             A[h][(24 * 2) + 1] = weather[h] - self.tcool
-
-    #     return A
 
     def get_multiplier(self, weather):
         """multiplier array to get weather sensitive loadshapes 

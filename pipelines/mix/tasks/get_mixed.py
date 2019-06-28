@@ -50,6 +50,8 @@ class GetMixed(t.Task):
         
     def _task(self):
         data_map = self._get_data()
+
+        self.output_normalization_flag = True
         
         self.commercial_enduses = data_map[self.input_artifact_commercial_enduses]
         self.residential_enduses = data_map[self.input_artifact_residential_enduse]
@@ -140,6 +142,9 @@ class GetMixed(t.Task):
                 else:
                     mixed_df = new_df
                     initialization = True
+
+            if self.output_normalization_flag:
+                mixed_df = self.normalize(mixed_df)
             
             mixed_df.insert(loc=0, column='target', value=location)
             mixed_df.insert(loc=1, column='daytype', value=df.daytype)
@@ -147,6 +152,15 @@ class GetMixed(t.Task):
             output_df = output_df.append(mixed_df)
 
         return output_df
+
+    def normalize(self, mixed_df):
+        min_val = mixed_df.min().min()
+        mixed_df = mixed_df - min_val
+
+        max_val = mixed_df.sum(axis=1).max()
+        mixed_df = mixed_df/max_val
+
+        return mixed_df
 
     def validate(self, df):
         """

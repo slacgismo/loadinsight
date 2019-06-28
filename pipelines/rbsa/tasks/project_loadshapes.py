@@ -59,7 +59,6 @@ class ProjectLoadshapes(t.Task):
 
         for target in target_locations:
             base = self.correlation_matrix.loc[target,:].idxmax()
-            print(base)
             base_loadshapes = self.loadshapes.loc[self.loadshapes['zipcode'] == int(base)]
 
             base_loadshapes["Ventilation"][:48] = base_loadshapes["Heating"][:48] + base_loadshapes["Cooling"][:48] + base_loadshapes["Ventilation"][:48]
