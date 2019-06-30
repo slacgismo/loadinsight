@@ -78,26 +78,6 @@ class SitesGrouper(t.Task):
         self.validate(area_loads)
         self.on_complete({self.output_artifact_area_load: area_loads, self.output_artifact_full_zipcodes: full_zipcodes})  
     
-    def get_zipsitemapping(self, all_sites, site_zip_map):
-        """
-        Creates new dict that maps 3 digit zipcodes to sites in zipcode
-        Currenly unused
-        """
-
-        zip_sitemap = {}
-
-        for site in all_sites:
-            zipcode = site_zip_map[site]
-            zipcode_3digit = zipcode[:3]
-            
-            if zipcode_3digit in zip_sitemap.keys(): 
-                zip_sitemap[zipcode_3digit].append(site)
-            else:
-                zip_sitemap[zipcode_3digit] = [site]
-
-        return zip_sitemap
-
-
     def add_df(self, df1, df2):
         """
         This function will add cell values of two dataframes.

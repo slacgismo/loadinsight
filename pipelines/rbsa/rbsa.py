@@ -37,32 +37,32 @@ class RbsaPipeline():
         site_grouping_task = group_sites.SitesGrouper('site_grouping_task')
         self.pipeline.add_task(site_grouping_task)
 
-        heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
-        self.pipeline.add_task(heatcool_indexing_task)
+        # heatcool_indexing_task = index_heatcool.HeatcoolIndexer('heatcool_indexing_task')
+        # self.pipeline.add_task(heatcool_indexing_task)
 
-        undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
-        self.pipeline.add_task(undiscount_gas_task)
+        # undiscount_gas_task = undiscount_gas.UndiscountGas('undiscount_gas_task')
+        # self.pipeline.add_task(undiscount_gas_task)
 
-        normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
-        self.pipeline.add_task(normalize_totals_task)
+        # normalize_totals_task = normalize_totals.NormalizeTotals('normalize_totals_task')
+        # self.pipeline.add_task(normalize_totals_task)
 
-        correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
-        self.pipeline.add_task(correlation_task)
+        # correlation_task = zipcode_correlation.ZipcodeCorrelation('correlation_task')
+        # self.pipeline.add_task(correlation_task)
 
-        find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
-        self.pipeline.add_task(find_sensitivities_task)
+        # find_sensitivities_task = find_sensitivities.FindSensitivities('find_sensitivities_task')
+        # self.pipeline.add_task(find_sensitivities_task)
 
-        project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
-        self.pipeline.add_task(project_loadshapes_task)
+        # project_loadshapes_task = project_loadshapes.ProjectLoadshapes('project_loadshapes_task')
+        # self.pipeline.add_task(project_loadshapes_task)
 
-        discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
-        self.pipeline.add_task(discount_gas_task)
+        # discount_gas_task = discount_gas.DiscountGas('discount_gas_task')
+        # self.pipeline.add_task(discount_gas_task)
 
-        normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
-        self.pipeline.add_task(normalize_loadshapes_task)
+        # normalize_loadshapes_task = normalize_loadshapes.NormalizeLoadshapes('normalize_loadshapes_task')
+        # self.pipeline.add_task(normalize_loadshapes_task)
 
-        apply_roa_task = apply_roa.ApplyRoa('apply_roa_task')
-        self.pipeline.add_task(apply_roa_task)
+        # apply_roa_task = apply_roa.ApplyRoa('apply_roa_task')
+        # self.pipeline.add_task(apply_roa_task)
 
     def _create_results_storage(self, storage_name=None):
         try:
@@ -138,7 +138,7 @@ class RbsaPipeline():
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
+                image_index_based_name = '{0:0=4d}'.format(image_index)
                 fig.savefig(f'{normal_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1
@@ -160,7 +160,7 @@ class RbsaPipeline():
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. base total peak)')      
                 fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
+                image_index_based_name = '{0:0=4d}'.format(image_index)
                 fig.savefig(f'{enduse_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1
@@ -182,7 +182,7 @@ class RbsaPipeline():
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. base total peak)')   
                 fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
+                image_index_based_name = '{0:0=4d}'.format(image_index)
                 fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1
@@ -203,7 +203,7 @@ class RbsaPipeline():
             plt.xlabel('Hour-of-Day')
             plt.ylabel('Load (pu. base total peak)')   
             fig = plot.get_figure()
-            image_index_based_name = '{0:0=2d}'.format(image_index)
+            image_index_based_name = '{0:0=4d}'.format(image_index)
             fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
             plt.close(fig)
             image_index += 1      
@@ -224,7 +224,7 @@ class RbsaPipeline():
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. summer total peak)')   
                 fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
+                image_index_based_name = '{0:0=4d}'.format(image_index)
                 fig.savefig(f'{components_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1   

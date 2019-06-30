@@ -131,7 +131,7 @@ class CeusPipeline():
                     day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                     plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                     fig = plot.get_figure()
-                    image_index_based_name = '{0:0=2d}'.format(image_index)
+                    image_index_based_name = '{0:0=4d}'.format(image_index)
                     fig.savefig(f'{normal_plots_dir}/{image_index_based_name}.png')
                     plt.close(fig)
                     image_index += 1
@@ -155,7 +155,7 @@ class CeusPipeline():
                     plt.xlabel('Hour-of-Day')
                     plt.ylabel('Load (pu. summer total peak)')
                     fig = plot.get_figure()
-                    image_index_based_name = '{0:0=2d}'.format(image_index)
+                    image_index_based_name = '{0:0=4d}'.format(image_index)
                     fig.savefig(f'{enduse_plots_dir}/{image_index_based_name}.png')
                     plt.close(fig)
                     image_index += 1
@@ -179,7 +179,7 @@ class CeusPipeline():
                     plt.xlabel('Hour-of-Day')
                     plt.ylabel('Load (pu. base total peak)')      
                     fig = plot.get_figure()
-                    image_index_based_name = '{0:0=2d}'.format(image_index)
+                    image_index_based_name = '{0:0=4d}'.format(image_index)
                     fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
                     plt.close(fig)
                     image_index += 1
@@ -201,7 +201,7 @@ class CeusPipeline():
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. base total peak)')   
                 fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
+                image_index_based_name = '{0:0=4d}'.format(image_index)
                 fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1    
@@ -224,7 +224,7 @@ class CeusPipeline():
                     plt.xlabel('Hour-of-Day')
                     plt.ylabel('Load (pu. summer total peak)')   
                     fig = plot.get_figure()
-                    image_index_based_name = '{0:0=2d}'.format(image_index)
+                    image_index_based_name = '{0:0=4d}'.format(image_index)
                     fig.savefig(f'{components_plots_dir}/{image_index_based_name}.png')
                     plt.close(fig)
                     image_index += 1   
