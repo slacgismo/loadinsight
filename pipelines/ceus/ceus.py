@@ -114,7 +114,7 @@ class CeusPipeline():
 
         plotting_components = ['MotorA', 'MotorB', 'MotorC', 'MotorD', 'PE', 'Stat_P_Cur', 'Stat_P_Res']
 
-        logger.info('GENERATING NORMAL LOADSHAPE PLOTS')
+        logger.info('GENERATING CEUS NORMAL LOADSHAPE PLOTS')
 
         image_index = 0
         for idx, city in enumerate(normal_loadshapes.target.unique()):
@@ -136,7 +136,7 @@ class CeusPipeline():
                     plt.close(fig)
                     image_index += 1
 
-        logger.info('GENERATING ENDUSE LOADSHAPE PLOTS')
+        logger.info('GENERATING CEUS ENDUSE LOADSHAPE PLOTS')
 
         image_index = 0
         for idx, city in enumerate(enduse_loadshapes.target.unique()):
@@ -160,7 +160,7 @@ class CeusPipeline():
                     plt.close(fig)
                     image_index += 1
 
-        logger.info('GENERATING TOTAL LOADSHAPE PLOTS')
+        logger.info('GENERATING CEUS TOTAL LOADSHAPE PLOTS')
 
         image_index = 0
         for idx, city in enumerate(total_loadshapes.target.unique()):
@@ -184,7 +184,7 @@ class CeusPipeline():
                     plt.close(fig)
                     image_index += 1
 
-        logger.info('GENERATING LOADSHAPE PLOTS')
+        logger.info('GENERATING CEUS LOADSHAPE PLOTS')
 
         image_index = 0
         for idx, city in enumerate(loadshapes.fcz.unique()):
@@ -206,7 +206,7 @@ class CeusPipeline():
                 plt.close(fig)
                 image_index += 1    
 
-        logger.info('GENERATING COMPONENT PLOTS')
+        logger.info('GENERATING CEUS COMPONENT PLOTS')
 
         image_index = 0
         for idx, city in enumerate(components.target.unique()):

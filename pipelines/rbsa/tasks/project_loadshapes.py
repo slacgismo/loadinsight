@@ -59,7 +59,6 @@ class ProjectLoadshapes(t.Task):
 
         for target in target_locations:
             base = self.correlation_matrix.loc[target,:].idxmax()
-            print(base)
             base_loadshapes = self.loadshapes.loc[self.loadshapes['zipcode'] == int(base)]
 
             base_loadshapes["Ventilation"][:48] = base_loadshapes["Heating"][:48] + base_loadshapes["Cooling"][:48] + base_loadshapes["Ventilation"][:48]
@@ -78,18 +77,41 @@ class ProjectLoadshapes(t.Task):
             spring = weather['spring'] if not use_adjusted else weather['spring_adjusted']
             summer = weather['summer'] if not use_adjusted else weather['summer_adjusted']
 
-            A_winter = self.get_A(winter)
-            A_spring = self.get_A(spring)
-            A_summer = self.get_A(summer)
+            multiplier_winter = self.get_multiplier(winter)
+            multiplier_spring = self.get_multiplier(spring)
+            multiplier_summer = self.get_multiplier(summer)
 
             target_loadshapes = pd.DataFrame(columns=self.enduse_cols)
 
             for enduse in self.enduse_cols:
                 x = np.array(base_loadshapes[enduse])
+                y_winter = []
+                y_spring = []
+                y_summer = []
 
-                y_winter = np.matmul(A_winter, x)
-                y_spring = np.matmul(A_spring, x)
-                y_summer = np.matmul(A_summer, x)
+                for idx, val in enumerate(multiplier_winter):
+                    if val < 0:
+                        y_winter.append(x[idx] + (x[48] * val))
+                    elif val > 0:
+                        y_winter.append(x[idx] + (x[49] * val))
+                    else:
+                        y_winter.append(x[idx]) 
+
+                for idx, val in enumerate(multiplier_spring):
+                    if val < 0:
+                        y_spring.append(x[idx] + (x[48] * val))
+                    elif val > 0:
+                        y_spring.append(x[idx] + (x[49] * val))
+                    else:
+                        y_spring.append(x[idx])
+         
+                for idx, val in enumerate(multiplier_summer):
+                    if val < 0:
+                        y_summer.append(x[idx] + (x[48] * val))
+                    elif val > 0:
+                        y_summer.append(x[idx] + (x[49] * val))
+                    else:
+                        y_summer.append(x[idx])
 
                 y = np.concatenate((y_winter, y_spring, y_summer), axis=0)
 
@@ -104,21 +126,19 @@ class ProjectLoadshapes(t.Task):
         self.validate(total_loadshapes)
         self.on_complete({self.output_artifact_total_loadshapes: total_loadshapes})
 
-    def get_A(self, weather):
-        """constructs A matrix for non weather sensitive loads
+    def get_multiplier(self, weather):
+        """multiplier array to get weather sensitive loadshapes 
         """
-        A = np.zeros((len(weather.index), 50), float)
+        multiplier_array = []
 
-        for h in range(len(weather.index)):
-            A[h][0] = 1
-            A[h][h % 24] = 1.0
+        for time_temp in weather:
+            if self.theat < time_temp < self.tcool:
+                multiplier_array.append(0)
+            else:
+                multiplier_array.append(time_temp-self.theat)
 
-            if weather[h] < self.theat:
-                A[h][(24 * 2)] = weather[h] - self.theat
-            elif weather[h] > self.tcool:
-                A[h][(24 * 2) + 1] = weather[h] - self.tcool
+        return multiplier_array
 
-        return A
 
     def validate(self, df):
         """

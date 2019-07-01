@@ -45,7 +45,6 @@ class ZipcodeCorrelation(t.Task):
 
     def _task(self):
         self._get_data()
-        logger.info(self.df)
 
         correlation_metrics = ['Temperature', 'Solar Zenith Angle', 'GHI', 'DHI', 'DNI', 'Wind Speed', 'Wind Direction', 'Relative Humidity']    
         correlation_matrix = pd.DataFrame(0, index=self.projection_locations, columns=self.full_zipcodes)

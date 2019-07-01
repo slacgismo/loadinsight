@@ -50,11 +50,15 @@ class SitesGrouper(t.Task):
         for site in all_sites:
             zipcode = site_zip_map[site]
             zipcode_3digit = zipcode[:3]
-            full_zipcodes.add(zipcode)
 
             site_df = self.df.loc[self.df['siteid'] == site]
             site_df = site_df.set_index('time')
             site_df = site_df.drop(['siteid'], axis=1)
+
+            if site_df.min().min() < 0:
+                continue
+
+            full_zipcodes.add(zipcode)
 
             # removing one-off negatives
             if site_df.min().min() < 0:
@@ -78,11 +82,28 @@ class SitesGrouper(t.Task):
         self.validate(area_loads)
         self.on_complete({self.output_artifact_area_load: area_loads, self.output_artifact_full_zipcodes: full_zipcodes})  
     
+    def get_zipsitemapping(self, all_sites, site_zip_map):
+        """
+        Creates new dict that maps 3 digit zipcodes to sites in zipcode
+        Currenly unused
+        """
+        zip_sitemap = {}
+
+        for site in all_sites:
+            zipcode = site_zip_map[site]
+            zipcode_3digit = zipcode[:3]
+            
+            if zipcode_3digit in zip_sitemap.keys(): 
+                zip_sitemap[zipcode_3digit].append(site)
+            else:
+                zip_sitemap[zipcode_3digit] = [site]
+
+        return zip_sitemap
+
     def add_df(self, df1, df2):
         """
         This function will add cell values of two dataframes.
         """
-
         if (df1.index.min() < df2.index.min()) & (df1.index.max() >= df2.index.max()):
             df2 = df2.reindex_like(df1).fillna(0)
         

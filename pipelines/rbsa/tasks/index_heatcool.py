@@ -59,10 +59,6 @@ class HeatcoolIndexer(t.Task):
 
     def _task(self):
         self._get_data()
-        logger.info(self.df)
-
-        # output dataframe initialization
-        initialization = True
 
         zipcodes = self.df.zipcode.unique()
         enduse_loads = pd.DataFrame()
@@ -86,7 +82,7 @@ class HeatcoolIndexer(t.Task):
 
             zipcode_weather = zipcode_weather.loc[(zipcode_weather.DATE >= start) & (zipcode_weather.DATE <= end)]
 
-            load_df = pd.DataFrame(columns=['HeatCool','Temperature','Indexer','Heating','Cooling','Ventilation'])
+            load_df = pd.DataFrame(columns=['HeatCool', 'Temperature', 'Indexer','Heating', 'Cooling', 'Ventilation', 'HeatCoolVent'])
 
             # apply indexing
             load_df['HeatCool'] = zipcode_df['HeatCool']
@@ -94,11 +90,13 @@ class HeatcoolIndexer(t.Task):
             load_df['Indexer'] = zipcode_weather.apply(self.temp_dir, axis=1)
             load_df['Heating'] = load_df.apply(self.heat_method, axis=1)
             load_df['Cooling'] = load_df.apply(self.cool_method, axis=1)
-            load_df['Ventilation'] = load_df.apply(self.vent_method, axis=1)
+            load_df['HeatCoolVent'] = load_df.apply(self.vent_method, axis=1)
+
+            load_df['Heating'] = load_df['Heating'] + (load_df['HeatCoolVent']/3)
+            load_df['Cooling'] = load_df['Cooling'] + (load_df['HeatCoolVent']/3)
+            load_df['Ventilation'] = load_df['HeatCoolVent']/3
 
             load_df = load_df.fillna(0)
-
-            self.validate(load_df)
 
             enduses_updated = ['Heating', 'Cooling', 'Ventilation']
 
