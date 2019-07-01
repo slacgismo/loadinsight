@@ -100,7 +100,6 @@ class SitesGrouper(t.Task):
 
         return zip_sitemap
 
-
     def add_df(self, df1, df2):
         """
         This function will add cell values of two dataframes.

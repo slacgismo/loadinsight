@@ -99,7 +99,7 @@ def execute_lctk(argv):
     from pipelines.rbsa import rbsa
     rbsa_pipeline = rbsa.RbsaPipeline()
     rbsa_pipeline.execute()
-    rbsa_pipeline.generate_result_plots()
+    # rbsa_pipeline.generate_result_plots()
 
     from pipelines.ceus import ceus
     ceus_pipeline = ceus.CeusPipeline()
@@ -111,19 +111,19 @@ def execute_lctk(argv):
     mix_pipeline.execute()
     mix_pipeline.generate_result_plots()
     
-    from utilities import image_stitcher
+    # from utilities import image_stitcher
 
-    image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/normal_loadshapes/', 'normalized_loadshapes.png')
-    image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/enduse_loadshapes/', 'enduse_loadshapes.png')
-    image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/total_loadshapes/', 'total_loadshapes.png')
-    image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/loadshapes/', 'loadshapes.png')
-    image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/components/', 'components.png')
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/normal_loadshapes/', 'normalized_loadshapes.png')
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/enduse_loadshapes/', 'enduse_loadshapes.png')
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/total_loadshapes/', 'total_loadshapes.png')
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/loadshapes/', 'loadshapes.png')
+    # image_stitcher.stitch(f'{rbsa_pipeline.dir_name}/components/', 'components.png')
 
-    image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_normal_loadshapes/', 'ceus_normal_loadshapes.png')
-    image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_enduse_loadshapes/', 'ceus_enduse_loadshapes.png')
-    image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_total_loadshapes/', 'ceus_total_loadshapes.png')
-    image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_loadshapes/', 'ceus_loadshapes.png')
-    image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_components/', 'ceus_components.png')
+    # image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_normal_loadshapes/', 'ceus_normal_loadshapes.png')
+    # image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_enduse_loadshapes/', 'ceus_enduse_loadshapes.png')
+    # image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_total_loadshapes/', 'ceus_total_loadshapes.png')
+    # image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_loadshapes/', 'ceus_loadshapes.png')
+    # image_stitcher.stitch(f'{ceus_pipeline.dir_name}/ceus_components/', 'ceus_components.png')
 
     image_stitcher.stitch(f'{mix_pipeline.dir_name}/residential_mix/', 'residential_mix.png')
     image_stitcher.stitch(f'{mix_pipeline.dir_name}/commercial_mix/', 'commercial_mix.png')
