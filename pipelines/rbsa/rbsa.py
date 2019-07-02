@@ -117,18 +117,18 @@ class RbsaPipeline():
         adm = ArtifactDataManager()
         
         df =  adm.load_data([
-            { 'name': 'normal_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'enduse_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'total_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'components.csv', 'read_type': SupportedFileReadType.DATA }
+            { 'name': f'{self.artifact_root_dir}/normal_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/enduse_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/total_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/components.csv', 'read_type': SupportedFileReadType.DATA }
         ])
 
-        normal_loadshapes = df['normal_loadshapes.csv']
-        enduse_loadshapes = df['enduse_loadshapes.csv']
-        total_loadshapes = df['total_loadshapes.csv']
-        loadshapes = df['loadshapes.csv']
-        components = df['components.csv']
+        normal_loadshapes = df[f'{self.artifact_root_dir}/normal_loadshapes.csv']
+        enduse_loadshapes = df[f'{self.artifact_root_dir}/enduse_loadshapes.csv']
+        total_loadshapes = df[f'{self.artifact_root_dir}/total_loadshapes.csv']
+        loadshapes = df[f'{self.artifact_root_dir}/loadshapes.csv']
+        components = df[f'{self.artifact_root_dir}/components.csv']
 
         base_enduses = list(normal_loadshapes.columns)
         base_enduses.remove('time')
@@ -140,19 +140,19 @@ class RbsaPipeline():
 
         plotting_components = ['MotorA', 'MotorB', 'MotorC', 'MotorD', 'PE', 'Stat_P_Cur', 'Stat_P_Res']
 
-        normal_plots_dir = f'{self.dir_name}/normal_loadshapes'
+        normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/normal_loadshapes'
         self._create_results_storage(normal_plots_dir)
 
-        enduse_plots_dir = f'{self.dir_name}/enduse_loadshapes'
+        enduse_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/enduse_loadshapes'
         self._create_results_storage(enduse_plots_dir)
 
-        total_plots_dir = f'{self.dir_name}/total_loadshapes'
+        total_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/total_loadshapes'
         self._create_results_storage(total_plots_dir)
 
-        loadshapes_plots_dir = f'{self.dir_name}/loadshapes'
+        loadshapes_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/loadshapes'
         self._create_results_storage(loadshapes_plots_dir)
 
-        components_plots_dir = f'{self.dir_name}/components'
+        components_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/components'
         self._create_results_storage(components_plots_dir)
 
         logger.info('GENERATING RBSA NORMAL LOADSHAPE PLOTS')

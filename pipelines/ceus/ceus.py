@@ -107,18 +107,18 @@ class CeusPipeline():
         adm = ArtifactDataManager()
         
         df =  adm.load_data([
-            { 'name': 'ceus_normal_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_enduse_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_total_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_components.csv', 'read_type': SupportedFileReadType.DATA }
+            { 'name': f'{self.artifact_root_dir}/ceus_normal_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/ceus_enduse_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/ceus_total_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/ceus_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/ceus_components.csv', 'read_type': SupportedFileReadType.DATA }
         ])
 
-        normal_loadshapes = df['ceus_normal_loadshapes.csv']
-        enduse_loadshapes = df['ceus_enduse_loadshapes.csv']
-        total_loadshapes = df['ceus_total_loadshapes.csv']
-        loadshapes = df['ceus_loadshapes.csv']
-        components = df['ceus_components.csv']
+        normal_loadshapes = df[f'{self.artifact_root_dir}/ceus_normal_loadshapes.csv']
+        enduse_loadshapes = df[f'{self.artifact_root_dir}/ceus_enduse_loadshapes.csv']
+        total_loadshapes = df[f'{self.artifact_root_dir}/ceus_total_loadshapes.csv']
+        loadshapes = df[f'{self.artifact_root_dir}/ceus_loadshapes.csv']
+        components = df[f'{self.artifact_root_dir}/ceus_components.csv']
 
         base_enduses = list(normal_loadshapes.columns)
         base_enduses.remove('time')
@@ -129,19 +129,19 @@ class CeusPipeline():
         base_enduses.remove('Cooling')
         ticks = np.arange(0, 25, 3) 
 
-        normal_plots_dir = f'{self.dir_name}/ceus_normal_loadshapes'
+        normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_normal_loadshapes'
         self._create_results_storage(normal_plots_dir)
 
-        enduse_plots_dir = f'{self.dir_name}/ceus_enduse_loadshapes'
+        enduse_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_enduse_loadshapes'
         self._create_results_storage(enduse_plots_dir)
 
-        total_plots_dir = f'{self.dir_name}/ceus_total_loadshapes'
+        total_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_total_loadshapes'
         self._create_results_storage(total_plots_dir)
 
-        loadshapes_plots_dir = f'{self.dir_name}/ceus_loadshapes'
+        loadshapes_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_loadshapes'
         self._create_results_storage(loadshapes_plots_dir)
 
-        components_plots_dir = f'{self.dir_name}/ceus_components'
+        components_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_components'
         self._create_results_storage(components_plots_dir)
 
         plotting_components = ['MotorA', 'MotorB', 'MotorC', 'MotorD', 'PE', 'Stat_P_Cur', 'Stat_P_Res']

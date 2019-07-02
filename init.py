@@ -96,39 +96,40 @@ def execute_lctk(argv):
     logger.info('Starting the LCTK main program')
 
     ### PRIMARILY USING FOR DEBUG PURPOSES - WILL MOVE THIS TO AN ORCHESTRATION FILE
-    # from pipelines.rbsa import rbsa
-    # rbsa_pipeline = rbsa.RbsaPipeline()
-    # rbsa_pipeline.execute()
-    # rbsa_pipeline.generate_result_plots()
+    from pipelines.rbsa import rbsa
+    rbsa_pipeline = rbsa.RbsaPipeline()
+    rbsa_pipeline.execute()
+    rbsa_pipeline.generate_result_plots()
 
-    # from pipelines.ceus import ceus
-    # ceus_pipeline = ceus.CeusPipeline()
-    # ceus_pipeline.execute()
-    # ceus_pipeline.generate_result_plots()
+    from pipelines.ceus import ceus
+    ceus_pipeline = ceus.CeusPipeline()
+    ceus_pipeline.execute()
+    ceus_pipeline.generate_result_plots()
 
     from pipelines.mix import mix
     mix_pipeline = mix.MixedFeederPipeline()
     mix_pipeline.execute()
-    # mix_pipeline.generate_result_plots()
+    mix_pipeline.generate_result_plots()
     
-    # from utilities import image_stitcher
+    from utilities import image_stitcher
+    from settings import base
 
-    # image_stitcher.stitch(f'{rbsa_pipeline.run_dir}/normal_loadshapes/', 'normalized_loadshapes.png')
-    # image_stitcher.stitch(f'{rbsa_pipeline.run_dir}/enduse_loadshapes/', 'enduse_loadshapes.png')
-    # image_stitcher.stitch(f'{rbsa_pipeline.run_dir}/total_loadshapes/', 'total_loadshapes.png')
-    # image_stitcher.stitch(f'{rbsa_pipeline.run_dir}/loadshapes/', 'loadshapes.png')
-    # image_stitcher.stitch(f'{rbsa_pipeline.run_dir}/components/', 'components.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/normal_loadshapes/', 'normalized_loadshapes.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/enduse_loadshapes/', 'enduse_loadshapes.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/total_loadshapes/', 'total_loadshapes.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/loadshapes/', 'loadshapes.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/components/', 'components.png')
 
-    # image_stitcher.stitch(f'{ceus_pipeline.run_dir}/ceus_normal_loadshapes/', 'ceus_normal_loadshapes.png')
-    # image_stitcher.stitch(f'{ceus_pipeline.run_dir}/ceus_enduse_loadshapes/', 'ceus_enduse_loadshapes.png')
-    # image_stitcher.stitch(f'{ceus_pipeline.run_dir}/ceus_total_loadshapes/', 'ceus_total_loadshapes.png')
-    # image_stitcher.stitch(f'{ceus_pipeline.run_dir}/ceus_loadshapes/', 'ceus_loadshapes.png')
-    # image_stitcher.stitch(f'{ceus_pipeline.run_dir}/ceus_components/', 'ceus_components.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_normal_loadshapes/', 'ceus_normal_loadshapes.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_enduse_loadshapes/', 'ceus_enduse_loadshapes.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_total_loadshapes/', 'ceus_total_loadshapes.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_loadshapes/', 'ceus_loadshapes.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_components/', 'ceus_components.png')
 
-    # image_stitcher.stitch(f'{mix_pipeline.run_dir}/residential_mix/', 'residential_mix.png')
-    # image_stitcher.stitch(f'{mix_pipeline.run_dir}/commercial_mix/', 'commercial_mix.png')
-    # image_stitcher.stitch(f'{mix_pipeline.run_dir}/mixed_mix/', 'mixed_mix.png')
-    # image_stitcher.stitch(f'{mix_pipeline.run_dir}/rural_mix/', 'rural_mix.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/residential_mix/', 'residential_mix.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/commercial_mix/', 'commercial_mix.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/mixed_mix/', 'mixed_mix.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/rural_mix/', 'rural_mix.png')
 
 if __name__ == '__main__':
     try:
