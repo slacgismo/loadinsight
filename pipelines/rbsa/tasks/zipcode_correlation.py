@@ -9,37 +9,35 @@ logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
 class ZipcodeCorrelation(t.Task):
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
+        self.df = None
         self.name = name
-
-        self.input_artifact_full_zipcodes = 'full_zipcodes.csv'
+        self.data_map = None
+        self.task_function = self._task
+        self.pipeline_artifact_dir = pipeline_artifact_dir
         self.input_artifact_projection_locations = 'PROJECTION_LOCATIONS.json'
-
+        self.input_artifact_full_zipcodes = f'{pipeline_artifact_dir}/full_zipcodes.csv'
+        self.output_artifact_correlation_matrix = f'{pipeline_artifact_dir}/correlation_matrix.csv'
+        
         # these will be used to generate list of input files
         self.pre_data_files = [ 
             { 'name': self.input_artifact_full_zipcodes, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_projection_locations, 'read_type': SupportedFileReadType.CONFIG }
         ]
 
-        self.task_function = self._task
-        self.output_artifact_correlation_matrix = 'correlation_matrix.csv'
-        
-        self.data_map = None
-        self.df = None
-
     def _get_data(self):
         self.pre_data_map = self.load_data(self.pre_data_files) 
-        self.full_zipcodes = list(self.pre_data_map['full_zipcodes.csv']['zipcodes'])  
+        self.full_zipcodes = list(self.pre_data_map[f'{self.pipeline_artifact_dir}/full_zipcodes.csv']['zipcodes'])  
         self.projection_locations = list(self.pre_data_map['PROJECTION_LOCATIONS.json']['cities'].keys())
 
         self.data_files = []
 
         for location in self.full_zipcodes:
-            self.data_files.append({ 'name': f'tmy_base/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
+            self.data_files.append({ 'name': f'{self.pipeline_artifact_dir}/tmy_base/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
 
         for location in self.projection_locations:
-            self.data_files.append({ 'name': f'tmy_target/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
+            self.data_files.append({ 'name': f'{self.pipeline_artifact_dir}/tmy_target/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
 
         self.data_map = self.load_data(self.data_files)       
 
@@ -58,8 +56,8 @@ class ZipcodeCorrelation(t.Task):
                 if base == 97008:
                     continue
                     
-                base_filename = f'tmy_base/{str(base)}.csv'
-                target_filename = f'tmy_target/{str(target)}.csv'
+                base_filename = f'{self.pipeline_artifact_dir}/tmy_base/{str(base)}.csv'
+                target_filename = f'{self.pipeline_artifact_dir}/tmy_target/{str(target)}.csv'
 
                 base_weather = self.data_map[base_filename]
                 target_weather = self.data_map[target_filename]

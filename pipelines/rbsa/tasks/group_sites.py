@@ -11,14 +11,14 @@ class SitesGrouper(t.Task):
     """ 
     This class is used to group sites into 3 digit zip codes
     """
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
         self.task_function = self._task
-        self.input_artifact_zip_map = 'rbsa_zipmap.csv'
-        self.output_artifact_area_load = 'area_loads.csv'
-        self.input_artifact_clean_data = 'rbsa_cleandata.csv'
-        self.output_artifact_full_zipcodes = 'full_zipcodes.csv'
+        self.input_artifact_zip_map = f'{pipeline_artifact_dir}/rbsa_zipmap.csv'
+        self.output_artifact_area_load = f'{pipeline_artifact_dir}/area_loads.csv'
+        self.input_artifact_clean_data = f'{pipeline_artifact_dir}/rbsa_cleandata.csv'
+        self.output_artifact_full_zipcodes = f'{pipeline_artifact_dir}/full_zipcodes.csv'
         self.my_data_files = [
             { 'name': self.input_artifact_clean_data, 'read_type': SupportedFileReadType.DATA }, 
             { 'name': self.input_artifact_zip_map, 'read_type': SupportedFileReadType.DATA }

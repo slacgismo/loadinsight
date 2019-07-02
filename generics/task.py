@@ -83,7 +83,7 @@ class Task(artifact.ArtifactDataManager):
                 
                 # ...therefore we'll temporarily write a file based on the data hash
                 # and determine its file content's hash
-                new_filename = f'__{df_hex_digest}__{output_filename}'
+                new_filename = f'__{df_hex_digest}__.csv'
                 self.save_data(new_filename, data_frame)
                 new_file_contents_hex_digest = self.check_file_contents_hash(new_filename)
 

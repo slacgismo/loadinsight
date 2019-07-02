@@ -13,41 +13,42 @@ class FindSensitivities(t.Task):
     """ 
     This class is used to group sites into 3 digit zip codes
     """
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-        self.input_artifact_normal_loads = 'normal_loads.csv'
+        self.pipeline_artifact_dir = pipeline_artifact_dir
+        self.input_artifact_normal_loads = f'{pipeline_artifact_dir}/normal_loads.csv'
         self.input_artifact_sensitivity_temperatures = 'SENSITIVITY_TEMPERATURES.json'
-        self.output_artifact_loadshapes = 'loadshapes.csv'
+        self.output_artifact_loadshapes = f'{pipeline_artifact_dir}/loadshapes.csv'
         self.my_data_files = [
             { 'name': self.input_artifact_normal_loads, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_sensitivity_temperatures, 'read_type': SupportedFileReadType.CONFIG },
-            { 'name': 'noaa/594.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/596.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/597.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/598.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/833.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/835.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/836.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/837.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/838.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/970.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/971.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/972.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/973.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/974.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/980.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/981.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/982.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/983.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/984.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/985.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/988.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/989.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/990.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/991.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/992.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'noaa/993.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/594.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/596.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/597.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/598.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/833.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/835.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/836.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/837.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/838.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/970.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/971.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/972.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/973.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/974.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/980.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/981.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/982.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/983.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/984.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/985.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/988.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/989.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/990.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/991.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/992.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/noaa/993.csv', 'read_type': SupportedFileReadType.DATA },
         ]
         self.task_function = self._task
 
@@ -76,7 +77,7 @@ class FindSensitivities(t.Task):
         loadshapes = pd.DataFrame(columns=list(self.df.columns))
 
         for zipcode in zipcodes:
-            weather_file = f'noaa/{str(zipcode)}.csv'
+            weather_file = f'{self.pipeline_artifact_dir}/noaa/{str(zipcode)}.csv'
             weather = data_map[weather_file]
             weather = weather.set_index(['DATE'])
             weather.index = pd.to_datetime(weather.index)

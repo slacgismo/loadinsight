@@ -10,11 +10,11 @@ class UndiscountGas(t.Task):
     """ 
     This class is used to group sites into 3 digit zip codes
     """
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
 
-        self.input_artifact_enduse_loads = 'enduse_loads.csv'
+        self.input_artifact_enduse_loads = f'{pipeline_artifact_dir}/enduse_loads.csv'
         self.input_artifact_gas_fraction = 'GAS_FRACTIONS.json'
         self.input_artifact_zip_zone_map = 'ZIP_ZONE_MAP.json'
         self.my_data_files = [
@@ -23,7 +23,7 @@ class UndiscountGas(t.Task):
             { 'name': self.input_artifact_zip_zone_map, 'read_type': SupportedFileReadType.CONFIG },
         ] 
 
-        self.output_artifact_total_loads = 'total_loads.csv'
+        self.output_artifact_total_loads = f'{pipeline_artifact_dir}/total_loads.csv'
         self.task_function = self._task
 
     def _get_data(self):

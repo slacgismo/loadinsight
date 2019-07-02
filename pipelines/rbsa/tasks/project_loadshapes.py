@@ -12,12 +12,12 @@ class ProjectLoadshapes(t.Task):
     """ 
     This class is used to group sites into 3 digit zip codes
     """
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-
-        self.input_artifact_loadshapes = 'loadshapes.csv'
-        self.input_artifact_correlation_matrix = 'correlation_matrix.csv'
+        self.pipeline_artifact_dir = pipeline_artifact_dir
+        self.input_artifact_loadshapes = f'{pipeline_artifact_dir}/loadshapes.csv'
+        self.input_artifact_correlation_matrix = f'{pipeline_artifact_dir}/correlation_matrix.csv'
         self.input_artifact_sensitivity_temperatures = 'SENSITIVITY_TEMPERATURES.json'
 
         self.my_data_files = [
@@ -26,7 +26,7 @@ class ProjectLoadshapes(t.Task):
             { 'name': self.input_artifact_sensitivity_temperatures, 'read_type': SupportedFileReadType.CONFIG }
         ] 
 
-        self.output_artifact_total_loadshapes = 'total_loadshapes.csv'
+        self.output_artifact_total_loadshapes = f'{pipeline_artifact_dir}/total_loadshapes.csv'
         self.task_function = self._task
 
     def _get_data(self):
@@ -67,8 +67,9 @@ class ProjectLoadshapes(t.Task):
             base_loadshapes["Cooling"][:48] = 0
 
             try:
-                weather_file = [{ 'name': f'target_weather/{str(target)}.csv', 'read_type': SupportedFileReadType.DATA }] 
-                weather = self.load_data(weather_file)[f'target_weather/{str(target)}.csv']
+                weather_filename = f'{self.pipeline_artifact_dir}/target_weather/{str(target)}.csv'
+                weather_file = [{ 'name': weather_filename, 'read_type': SupportedFileReadType.DATA }] 
+                weather = self.load_data(weather_file)[weather_filename]
             except:
                 logger.warning(f'In task {self.name}, weather data for {target} not found')
                 continue

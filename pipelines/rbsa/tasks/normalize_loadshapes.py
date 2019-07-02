@@ -11,11 +11,11 @@ class NormalizeLoadshapes(t.Task):
     """ 
     This class is used to group sites into 3 digit zip codes
     """
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-        self.input_artifact_enduse_loadshapes = 'enduse_loadshapes.csv'
-        self.output_artifact_normal_loadshapes = 'normal_loadshapes.csv'
+        self.input_artifact_enduse_loadshapes = f'{pipeline_artifact_dir}/enduse_loadshapes.csv'
+        self.output_artifact_normal_loadshapes = f'{pipeline_artifact_dir}/normal_loadshapes.csv'
         self.my_data_files = [{ 'name': self.input_artifact_enduse_loadshapes, 'read_type': SupportedFileReadType.DATA }]
         self.task_function = self._task
 
