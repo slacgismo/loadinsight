@@ -101,14 +101,14 @@ def execute_lctk(argv):
     # rbsa_pipeline.execute()
     # rbsa_pipeline.generate_result_plots()
 
-    from pipelines.ceus import ceus
-    ceus_pipeline = ceus.CeusPipeline()
-    ceus_pipeline.execute()
+    # from pipelines.ceus import ceus
+    # ceus_pipeline = ceus.CeusPipeline()
+    # ceus_pipeline.execute()
     # ceus_pipeline.generate_result_plots()
 
-    # from pipelines.mix import mix
-    # mix_pipeline = mix.MixedFeederPipeline()
-    # mix_pipeline.execute()
+    from pipelines.mix import mix
+    mix_pipeline = mix.MixedFeederPipeline()
+    mix_pipeline.execute()
     # mix_pipeline.generate_result_plots()
     
     # from utilities import image_stitcher

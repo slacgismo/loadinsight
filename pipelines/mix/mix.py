@@ -14,9 +14,11 @@ logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 class MixedFeederPipeline():
     def __init__(self, pipeline_configuration=None):
-        self.name = 'loadinsight_mix_pipeline'
+        self.name = 'mixed_commercial_residential'
         self.pipeline = p.Pipeline(self.name)
-        self.dir_name = f'{base.LOCAL_PATH}/{time()}__{self.name}'
+
+        self.artifact_root_dir = 'mix'
+        self.run_dir = f'{base.LOCAL_PATH}/{time()}__{self.name}'
         
         if pipeline_configuration:
             # TODO: establish a configuration scheme for this to run dynamically
@@ -24,8 +26,18 @@ class MixedFeederPipeline():
         else:
             self.create_tasks()
 
+        self._verify_or_create_local_artifact_directory()
+    
+    def _verify_or_create_local_artifact_directory(self):
+        # check if an rbsa artifact folder exists in the local data
+        if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}'):
+            self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}')
+        
+        # create the unique run folder for this run instance
+        self._create_results_storage(f'{base.LOCAL_PATH}/{self.run_dir}')
+
     def create_tasks(self):
-        get_mixed_task = get_mixed.GetMixed('get_mixed_task')
+        get_mixed_task = get_mixed.GetMixed('get_mixed_task', self.artifact_root_dir)
         self.pipeline.add_task(get_mixed_task)
 
     def _create_results_storage(self, storage_name=None):
@@ -41,8 +53,7 @@ class MixedFeederPipeline():
         """
         Run all the tasks in this pipeline
         """
-        try:
-            self._create_results_storage()
+        try:            
             self.pipeline.run()
             logger.info(f'Total Pipeline Run Time: {self.pipeline.total_pipeline_run_time}')
         except ValueError as ve:

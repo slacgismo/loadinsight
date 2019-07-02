@@ -1,8 +1,8 @@
 import logging
+import numpy as np
 import pandas as pd
 from generics import task as t
 from generics.file_type_enum import SupportedFileReadType
-import numpy as np
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
@@ -11,26 +11,25 @@ class GetMixed(t.Task):
     """ 
     This class is used to group sites into 3 digit zip codes
     """
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-        self.input_artifact_residential_mix = 'residential_mix.csv'
-        self.input_artifact_commercial_mix = 'commercial_mix.csv'
-        self.input_artifact_mixed_mix = 'mixed_mix.csv'
-        self.input_artifact_rural_mix = 'rural_mix.csv'
+        self.input_artifact_residential_mix = f'{pipeline_artifact_dir}/residential_mix.csv'
+        self.input_artifact_commercial_mix = f'{pipeline_artifact_dir}/commercial_mix.csv'
+        self.input_artifact_mixed_mix = f'{pipeline_artifact_dir}/mixed_mix.csv'
+        self.input_artifact_rural_mix = f'{pipeline_artifact_dir}/rural_mix.csv'
 
-        self.input_artifact_commercial_enduses = 'ceus_normal_loadshapes.csv'
-        self.input_artifact_residential_enduse = 'normal_loadshapes.csv'
-
-        self.input_artifact_commercial_components = 'ceus_components.csv'
-        self.input_artifact_residential_components = 'components.csv'
+        self.input_artifact_residential_components = 'rbsa/components.csv'
+        self.input_artifact_residential_enduse = 'rbsa/normal_loadshapes.csv'
+        self.input_artifact_commercial_components = 'ceus/ceus_components.csv'
+        self.input_artifact_commercial_enduses = 'ceus/ceus_normal_loadshapes.csv'
 
         self.input_artifact_buildingtype_dict = 'BUILDINGTYPE_DICT.json'
 
-        self.output_artifact_residential_mix = 'residential_mix_output.csv'
-        self.output_artifact_commercial_mix = 'commercial_mix_output.csv'
-        self.output_artifact_mixed_mix = 'mixed_mix_output.csv'
-        self.output_artifact_rural_mix = 'rural_mix_output.csv'
+        self.output_artifact_residential_mix = f'{pipeline_artifact_dir}/residential_mix_output.csv'
+        self.output_artifact_commercial_mix = f'{pipeline_artifact_dir}/commercial_mix_output.csv'
+        self.output_artifact_mixed_mix = f'{pipeline_artifact_dir}/mixed_mix_output.csv'
+        self.output_artifact_rural_mix = f'{pipeline_artifact_dir}/rural_mix_output.csv'
 
         self.my_data_files = [
             { 'name': self.input_artifact_residential_mix, 'read_type': SupportedFileReadType.DATA },
@@ -91,21 +90,22 @@ class GetMixed(t.Task):
         self.validate(commercial_mix_output)
         self.validate(mixed_mix_output)
         self.validate(rural_mix_output)
-        self.on_complete({self.output_artifact_residential_mix: residential_mix_output, self.output_artifact_commercial_mix: commercial_mix_output,
-                        self.output_artifact_mixed_mix: mixed_mix_output, self.output_artifact_rural_mix: rural_mix_output})           
+        self.on_complete({
+            self.output_artifact_residential_mix: residential_mix_output,
+            self.output_artifact_commercial_mix: commercial_mix_output,
+            self.output_artifact_mixed_mix: mixed_mix_output,
+            self.output_artifact_rural_mix: rural_mix_output
+        })
 
     def get_mixed_output(self, mix_chart): 
-        """This function adapt the customer_chart
         """
-
+        This function adapt the customer_chart
+        """
         output_df = pd.DataFrame(columns=['target', 'daytype', 'time'] + self.components)
         
-        for location in self.residential_components.target.unique():
-            
+        for location in self.residential_components.target.unique(): 
             initialization = False
-
-            for building in mix_chart.index:
-                
+            for building in mix_chart.index:                
                 percent = mix_chart['Percent'][building]
 
                 if building in self.buildingtype_dict.keys():
