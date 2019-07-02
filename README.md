@@ -1,33 +1,33 @@
 # Getting Setup
 
-## Creating the env - ensure you are running the anaconda `4.5.x +`
+## Create the env - ensure you are running the anaconda `4.5.x +`
 ```
 conda env create -f loadinsight-environment.yml
 ```
 
-## Updating the env after adding new packages
+## Update the env after adding new packages
 ```
 conda env update -f loadinsight-environment.yml
 ```
 
-## Starting the env
+## Start the env
 ```
 conda activate venv_loadinsight
 ```
 
-## Stopping the env
+## Stop the env
 ```
 conda deactivate
 ```
 
-## Running LCTK
+## Run all the pipelines
 ```
 # runs with DEBUG=True
-python -d init.py 
+python init.py -d
 ```
 
-## Executing tests locally
+## Execute tests locally
 ```
-# make sure you venv is active
+# make sure your venv is active
 python -m unittest
 ```
