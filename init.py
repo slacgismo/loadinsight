@@ -96,14 +96,14 @@ def execute_lctk(argv):
     logger.info('Starting the LCTK main program')
 
     ### PRIMARILY USING FOR DEBUG PURPOSES - WILL MOVE THIS TO AN ORCHESTRATION FILE
-    from pipelines.rbsa import rbsa
-    rbsa_pipeline = rbsa.RbsaPipeline()
-    rbsa_pipeline.execute()
+    # from pipelines.rbsa import rbsa
+    # rbsa_pipeline = rbsa.RbsaPipeline()
+    # rbsa_pipeline.execute()
     # rbsa_pipeline.generate_result_plots()
 
-    # from pipelines.ceus import ceus
-    # ceus_pipeline = ceus.CeusPipeline()
-    # ceus_pipeline.execute()
+    from pipelines.ceus import ceus
+    ceus_pipeline = ceus.CeusPipeline()
+    ceus_pipeline.execute()
     # ceus_pipeline.generate_result_plots()
 
     # from pipelines.mix import mix

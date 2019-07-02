@@ -11,12 +11,12 @@ class ApplyRoa(t.Task):
     """ 
     This class is used to group sites into 3 digit zip codes
     """
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-        self.input_artifact_roa_com = 'roa_com.csv'
-        self.input_artifact_normal_loadshapes = 'ceus_normal_loadshapes.csv'
-        self.output_artifact_components = 'ceus_components.csv'
+        self.input_artifact_roa_com = f'{pipeline_artifact_dir}/roa_com.csv'
+        self.input_artifact_normal_loadshapes = f'{pipeline_artifact_dir}/ceus_normal_loadshapes.csv'
+        self.output_artifact_components = f'{pipeline_artifact_dir}/ceus_components.csv'
         self.my_data_files = [
             { 'name': self.input_artifact_roa_com, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_normal_loadshapes, 'read_type': SupportedFileReadType.DATA }

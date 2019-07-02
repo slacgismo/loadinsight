@@ -9,11 +9,11 @@ logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
 class FczCorrelation(t.Task):
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-
-        self.input_artifact_normal_loads = 'ceus_normal_loads.csv'
+        self.pipeline_artifact_dir = pipeline_artifact_dir
+        self.input_artifact_normal_loads = f'{pipeline_artifact_dir}/ceus_normal_loads.csv'
         self.input_artifact_projection_locations = 'PROJECTION_LOCATIONS.json'
 
         # these will be used to generate list of input files
@@ -23,7 +23,7 @@ class FczCorrelation(t.Task):
         ]
 
         self.task_function = self._task
-        self.output_artifact_correlation_matrix = 'ceus_correlation_matrix.csv'
+        self.output_artifact_correlation_matrix = f'{pipeline_artifact_dir}/ceus_correlation_matrix.csv'
         
         self.data_map = None
         self.df = None
@@ -36,10 +36,10 @@ class FczCorrelation(t.Task):
         self.data_files = []
 
         for location in self.fcz_names:
-            self.data_files.append({ 'name': f'ceus_tmy_base/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
+            self.data_files.append({ 'name': f'{self.pipeline_artifact_dir}/ceus_tmy_base/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
 
         for location in self.projection_locations:
-            self.data_files.append({ 'name': f'ceus_tmy_target/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
+            self.data_files.append({ 'name': f'{self.pipeline_artifact_dir}/ceus_tmy_target/{str(location)}.csv', 'read_type': SupportedFileReadType.DATA })
 
         self.data_map = self.load_data(self.data_files)       
 
@@ -53,8 +53,8 @@ class FczCorrelation(t.Task):
         for base in self.fcz_names:
             for target in self.projection_locations:
                     
-                base_filename = f'ceus_tmy_base/{str(base)}.csv'
-                target_filename = f'ceus_tmy_target/{str(target)}.csv'
+                base_filename = f'{self.pipeline_artifact_dir}/ceus_tmy_base/{str(base)}.csv'
+                target_filename = f'{self.pipeline_artifact_dir}/ceus_tmy_target/{str(target)}.csv'
 
                 base_weather = self.data_map[base_filename]
                 target_weather = self.data_map[target_filename]

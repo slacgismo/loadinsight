@@ -11,11 +11,11 @@ class NormalizeTotals(t.Task):
     """ 
     This class is used to group sites into 3 digit zip codes
     """
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-        self.input_artifact_total_loads = 'ceus_total_loads.csv'
-        self.output_artifact_normal_loads = 'ceus_normal_loads.csv'
+        self.input_artifact_total_loads = f'{pipeline_artifact_dir}/ceus_total_loads.csv'
+        self.output_artifact_normal_loads = f'{pipeline_artifact_dir}/ceus_normal_loads.csv'
         self.my_data_files = [{ 'name': self.input_artifact_total_loads, 'read_type': SupportedFileReadType.DATA }]
         self.task_function = self._task
 
@@ -64,14 +64,11 @@ class NormalizeTotals(t.Task):
     def get_normalization_val(self, buildingtype_df):
         """
         returns peak total
-        """        
-
+        """
         totals = buildingtype_df[self.enduse_cols].sum(axis=1)
         totals.index = buildingtype_df['time']
         normalization_val = totals.max() # can be adjusted if normalizing for summer peak
-
         # can check here for totals.idxmax() month to confirm summer/winter
-
         return normalization_val
 
     def validate(self, df):

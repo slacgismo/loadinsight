@@ -13,26 +13,27 @@ class FindSensitivities(t.Task):
     """ 
     This class is used to group sites into 3 digit zip codes
     """
-    def __init__(self, name):
+    def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-        self.input_artifact_normal_loads = 'ceus_normal_loads.csv'
+        self.pipeline_artifact_dir = pipeline_artifact_dir
+        self.input_artifact_normal_loads = f'{pipeline_artifact_dir}/ceus_normal_loads.csv'
         self.input_artifact_sensitivity_temperatures = 'SENSITIVITY_TEMPERATURES.json'
-        self.output_artifact_loadshapes = 'ceus_loadshapes.csv'
+        self.output_artifact_loadshapes = f'{pipeline_artifact_dir}/ceus_loadshapes.csv'
         self.my_data_files = [
             { 'name': self.input_artifact_normal_loads, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_sensitivity_temperatures, 'read_type': SupportedFileReadType.CONFIG },
-            { 'name': 'ceus_noaa/FCZ01.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ02.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ03.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ04.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ05.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ06.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ07.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ08.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ09.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ10.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': 'ceus_noaa/FCZ13.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ01.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ02.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ03.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ04.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ05.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ06.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ07.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ08.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ09.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ10.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{pipeline_artifact_dir}/ceus_noaa/FCZ13.csv', 'read_type': SupportedFileReadType.DATA },
         ]
         self.task_function = self._task
 
@@ -62,7 +63,7 @@ class FindSensitivities(t.Task):
 
         for fcz in climate_zones:
             logger.info(f'calculating {fcz}')
-            weather_file = f'ceus_noaa/{str(fcz)}.csv'
+            weather_file = f'{self.pipeline_artifact_dir}/ceus_noaa/{str(fcz)}.csv'
             weather = data_map[weather_file]
             weather = weather.set_index(['DATE'])
             weather.index = pd.to_datetime(weather.index)
