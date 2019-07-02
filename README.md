@@ -1,21 +1,26 @@
-# Getting Setup
+# Running the pipelines
 
-## Create the env - ensure you are running the anaconda `4.5.x +`
+## Make sure you are running anaconda `4.5.x` or better
+```
+conda --version
+```
+
+## Create required the environment
 ```
 conda env create -f loadinsight-environment.yml
 ```
 
-## Update the env after adding new packages
+## Update the environment after adding new packages
 ```
 conda env update -f loadinsight-environment.yml
 ```
 
-## Start the env
+## Start the environment
 ```
 conda activate venv_loadinsight
 ```
 
-## Stop the env
+## Stop the environment
 ```
 conda deactivate
 ```
