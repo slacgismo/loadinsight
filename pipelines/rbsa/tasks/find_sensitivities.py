@@ -99,19 +99,22 @@ class FindSensitivities(t.Task):
 
                 if enduse == 'Heating':
                     A_heat = A[:, :-1]
-                    x = self.get_baseload(enduse_df, A_heat)
+                    x = self.get_baseload(enduse_df, A_heat)/3
                     x = np.append(x, [0])
 
                 elif enduse == 'Cooling':
                     A_cool = np.delete(A, -2, 1)
-                    x = self.get_baseload(enduse_df, A_cool)
+                    x = self.get_baseload(enduse_df, A_cool)/3
                     cooling_sensitivity = x[-1]
                     x = np.append(x[:-1], [0])
                     x = np.append(x, [cooling_sensitivity])
 
                 else:
                     A_base = A[:, :-2]
-                    x = self.get_baseload(enduse_df, A_base)
+                    if enduse == 'Ventilation':
+                        x = self.get_baseload(enduse_df, A_base)/3
+                    else:
+                        x = self.get_baseload(enduse_df, A_base)
                     x = np.append(x, [0])
                     x = np.append(x, [0])
 
