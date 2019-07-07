@@ -96,7 +96,7 @@ class Task(artifact.ArtifactDataManager):
                 else:
                     logger.info('The hashes did not match. Preserving the old file and using the new one as the latest.')
                     # the old existing file gets prepended with a timestamp
-                    versioned_name = f'{time()}__{output_filename}'
+                    versioned_name = '{0}__{2}{1}'.format(*os.path.splitext(output_filename) + (time(),))
                     os.rename(f'{base.LOCAL_PATH}/{output_filename}', f'{base.LOCAL_PATH}/{versioned_name}')
                     # the new file gets renamed to whatever the output needs to be
                     os.rename(f'{base.LOCAL_PATH}/{new_filename}', f'{base.LOCAL_PATH}/{output_filename}')
