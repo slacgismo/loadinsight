@@ -50,9 +50,7 @@ class ZipcodeCorrelation(t.Task):
         for base in self.full_zipcodes:
             for target in self.projection_locations:
                 # this section will need to be fixed so it reads loadshapes file and skips skewed base zipcodes.
-                if base == 97239:
-                    continue
-                if base == 97008:
+                if base in [97239, 97008]:
                     continue
                 if str(base)[:3] == '833': 
                     continue
