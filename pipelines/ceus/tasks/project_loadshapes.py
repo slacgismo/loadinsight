@@ -141,8 +141,10 @@ class ProjectLoadshapes(t.Task):
         for time_temp in weather:
             if self.theat < time_temp < self.tcool:
                 multiplier_array.append(0)
+            elif self.tcool < time_temp:
+                multiplier_array.append(time_temp - self.tcool)
             else:
-                multiplier_array.append(time_temp-self.theat)
+                multiplier_array.append(time_temp - self.theat)
 
         return multiplier_array
 

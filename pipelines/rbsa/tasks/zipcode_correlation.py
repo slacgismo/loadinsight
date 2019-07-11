@@ -49,11 +49,10 @@ class ZipcodeCorrelation(t.Task):
 
         for base in self.full_zipcodes:
             for target in self.projection_locations:
-                if target == 'CorpusChristi,TX':
+                # this section will need to be fixed so it reads loadshapes file and skips skewed base zipcodes.
+                if base in [97239, 97008]:
                     continue
-                if base == 97239:
-                    continue
-                if base == 97008:
+                if str(base)[:3] == '833': 
                     continue
                     
                 base_filename = f'{self.pipeline_artifact_dir}/tmy_base/{str(base)}.csv'
