@@ -82,7 +82,7 @@ class ProjectLoadshapes(t.Task):
                 base_loadshapes = self.loadshapes.loc[(self.loadshapes['fcz'] == base) & (self.loadshapes['buildingtype'] == buildingtype)].copy()
 
                 base_loadshapes["Ventilation"][:48] = base_loadshapes["Heating"][:48] + base_loadshapes["Cooling"][:48] + base_loadshapes["Ventilation"][:48]
-                base_loadshapes["Ventilation"][:48] = base_loadshapes["Ventilation"][:48]/3
+                base_loadshapes["Ventilation"][:48] = base_loadshapes["Ventilation"][:48] / 3
                 base_loadshapes["Heating"][:48] = 0
                 base_loadshapes["Cooling"][:48] = 0
 
@@ -139,7 +139,7 @@ class ProjectLoadshapes(t.Task):
         multiplier_array = []
 
         for time_temp in weather:
-            if self.theat < time_temp < self.tcool:
+            if self.theat <= time_temp <= self.tcool:
                 multiplier_array.append(0)
             elif self.tcool < time_temp:
                 multiplier_array.append(time_temp - self.tcool)
