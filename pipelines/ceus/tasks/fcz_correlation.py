@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from generics import task as t
 from generics.file_type_enum import SupportedFileReadType
+from meteocalc import Temp, heat_index
 
 
 logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
@@ -47,7 +48,8 @@ class FczCorrelation(t.Task):
         self._get_data()
         logger.info(self.df)
 
-        correlation_metrics = ['Temperature', 'Solar Zenith Angle', 'GHI', 'DHI', 'DNI', 'Wind Speed', 'Wind Direction', 'Relative Humidity']    
+        # correlation_metrics = ['Temperature', 'Solar Zenith Angle', 'GHI', 'DHI', 'DNI', 'Wind Speed', 'Wind Direction', 'Relative Humidity']    
+        correlation_metrics = ['Temperature', 'Solar Zenith Angle', 'HeatIndex']   
         correlation_matrix = pd.DataFrame(0, index=self.projection_locations, columns=self.fcz_names)
 
         for base in self.fcz_names:
@@ -62,6 +64,12 @@ class FczCorrelation(t.Task):
                 base_weather = base_weather.set_index(base_weather.columns[0])
                 target_weather = target_weather.set_index(target_weather.columns[0])
 
+                base_weather['HeatIndex'] = np.nan
+                target_weather['HeatIndex'] = np.nan
+
+                base_weather['HeatIndex'] = base_weather.apply(self.calculate_heat_index, axis=1)
+                target_weather['HeatIndex'] = target_weather.apply(self.calculate_heat_index, axis=1)
+
                 if base_weather.shape != target_weather.shape:
                     logger.warning(f'Task {self.name} did not pass validation. TMY weather data sizes do not match for {base} and {target}.')
                     continue
@@ -75,6 +83,15 @@ class FczCorrelation(t.Task):
 
         self.validate(correlation_matrix)
         self.on_complete({self.output_artifact_correlation_matrix: correlation_matrix})
+    
+    def calculate_heat_index(self, row):
+        """
+        Function used for calculating heat_index
+        """
+        t = Temp(row['Temperature'], 'c')
+        hi = heat_index(temperature=t, humidity=row['Relative Humidity'])
+
+        return hi
 
     def validate(self, df):
         """
