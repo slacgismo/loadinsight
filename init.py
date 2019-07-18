@@ -126,8 +126,8 @@ def execute_lctk(argv):
     image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_loadshapes/', 'ceus_loadshapes.png')
     image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_components/', 'ceus_components.png')
 
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/residential_mix/', 'residential_mix.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/commercial_mix/', 'commercial_mix.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/suburban_mix/', 'suburban_mix.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/urban_mix/', 'urban_mix.png')
     image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/mixed_mix/', 'mixed_mix.png')
     image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/rural_mix/', 'rural_mix.png')
 

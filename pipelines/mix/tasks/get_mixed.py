@@ -26,8 +26,8 @@ class GetMixed(t.Task):
 
         self.input_artifact_buildingtype_dict = 'BUILDINGTYPE_DICT.json'
 
-        self.output_artifact_residential_mix = f'{pipeline_artifact_dir}/residential_mix_output.csv'
-        self.output_artifact_commercial_mix = f'{pipeline_artifact_dir}/commercial_mix_output.csv'
+        self.output_artifact_residential_mix = f'{pipeline_artifact_dir}/suburban_mix_output.csv'
+        self.output_artifact_commercial_mix = f'{pipeline_artifact_dir}/urban_mix_output.csv'
         self.output_artifact_mixed_mix = f'{pipeline_artifact_dir}/mixed_mix_output.csv'
         self.output_artifact_rural_mix = f'{pipeline_artifact_dir}/rural_mix_output.csv'
 

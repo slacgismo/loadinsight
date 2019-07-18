@@ -70,14 +70,14 @@ class MixedFeederPipeline():
         adm = ArtifactDataManager()
         
         df =  adm.load_data([
-            { 'name': f'{self.artifact_root_dir}/residential_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': f'{self.artifact_root_dir}/commercial_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/suburban_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/urban_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': f'{self.artifact_root_dir}/mixed_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': f'{self.artifact_root_dir}/rural_mix_output.csv', 'read_type': SupportedFileReadType.DATA }
         ])
 
-        residential_mix = df[f'{self.artifact_root_dir}/residential_mix_output.csv']
-        commercial_mix = df[f'{self.artifact_root_dir}/commercial_mix_output.csv']
+        residential_mix = df[f'{self.artifact_root_dir}/suburban_mix_output.csv']
+        commercial_mix = df[f'{self.artifact_root_dir}/urban_mix_output.csv']
         mixed_mix = df[f'{self.artifact_root_dir}/mixed_mix_output.csv']
         rural_mix = df[f'{self.artifact_root_dir}/rural_mix_output.csv']
 
@@ -85,10 +85,10 @@ class MixedFeederPipeline():
 
         plotting_components = ['MotorA', 'MotorB', 'MotorC', 'MotorD', 'PE', 'Stat_P_Cur', 'Stat_P_Res']
 
-        residential_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/residential_mix'
+        residential_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/suburban_mix'
         self._create_results_storage(residential_mix_plots_dir)
 
-        commercial_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/commercial_mix'
+        commercial_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/urban_mix'
         self._create_results_storage(commercial_mix_plots_dir)
 
         mixed_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/mixed_mix'
@@ -97,7 +97,7 @@ class MixedFeederPipeline():
         rural_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/rural_mix'
         self._create_results_storage(rural_mix_plots_dir)
 
-        logger.info('GENERATING RESIDENTIAL MIX PLOTS')
+        logger.info('GENERATING SUBURBAN MIX PLOTS')
 
         image_index = 0
         for idx, city in enumerate(residential_mix.target.unique()):
@@ -118,7 +118,7 @@ class MixedFeederPipeline():
                 plt.close(fig)
                 image_index += 1   
 
-        logger.info('GENERATING COMMERCIAL MIX PLOTS')
+        logger.info('GENERATING URBAN MIX PLOTS')
 
         image_index = 0
         for idx, city in enumerate(commercial_mix.target.unique()):

@@ -52,6 +52,9 @@ class FczCorrelation(t.Task):
 
         for base in self.fcz_names:
             for target in self.projection_locations:
+
+                if base == 'FCZ10': #FCZ10 shows unecpected behavior
+                    continue
                     
                 base_filename = f'{self.pipeline_artifact_dir}/ceus_tmy_base/{str(base)}.csv'
                 target_filename = f'{self.pipeline_artifact_dir}/ceus_tmy_target/{str(target)}.csv'
