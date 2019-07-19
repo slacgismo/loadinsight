@@ -131,6 +131,11 @@ def execute_lctk(argv):
     image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/mixed_mix/', 'mixed_mix.png')
     image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/rural_mix/', 'rural_mix.png')
 
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/suburban_mix_hournorm/', 'suburban_mix_hournorm.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/urban_mix_hournorm/', 'urban_mix_hournorm.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/mixed_mix_hournorm/', 'mixed_mix_hournorm.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/rural_mix_hournorm/', 'rural_mix_hournorm.png')
+
 if __name__ == '__main__':
     try:
         # before we even attempt to run the pipeline the error reporting

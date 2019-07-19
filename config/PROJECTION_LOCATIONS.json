@@ -3,6 +3,20 @@
 	"application": "loadinsight",
 	"name": "PROJECTION_LOCATIONS",
 	"cities" : {
+				"Atlanta,GA":"SEN",
+				"Boston,MA":"NPC",
+				"Calgary,AB":"RMN",
+				"Chicago,IL":"RFW",
+				"Dallas,TX":"TXI",
+				"Houston,TX":"TXG",
+				"Miami,FL":"FRC",
+				"Minneapolis,MN":"MRN",
+				"Nashville,TN":"SEN",
+				"NewYorkCity,NY":"NPC",
+				"QuebecCity,QC":"NPN",
+				"Toronto,ON":"NPN"
+				},
+	"all_cities" : {
 				"Abilene,TX":"TXI",
 				"Albany,NY":"NPC",
 				"Amarillo,TX":"TXI",
