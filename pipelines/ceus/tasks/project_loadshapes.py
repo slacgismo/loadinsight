@@ -64,8 +64,8 @@ class ProjectLoadshapes(t.Task):
             base = self.correlation_matrix.loc[target,:].idxmax()
 
             try:
-                weather_file = [{ 'name': f'{self.pipeline_artifact_dir}/target_weather/{str(target)}.csv', 'read_type': SupportedFileReadType.DATA }] 
-                weather = self.load_data(weather_file)[f'{self.pipeline_artifact_dir}/target_weather/{str(target)}.csv']
+                weather_file = [{ 'name': f'{self.pipeline_artifact_dir}/target_weather_july18/{str(target)}.csv', 'read_type': SupportedFileReadType.DATA }] 
+                weather = self.load_data(weather_file)[f'{self.pipeline_artifact_dir}/target_weather_july18/{str(target)}.csv']
             except:
                 logger.warning(f'In task {self.name}, weather data for {target} not found')
                 continue

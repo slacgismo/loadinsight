@@ -1,0 +1,13 @@
+{
+	"version": 1,
+	"application": "loadinsight",
+	"name": "EXCLUDED_LOCATIONS",
+	"Residential" : {
+		"base": ["833", "97008", "97239"],
+		"target": []
+	},
+	"Commercial" : {
+		"base": ["FCZ10"],
+		"target": []
+	}
+}

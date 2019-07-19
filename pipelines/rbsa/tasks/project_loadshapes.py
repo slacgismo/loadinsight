@@ -67,7 +67,7 @@ class ProjectLoadshapes(t.Task):
             base_loadshapes["Cooling"][:48] = 0
 
             try:
-                weather_filename = f'{self.pipeline_artifact_dir}/target_weather/{str(target)}.csv'
+                weather_filename = f'{self.pipeline_artifact_dir}/target_weather_july18/{str(target)}.csv'
                 weather_file = [{ 'name': weather_filename, 'read_type': SupportedFileReadType.DATA }] 
                 weather = self.load_data(weather_file)[weather_filename]
             except:

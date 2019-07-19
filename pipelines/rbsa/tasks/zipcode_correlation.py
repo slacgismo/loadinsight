@@ -17,19 +17,22 @@ class ZipcodeCorrelation(t.Task):
         self.task_function = self._task
         self.pipeline_artifact_dir = pipeline_artifact_dir
         self.input_artifact_projection_locations = 'PROJECTION_LOCATIONS.json'
+        self.input_artifact_excluded_locations = 'EXCLUDED_LOCATIONS.json'
         self.input_artifact_full_zipcodes = f'{pipeline_artifact_dir}/full_zipcodes.csv'
         self.output_artifact_correlation_matrix = f'{pipeline_artifact_dir}/correlation_matrix.csv'
         
         # these will be used to generate list of input files
         self.pre_data_files = [ 
             { 'name': self.input_artifact_full_zipcodes, 'read_type': SupportedFileReadType.DATA },
-            { 'name': self.input_artifact_projection_locations, 'read_type': SupportedFileReadType.CONFIG }
+            { 'name': self.input_artifact_projection_locations, 'read_type': SupportedFileReadType.CONFIG },
+            { 'name': self.input_artifact_excluded_locations, 'read_type': SupportedFileReadType.CONFIG }
         ]
 
     def _get_data(self):
         self.pre_data_map = self.load_data(self.pre_data_files) 
         self.full_zipcodes = list(self.pre_data_map[f'{self.pipeline_artifact_dir}/full_zipcodes.csv']['zipcodes'])  
         self.projection_locations = list(self.pre_data_map['PROJECTION_LOCATIONS.json']['cities'].keys())
+        self.excluded_locations = self.pre_data_map['EXCLUDED_LOCATIONS.json']['Residential']
 
         self.data_files = []
 
@@ -48,13 +51,16 @@ class ZipcodeCorrelation(t.Task):
         correlation_matrix = pd.DataFrame(0, index=self.projection_locations, columns=self.full_zipcodes)
 
         for base in self.full_zipcodes:
+
+            if (str(base)[:3] in self.excluded_locations['base']) | (str(base)[:5] in self.excluded_locations['base']):
+                logger.info(f'In task {self.name}, skipping base {base}')
+                continue
             for target in self.projection_locations:
-                # this section will need to be fixed so it reads loadshapes file and skips skewed base zipcodes.
-                if base in [97239, 97008]:
+
+                if target in self.excluded_locations['target']:
+                    logger.info(f'In task {self.name}, skipping target {target}')
                     continue
-                if str(base)[:3] == '833': 
-                    continue
-                    
+
                 base_filename = f'{self.pipeline_artifact_dir}/tmy_base/{str(base)}.csv'
                 target_filename = f'{self.pipeline_artifact_dir}/tmy_target/{str(target)}.csv'
 
