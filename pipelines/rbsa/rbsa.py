@@ -66,6 +66,10 @@ class RbsaPipeline():
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_target_weather_dir}')
 
     def create_tasks(self):
+
+        apply_devicemap_task = apply_devicemap.ApplyDevicemap('apply_devicemap_task', self.artifact_root_dir)
+        self.pipeline.add_task(apply_devicemap_task)
+
         site_grouping_task = group_sites.SitesGrouper('site_grouping_task', self.artifact_root_dir)
         self.pipeline.add_task(site_grouping_task)
 
