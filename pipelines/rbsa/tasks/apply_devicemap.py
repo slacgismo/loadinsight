@@ -15,15 +15,48 @@ class ApplyDevicemap(t.Task):
         super().__init__(self)
         self.name = name
         self.input_artifact_device_map = f'{pipeline_artifact_dir}/device_map.csv'
-        self.input_artifact_y1 = f'{pipeline_artifact_dir}/combined_Y1.csv'
-        self.input_artifact_y2 = f'{pipeline_artifact_dir}/combined_Y2.csv'
+
+        self.input_artifact_y1_1 = f'{pipeline_artifact_dir}/raw/RBSAM_Y1_PART 1 OF 4.csv'
+        self.input_artifact_y1_2 = f'{pipeline_artifact_dir}/raw/RBSAM_Y1_PART 2 OF 4.csv'
+        self.input_artifact_y1_3 = f'{pipeline_artifact_dir}/raw/RBSAM_Y1_PART 3 OF 4.csv'
+        self.input_artifact_y1_4 = f'{pipeline_artifact_dir}/raw/RBSAM_Y1_PART 4 OF 4.csv'
+        self.input_artifact_y2_1 = f'{pipeline_artifact_dir}/raw/RBSAM_Y2_PART 1 OF 5.csv'
+        self.input_artifact_y2_2 = f'{pipeline_artifact_dir}/raw/RBSAM_Y2_PART 2 OF 5.csv'
+        self.input_artifact_y2_3 = f'{pipeline_artifact_dir}/raw/RBSAM_Y2_PART 3 OF 5.csv'
+        self.input_artifact_y2_4 = f'{pipeline_artifact_dir}/raw/RBSAM_Y2_PART 4 OF 5.csv'
+        self.input_artifact_y2_5 = f'{pipeline_artifact_dir}/raw/RBSAM_Y2_PART 5 OF 5.csv'
+
+        self.Y1_files = [
+                        self.input_artifact_y1_1,
+                        self.input_artifact_y1_2,
+                        self.input_artifact_y1_3,
+                        self.input_artifact_y1_4
+                        ]
+        self.Y2_files = [
+                        self.input_artifact_y2_1,
+                        self.input_artifact_y2_2,
+                        self.input_artifact_y2_3,
+                        self.input_artifact_y2_4,
+                        self.input_artifact_y2_5
+                        ]
+
         self.output_artifact_clean_data = f'{pipeline_artifact_dir}/rbsa_cleandata.csv'
         self.my_data_files = [
             { 'name': self.input_artifact_device_map, 'read_type': SupportedFileReadType.DATA },
-            { 'name': self.input_artifact_y1, 'read_type': SupportedFileReadType.DATA },
-            { 'name': self.input_artifact_y2, 'read_type': SupportedFileReadType.DATA }
+            { 'name': self.input_artifact_y1_1, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_y1_2, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_y1_3, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_y1_4, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_y2_1, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_y2_2, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_y2_3, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_y2_4, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_y2_5, 'read_type': SupportedFileReadType.DATA }
         ] 
         self.task_function = self._task
+        self.enduses_needed = ['Heating',  'Cooling', 'Ventilation', 'WaterHeating', 'Cooking', 'Refrigeration', 'ExteriorLighting', 
+                        'InteriorLighting', 'Electronics', 'Appliances', 'Miscellaneous', 'Vehicle']
+        self.unneded_columns = ['Total', 'Service', 'Panel']
 
     def _get_data(self):
         return self.load_data(self.my_data_files)
@@ -33,10 +66,127 @@ class ApplyDevicemap(t.Task):
         
         self.device_map = data_map[self.input_artifact_device_map]
    
-        
+        rbsa_dict = {} # device name to enduse
 
-        self.validate(rbsa_cleandata)
-        self.on_complete({self.output_artifact_clean_data: rbsa_cleandata})           
+        for index, row in self.device_map.iterrows():
+            key = row["enduse_code"]
+            enduse = row["eu"]
+            units = row["units"]
+            rbsa_dict[key] = {"enduse": enduse, "unit": units}
+
+        enduses = set()
+
+        for key in rbsa_dict.keys():
+            if rbsa_dict[key]['unit'] == 'kWh':
+                enduses.add(rbsa_dict[key]['enduse'])
+
+        initialize_master = True
+
+        for file in self.Y1_files:
+            logger.info(f'Cleaning {file}')
+            # clean and resample
+            df = data_map[file]
+            df['time'] = pd.to_datetime(df['time'], format='%d%b%y:%H:%M:%S')
+            df = df.fillna(0)
+            df['siteid'] = df['siteid'].astype(str)  
+            df = df.groupby('siteid').resample('60T', on='time').sum()
+            
+            # generate mapping
+            column_map = {k: [] for k in enduses}
+
+            for column in list(df): 
+                col_name = column.split()[0]
+
+                if (col_name == 'Hours') | (column[:10] == 'Fahrenheit'):
+                    continue  
+                elif rbsa_dict[col_name]['unit'] == 'kWh':    
+                    column_map[rbsa_dict[col_name]['enduse']].append(column)
+            
+            # remove unused
+            column_map.pop('', None)
+            column_map.pop('ignore', None)
+            
+            for enduse in column_map.keys():
+                df[enduse] = df[column_map[enduse]].sum(axis=1)
+                
+            df = df[list(column_map.keys())]
+            
+            if initialize_master:
+                master_y1 = df.copy(deep=True)
+                initialize_master = False
+            else:
+                master_y1 = pd.concat([master_y1, df])
+
+        initialize_master = True
+
+        for file in self.Y2_files:
+            logger.info(f'Cleaning {file}')
+            # clean and resample
+            df = data_map[file]
+            df['time'] = pd.to_datetime(df['time'], format='%d%b%y:%H:%M:%S')
+            df = df.fillna(0)
+            df['siteid'] = df['siteid'].astype(str)  
+            df = df.groupby('siteid').resample('60T', on='time').sum()
+
+            # generate mapping
+            column_map = {k: [] for k in enduses}
+
+            for column in list(df):
+                try:
+                    if rbsa_dict[column]['unit'] == 'kWh':    
+                        column_map[rbsa_dict[column]['enduse']].append(column)
+                except:
+                    continue # unused columns
+                    
+            # remove unused
+            column_map.pop('', None)
+            column_map.pop('ignore', None)
+
+            for enduse in column_map.keys():
+                df[enduse] = df[column_map[enduse]].sum(axis=1)
+                
+            df = df[list(column_map.keys())]
+            
+            if initialize_master:
+                master_y2 = df.copy(deep=True)
+                initialize_master = False
+            else:
+                master_y2 = pd.concat([master_y2, df])
+
+        master_df = pd.concat([master_y1, master_y2])
+        master_df = master_df.sort_values(by='siteid')
+        master_df = master_df.reset_index(level=[0,1])
+        master_df = master_df.groupby('siteid').resample('60T', on='time').sum()
+
+        for enduse in self.enduses_needed:
+            if enduse not in master_df.columns:
+                master_df[enduse] = 0
+                logger.info(f'Adding {enduse} column with values set to 0.')
+
+        for column in self.unneded_columns:
+            if column in master_df.columns:
+                master_df = master_df.drop([column], axis=1)
+                logger.info(f'Removing column {column}.')
+
+        # master_df['Ventilation'] = 0
+        # master_df['Vehicle'] = 0
+        print('Remove unwanted sites here')
+        # ID: 10887, zip: 98445
+        # ID: 12975, zip: 97301
+        # ID: 13222, zip: 98043
+        # ID: 13248, zip: 98422
+        # ID: 13445, zip: 98110
+        # ID: 13895, zip: 98106
+        # ID: 14174, zip: 97008
+        # ID: 14300, zip: 98229
+        # ID: 20020, zip: 99156
+        # ID: 20230, zip: 59840
+        # ID: 20998, zip: 83338
+        # ID: 22138, zip: 83634
+        # ID: 23028, zip: 98801
+
+        self.validate(master_df)
+        self.on_complete({self.output_artifact_clean_data: master_df})           
 
     def validate(self, df):
         """
