@@ -147,7 +147,7 @@ class RbsaPipeline():
         base_enduses.remove('Cooling')
         ticks = np.arange(0, 25, 3) 
 
-        plotting_components = ['MotorA', 'MotorB', 'MotorC', 'MotorD', 'PE', 'Stat_P_Cur', 'Stat_P_Res']
+        plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
 
         normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/normal_loadshapes'
         self._create_results_storage(normal_plots_dir)

@@ -14,7 +14,7 @@ class ApplyRoa(t.Task):
     def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-        self.input_artifact_roa_res = f'{pipeline_artifact_dir}/roa_res.csv'
+        self.input_artifact_roa_res = f'{pipeline_artifact_dir}/roa_res_motorc.csv'
         self.input_artifact_normal_loadshapes = f'{pipeline_artifact_dir}/normal_loadshapes.csv'
         self.output_artifact_components = f'{pipeline_artifact_dir}/components.csv'
         self.my_data_files = [

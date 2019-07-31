@@ -15,6 +15,7 @@ class ApplyDevicemap(t.Task):
         super().__init__(self)
         self.name = name
         self.input_artifact_device_map = f'{pipeline_artifact_dir}/device_map.csv'
+        self.input_artifact_excluded_locations = 'EXCLUDED_LOCATIONS.json'
 
         self.input_artifact_y1_1 = f'{pipeline_artifact_dir}/raw/RBSAM_Y1_PART 1 OF 4.csv'
         self.input_artifact_y1_2 = f'{pipeline_artifact_dir}/raw/RBSAM_Y1_PART 2 OF 4.csv'
@@ -43,6 +44,7 @@ class ApplyDevicemap(t.Task):
         self.output_artifact_clean_data = f'{pipeline_artifact_dir}/rbsa_cleandata.csv'
         self.my_data_files = [
             { 'name': self.input_artifact_device_map, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_excluded_locations, 'read_type': SupportedFileReadType.CONFIG },
             { 'name': self.input_artifact_y1_1, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_y1_2, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_y1_3, 'read_type': SupportedFileReadType.DATA },
@@ -65,6 +67,7 @@ class ApplyDevicemap(t.Task):
         data_map = self._get_data()
         
         self.device_map = data_map[self.input_artifact_device_map]
+        self.excluded_locations = data_map[self.input_artifact_excluded_locations]['Residential']
    
         rbsa_dict = {} # device name to enduse
 
@@ -168,22 +171,8 @@ class ApplyDevicemap(t.Task):
                 master_df = master_df.drop([column], axis=1)
                 logger.info(f'Removing column {column}.')
 
-        # master_df['Ventilation'] = 0
-        # master_df['Vehicle'] = 0
-        print('Remove unwanted sites here')
-        # ID: 10887, zip: 98445
-        # ID: 12975, zip: 97301
-        # ID: 13222, zip: 98043
-        # ID: 13248, zip: 98422
-        # ID: 13445, zip: 98110
-        # ID: 13895, zip: 98106
-        # ID: 14174, zip: 97008
-        # ID: 14300, zip: 98229
-        # ID: 20020, zip: 99156
-        # ID: 20230, zip: 59840
-        # ID: 20998, zip: 83338
-        # ID: 22138, zip: 83634
-        # ID: 23028, zip: 98801
+        logger.info(f'Removing sites {self.excluded_locations["sites"]}.')       
+        master_df = master_df.loc[~master_df.index.get_level_values('siteid').isin(self.excluded_locations['sites'])]
 
         self.validate(master_df)
         self.on_complete({self.output_artifact_clean_data: master_df})           

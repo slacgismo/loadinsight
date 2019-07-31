@@ -101,7 +101,7 @@ class HeatcoolIndexer(t.Task):
 
             enduses_updated = ['Heating', 'Cooling', 'Ventilation']
 
-            zipcode_df['Ventilation'] = 0 # no ventilation coming in
+            # zipcode_df['Ventilation'] = 0 # no ventilation coming in
 
             # apply changes
             for enduse in enduses_updated:
