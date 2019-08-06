@@ -131,10 +131,10 @@ def execute_lctk(argv):
     image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/mixed_mix/', 'mixed_mix.png')
     image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/rural_mix/', 'rural_mix.png')
 
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/suburban_mix_hournorm/', 'suburban_mix_hournorm.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/urban_mix_hournorm/', 'urban_mix_hournorm.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/mixed_mix_hournorm/', 'mixed_mix_hournorm.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/rural_mix_hournorm/', 'rural_mix_hournorm.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/suburban_mix_hour_norm/', 'suburban_mix_hour_norm.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/urban_mix_hour_norm/', 'urban_mix_hour_norm.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/mixed_mix_hour_norm/', 'mixed_mix_hour_norm.png')
+    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/rural_mix_hour_norm/', 'rural_mix_hour_norm.png')
 
 if __name__ == '__main__':
     try:

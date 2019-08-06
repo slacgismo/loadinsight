@@ -74,10 +74,10 @@ class MixedFeederPipeline():
             { 'name': f'{self.artifact_root_dir}/urban_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': f'{self.artifact_root_dir}/mixed_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': f'{self.artifact_root_dir}/rural_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': f'{self.artifact_root_dir}/suburban_mix_output_hournorm.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': f'{self.artifact_root_dir}/urban_mix_output_hournorm.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': f'{self.artifact_root_dir}/mixed_mix_output_hournorm.csv', 'read_type': SupportedFileReadType.DATA },
-            { 'name': f'{self.artifact_root_dir}/rural_mix_output_hournorm.csv', 'read_type': SupportedFileReadType.DATA }
+            { 'name': f'{self.artifact_root_dir}/suburban_mix_output_hour_norm.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/urban_mix_output_hour_norm.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/mixed_mix_output_hour_norm.csv', 'read_type': SupportedFileReadType.DATA },
+            { 'name': f'{self.artifact_root_dir}/rural_mix_output_hour_norm.csv', 'read_type': SupportedFileReadType.DATA }
         ])
 
         residential_mix = df[f'{self.artifact_root_dir}/suburban_mix_output.csv']
@@ -85,10 +85,10 @@ class MixedFeederPipeline():
         mixed_mix = df[f'{self.artifact_root_dir}/mixed_mix_output.csv']
         rural_mix = df[f'{self.artifact_root_dir}/rural_mix_output.csv']
 
-        residential_mix_hournorm = df[f'{self.artifact_root_dir}/suburban_mix_output_hournorm.csv']
-        commercial_mix_hournorm = df[f'{self.artifact_root_dir}/urban_mix_output_hournorm.csv']
-        mixed_mix_hournorm = df[f'{self.artifact_root_dir}/mixed_mix_output_hournorm.csv']
-        rural_mix_hournorm = df[f'{self.artifact_root_dir}/rural_mix_output_hournorm.csv']
+        residential_mix_hour_norm = df[f'{self.artifact_root_dir}/suburban_mix_output_hour_norm.csv']
+        commercial_mix_hour_norm = df[f'{self.artifact_root_dir}/urban_mix_output_hour_norm.csv']
+        mixed_mix_hour_norm = df[f'{self.artifact_root_dir}/mixed_mix_output_hour_norm.csv']
+        rural_mix_hour_norm = df[f'{self.artifact_root_dir}/rural_mix_output_hour_norm.csv']
 
         ticks = np.arange(0, 25, 3) 
 
@@ -106,17 +106,17 @@ class MixedFeederPipeline():
         rural_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/rural_mix'
         self._create_results_storage(rural_mix_plots_dir)
 
-        residential_mix_hournorm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/suburban_mix_hournorm'
-        self._create_results_storage(residential_mix_hournorm_plots_dir)
+        residential_mix_hour_norm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/suburban_mix_hour_norm'
+        self._create_results_storage(residential_mix_hour_norm_plots_dir)
 
-        commercial_mix_hournorm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/urban_mix_hournorm'
-        self._create_results_storage(commercial_mix_hournorm_plots_dir)
+        commercial_mix_hour_norm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/urban_mix_hour_norm'
+        self._create_results_storage(commercial_mix_hour_norm_plots_dir)
 
-        mixed_mix_hournorm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/mixed_mix_hournorm'
-        self._create_results_storage(mixed_mix_hournorm_plots_dir)
+        mixed_mix_hour_norm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/mixed_mix_hour_norm'
+        self._create_results_storage(mixed_mix_hour_norm_plots_dir)
 
-        rural_mix_hournorm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/rural_mix_hournorm'
-        self._create_results_storage(rural_mix_hournorm_plots_dir)
+        rural_mix_hour_norm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/rural_mix_hour_norm'
+        self._create_results_storage(rural_mix_hour_norm_plots_dir)
 
 
         logger.info('GENERATING SUBURBAN MIX PLOTS')
@@ -204,11 +204,11 @@ class MixedFeederPipeline():
                 image_index += 1   
 
 
-        logger.info('GENERATING HOURNORM SUBURBAN MIX PLOTS')
+        logger.info('GENERATING hour_norm SUBURBAN MIX PLOTS')
 
         image_index = 0
-        for idx, city in enumerate(residential_mix_hournorm.target.unique()):
-            city_df = residential_mix_hournorm.loc[residential_mix_hournorm.target == city]
+        for idx, city in enumerate(residential_mix_hour_norm.target.unique()):
+            city_df = residential_mix_hour_norm.loc[residential_mix_hour_norm.target == city]
             max_total = city_df[plotting_components].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
@@ -221,15 +221,15 @@ class MixedFeederPipeline():
                 plt.ylabel('Load (pu. summer total peak)')   
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{residential_mix_hournorm_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{residential_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1   
 
-        logger.info('GENERATING HOURNORM URBAN MIX PLOTS')
+        logger.info('GENERATING hour_norm URBAN MIX PLOTS')
 
         image_index = 0
-        for idx, city in enumerate(commercial_mix_hournorm.target.unique()):
-            city_df = commercial_mix_hournorm.loc[commercial_mix_hournorm.target == city]
+        for idx, city in enumerate(commercial_mix_hour_norm.target.unique()):
+            city_df = commercial_mix_hour_norm.loc[commercial_mix_hour_norm.target == city]
             max_total = city_df[plotting_components].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
@@ -242,15 +242,15 @@ class MixedFeederPipeline():
                 plt.ylabel('Load (pu. total peak)')   
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{commercial_mix_hournorm_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{commercial_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1   
 
-        logger.info('GENERATING HOURNORM MIXED MIX PLOTS')
+        logger.info('GENERATING hour_norm MIXED MIX PLOTS')
 
         image_index = 0
-        for idx, city in enumerate(mixed_mix_hournorm.target.unique()):
-            city_df = mixed_mix_hournorm.loc[mixed_mix_hournorm.target == city]
+        for idx, city in enumerate(mixed_mix_hour_norm.target.unique()):
+            city_df = mixed_mix_hour_norm.loc[mixed_mix_hour_norm.target == city]
             max_total = city_df[plotting_components].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
@@ -263,15 +263,15 @@ class MixedFeederPipeline():
                 plt.ylabel('Load (pu. total peak)')   
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{mixed_mix_hournorm_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{mixed_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1   
 
-        logger.info('GENERATING HOURNORM RURAL MIX PLOTS')
+        logger.info('GENERATING hour_norm RURAL MIX PLOTS')
 
         image_index = 0
-        for idx, city in enumerate(rural_mix_hournorm.target.unique()):
-            city_df = rural_mix_hournorm.loc[rural_mix_hournorm.target == city]
+        for idx, city in enumerate(rural_mix_hour_norm.target.unique()):
+            city_df = rural_mix_hour_norm.loc[rural_mix_hour_norm.target == city]
             max_total = city_df[plotting_components].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
@@ -284,7 +284,7 @@ class MixedFeederPipeline():
                 plt.ylabel('Load (pu. total peak)')   
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{rural_mix_hournorm_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{rural_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
                 image_index += 1   
 

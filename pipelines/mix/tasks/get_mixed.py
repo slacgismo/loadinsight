@@ -31,20 +31,20 @@ class GetMixed(t.Task):
         self.output_artifact_mixed_mix = f'{pipeline_artifact_dir}/mixed_mix_output.csv'
         self.output_artifact_rural_mix = f'{pipeline_artifact_dir}/rural_mix_output.csv'
 
-        self.output_artifact_residential_mix_hournorm = f'{pipeline_artifact_dir}/suburban_mix_output_hournorm.csv'
-        self.output_artifact_commercial_mix_hournorm = f'{pipeline_artifact_dir}/urban_mix_output_hournorm.csv'
-        self.output_artifact_mixed_mix_hournorm = f'{pipeline_artifact_dir}/mixed_mix_output_hournorm.csv'
-        self.output_artifact_rural_mix_hournorm = f'{pipeline_artifact_dir}/rural_mix_output_hournorm.csv'
+        self.output_artifact_residential_mix_hour_norm = f'{pipeline_artifact_dir}/suburban_mix_output_hour_norm.csv'
+        self.output_artifact_commercial_mix_hour_norm = f'{pipeline_artifact_dir}/urban_mix_output_hour_norm.csv'
+        self.output_artifact_mixed_mix_hour_norm = f'{pipeline_artifact_dir}/mixed_mix_output_hour_norm.csv'
+        self.output_artifact_rural_mix_hour_norm = f'{pipeline_artifact_dir}/rural_mix_output_hour_norm.csv'
 
-        self.output_artifact_residential_mix_studyhours = f'{pipeline_artifact_dir}/suburban_mix_output_studyhours.csv'
-        self.output_artifact_commercial_mix_studyhours = f'{pipeline_artifact_dir}/urban_mix_output_studyhours.csv'
-        self.output_artifact_mixed_mix_studyhours = f'{pipeline_artifact_dir}/mixed_mix_output_studyhours.csv'
-        self.output_artifact_rural_mix_studyhours = f'{pipeline_artifact_dir}/rural_mix_output_studyhours.csv'
+        self.output_artifact_residential_mix_study_hours = f'{pipeline_artifact_dir}/suburban_mix_output_study_hours.csv'
+        self.output_artifact_commercial_mix_study_hours = f'{pipeline_artifact_dir}/urban_mix_output_study_hours.csv'
+        self.output_artifact_mixed_mix_study_hours = f'{pipeline_artifact_dir}/mixed_mix_output_study_hours.csv'
+        self.output_artifact_rural_mix_study_hours = f'{pipeline_artifact_dir}/rural_mix_output_study_hours.csv'
 
-        self.output_artifact_residential_mix_studyhours_hournorm = f'{pipeline_artifact_dir}/suburban_mix_output_studyhours_hournorm.csv'
-        self.output_artifact_commercial_mix_studyhours_hournorm = f'{pipeline_artifact_dir}/urban_mix_output_studyhours_hournorm.csv'
-        self.output_artifact_mixed_mix_studyhours_hournorm = f'{pipeline_artifact_dir}/mixed_mix_output_studyhours_hournorm.csv'
-        self.output_artifact_rural_mix_studyhours_hournorm = f'{pipeline_artifact_dir}/rural_mix_output_studyhours_hournorm.csv'
+        self.output_artifact_residential_mix_study_hours_hour_norm = f'{pipeline_artifact_dir}/suburban_mix_output_study_hours_hour_norm.csv'
+        self.output_artifact_commercial_mix_study_hours_hour_norm = f'{pipeline_artifact_dir}/urban_mix_output_study_hours_hour_norm.csv'
+        self.output_artifact_mixed_mix_study_hours_hour_norm = f'{pipeline_artifact_dir}/mixed_mix_output_study_hours_hour_norm.csv'
+        self.output_artifact_rural_mix_study_hours_hour_norm = f'{pipeline_artifact_dir}/rural_mix_output_study_hours_hour_norm.csv'
 
         self.my_data_files = [
             { 'name': self.input_artifact_residential_mix, 'read_type': SupportedFileReadType.DATA },
@@ -87,38 +87,38 @@ class GetMixed(t.Task):
         self.residential_mix = data_map[self.input_artifact_residential_mix]
         self.residential_mix = self.residential_mix.set_index(self.residential_mix.columns[0])
 
-        residential_mix_output, residential_mix_output_hournorm = self.get_mixed_output(self.residential_mix)
+        residential_mix_output, residential_mix_output_hour_norm = self.get_mixed_output(self.residential_mix)
         residential_mix_output.insert(loc=1, column='mix', value='residential')
-        residential_mix_output_hournorm.insert(loc=1, column='mix', value='residential')
-        residential_mix_studyhours = self.get_study_period(residential_mix_output)
-        residential_mix_studyhours_hournorm = self.get_study_period(residential_mix_output_hournorm)
+        residential_mix_output_hour_norm.insert(loc=1, column='mix', value='residential')
+        residential_mix_study_hours = self.get_study_period(residential_mix_output)
+        residential_mix_study_hours_hour_norm = self.get_study_period(residential_mix_output_hour_norm)
 
         self.commercial_mix = data_map[self.input_artifact_commercial_mix]
         self.commercial_mix = self.commercial_mix.set_index(self.commercial_mix.columns[0])
 
-        commercial_mix_output, commercial_mix_output_hournorm = self.get_mixed_output(self.commercial_mix)
+        commercial_mix_output, commercial_mix_output_hour_norm = self.get_mixed_output(self.commercial_mix)
         commercial_mix_output.insert(loc=1, column='mix', value='commercial')
-        commercial_mix_output_hournorm.insert(loc=1, column='mix', value='commercial')
-        commercial_mix_studyhours = self.get_study_period(commercial_mix_output)
-        commercial_mix_studyhours_hournorm = self.get_study_period(commercial_mix_output_hournorm)
+        commercial_mix_output_hour_norm.insert(loc=1, column='mix', value='commercial')
+        commercial_mix_study_hours = self.get_study_period(commercial_mix_output)
+        commercial_mix_study_hours_hour_norm = self.get_study_period(commercial_mix_output_hour_norm)
 
         self.mixed_mix = data_map[self.input_artifact_mixed_mix]
         self.mixed_mix = self.mixed_mix.set_index(self.mixed_mix.columns[0])
 
-        mixed_mix_output, mixed_mix_output_hournorm = self.get_mixed_output(self.mixed_mix)
+        mixed_mix_output, mixed_mix_output_hour_norm = self.get_mixed_output(self.mixed_mix)
         mixed_mix_output.insert(loc=1, column='mix', value='mixed')
-        mixed_mix_output_hournorm.insert(loc=1, column='mix', value='mixed')
-        mixed_mix_studyhours = self.get_study_period(mixed_mix_output)
-        mixed_mix_studyhours_hournorm = self.get_study_period(mixed_mix_output_hournorm)
+        mixed_mix_output_hour_norm.insert(loc=1, column='mix', value='mixed')
+        mixed_mix_study_hours = self.get_study_period(mixed_mix_output)
+        mixed_mix_study_hours_hour_norm = self.get_study_period(mixed_mix_output_hour_norm)
 
         self.rural_mix = data_map[self.input_artifact_rural_mix]
         self.rural_mix = self.rural_mix.set_index(self.rural_mix.columns[0])
 
-        rural_mix_output, rural_mix_output_hournorm = self.get_mixed_output(self.rural_mix)
+        rural_mix_output, rural_mix_output_hour_norm = self.get_mixed_output(self.rural_mix)
         rural_mix_output.insert(loc=1, column='mix', value='rural')
-        rural_mix_output_hournorm.insert(loc=1, column='mix', value='rural')
-        rural_mix_studyhours = self.get_study_period(rural_mix_output)
-        rural_mix_studyhours_hournorm = self.get_study_period(rural_mix_output_hournorm)
+        rural_mix_output_hour_norm.insert(loc=1, column='mix', value='rural')
+        rural_mix_study_hours = self.get_study_period(rural_mix_output)
+        rural_mix_study_hours_hour_norm = self.get_study_period(rural_mix_output_hour_norm)
 
         self.validate(residential_mix_output)
         self.validate(commercial_mix_output)
@@ -129,18 +129,18 @@ class GetMixed(t.Task):
             self.output_artifact_commercial_mix: commercial_mix_output,
             self.output_artifact_mixed_mix: mixed_mix_output,
             self.output_artifact_rural_mix: rural_mix_output,            
-            self.output_artifact_residential_mix_hournorm: residential_mix_output_hournorm,
-            self.output_artifact_commercial_mix_hournorm: commercial_mix_output_hournorm,
-            self.output_artifact_mixed_mix_hournorm: mixed_mix_output_hournorm,
-            self.output_artifact_rural_mix_hournorm: rural_mix_output_hournorm,            
-            self.output_artifact_residential_mix_studyhours: residential_mix_studyhours,
-            self.output_artifact_commercial_mix_studyhours: commercial_mix_studyhours,
-            self.output_artifact_mixed_mix_studyhours: mixed_mix_studyhours,
-            self.output_artifact_rural_mix_studyhours: rural_mix_studyhours,            
-            self.output_artifact_residential_mix_studyhours_hournorm: residential_mix_studyhours_hournorm,
-            self.output_artifact_commercial_mix_studyhours_hournorm: commercial_mix_studyhours_hournorm,
-            self.output_artifact_mixed_mix_studyhours_hournorm: mixed_mix_studyhours_hournorm,
-            self.output_artifact_rural_mix_studyhours_hournorm: rural_mix_studyhours_hournorm
+            self.output_artifact_residential_mix_hour_norm: residential_mix_output_hour_norm,
+            self.output_artifact_commercial_mix_hour_norm: commercial_mix_output_hour_norm,
+            self.output_artifact_mixed_mix_hour_norm: mixed_mix_output_hour_norm,
+            self.output_artifact_rural_mix_hour_norm: rural_mix_output_hour_norm,            
+            self.output_artifact_residential_mix_study_hours: residential_mix_study_hours,
+            self.output_artifact_commercial_mix_study_hours: commercial_mix_study_hours,
+            self.output_artifact_mixed_mix_study_hours: mixed_mix_study_hours,
+            self.output_artifact_rural_mix_study_hours: rural_mix_study_hours,            
+            self.output_artifact_residential_mix_study_hours_hour_norm: residential_mix_study_hours_hour_norm,
+            self.output_artifact_commercial_mix_study_hours_hour_norm: commercial_mix_study_hours_hour_norm,
+            self.output_artifact_mixed_mix_study_hours_hour_norm: mixed_mix_study_hours_hour_norm,
+            self.output_artifact_rural_mix_study_hours_hour_norm: rural_mix_study_hours_hour_norm
         })
 
     def get_mixed_output(self, mix_chart): 
@@ -232,21 +232,20 @@ class GetMixed(t.Task):
         return mixed_df
 
     def normalize_hourly(self, mixed_df):
-
         mixed_hourly_normalzied = mixed_df.div(mixed_df.sum(axis=1), axis=0)
 
         return mixed_hourly_normalzied
 
     def get_study_period(self, full_df):
         daytypes = self.study_periods.keys()
-        studyhours_df =  pd.DataFrame(columns= full_df.columns)
+        study_hours_df = pd.DataFrame(columns=full_df.columns)
 
         for daytype in daytypes:
             for time in self.study_periods[daytype]:
                 day_df = full_df.loc[(full_df['daytype'] == daytype) & (full_df['time'] == time)]
-                studyhours_df = studyhours_df.append(day_df)
+                study_hours_df = study_hours_df.append(day_df)
 
-        return studyhours_df
+        return study_hours_df
 
     def validate(self, df):
         """

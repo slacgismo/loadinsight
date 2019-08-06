@@ -27,19 +27,11 @@ class ApplyDevicemap(t.Task):
         self.input_artifact_y2_4 = f'{pipeline_artifact_dir}/raw/RBSAM_Y2_PART 4 OF 5.csv'
         self.input_artifact_y2_5 = f'{pipeline_artifact_dir}/raw/RBSAM_Y2_PART 5 OF 5.csv'
 
-        self.Y1_files = [
-                        self.input_artifact_y1_1,
-                        self.input_artifact_y1_2,
-                        self.input_artifact_y1_3,
-                        self.input_artifact_y1_4
-                        ]
+        self.Y1_files = [self.input_artifact_y1_1, self.input_artifact_y1_2, self.input_artifact_y1_3, self.input_artifact_y1_4]
         self.Y2_files = [
-                        self.input_artifact_y2_1,
-                        self.input_artifact_y2_2,
-                        self.input_artifact_y2_3,
-                        self.input_artifact_y2_4,
-                        self.input_artifact_y2_5
-                        ]
+            self.input_artifact_y2_1, self.input_artifact_y2_2, self.input_artifact_y2_3, self.input_artifact_y2_4, 
+            self.input_artifact_y2_5
+        ]
 
         self.output_artifact_clean_data = f'{pipeline_artifact_dir}/rbsa_cleandata.csv'
         self.my_data_files = [
@@ -56,8 +48,10 @@ class ApplyDevicemap(t.Task):
             { 'name': self.input_artifact_y2_5, 'read_type': SupportedFileReadType.DATA }
         ] 
         self.task_function = self._task
-        self.enduses_needed = ['Heating',  'Cooling', 'Ventilation', 'WaterHeating', 'Cooking', 'Refrigeration', 'ExteriorLighting', 
-                        'InteriorLighting', 'Electronics', 'Appliances', 'Miscellaneous', 'Vehicle']
+        self.enduses_needed = [
+            'Heating',  'Cooling', 'Ventilation', 'WaterHeating', 'Cooking', 'Refrigeration', 'ExteriorLighting', 
+            'InteriorLighting', 'Electronics', 'Appliances', 'Miscellaneous', 'Vehicle'
+        ]
         self.unneded_columns = ['Total', 'Service', 'Panel']
 
     def _get_data(self):
@@ -70,25 +64,22 @@ class ApplyDevicemap(t.Task):
         self.excluded_locations = data_map[self.input_artifact_excluded_locations]['Residential']
    
         rbsa_dict = {} # device name to enduse
+        enduses = set()
 
         for index, row in self.device_map.iterrows():
             key = row["enduse_code"]
             enduse = row["eu"]
             units = row["units"]
             rbsa_dict[key] = {"enduse": enduse, "unit": units}
-
-        enduses = set()
-
-        for key in rbsa_dict.keys():
             if rbsa_dict[key]['unit'] == 'kWh':
                 enduses.add(rbsa_dict[key]['enduse'])
 
         initialize_master = True
 
-        for file in self.Y1_files:
-            logger.info(f'Cleaning {file}')
+        for filename in self.Y1_files:
+            logger.info(f'Cleaning {filename}')
             # clean and resample
-            df = data_map[file]
+            df = data_map[filename]
             df['time'] = pd.to_datetime(df['time'], format='%d%b%y:%H:%M:%S')
             df = df.fillna(0)
             df['siteid'] = df['siteid'].astype(str)  
@@ -100,9 +91,9 @@ class ApplyDevicemap(t.Task):
             for column in list(df): 
                 col_name = column.split()[0]
 
-                if (col_name == 'Hours') | (column[:10] == 'Fahrenheit'):
+                if (col_name == 'Hours') or (column[:10] == 'Fahrenheit'):
                     continue  
-                elif rbsa_dict[col_name]['unit'] == 'kWh':    
+                if rbsa_dict[col_name]['unit'] == 'kWh':    
                     column_map[rbsa_dict[col_name]['enduse']].append(column)
             
             # remove unused
@@ -122,10 +113,10 @@ class ApplyDevicemap(t.Task):
 
         initialize_master = True
 
-        for file in self.Y2_files:
-            logger.info(f'Cleaning {file}')
+        for filename in self.Y2_files:
+            logger.info(f'Cleaning {filename}')
             # clean and resample
-            df = data_map[file]
+            df = data_map[filename]
             df['time'] = pd.to_datetime(df['time'], format='%d%b%y:%H:%M:%S')
             df = df.fillna(0)
             df['siteid'] = df['siteid'].astype(str)  
@@ -134,7 +125,7 @@ class ApplyDevicemap(t.Task):
             # generate mapping
             column_map = {k: [] for k in enduses}
 
-            for column in list(df):
+            for column in df.columns:
                 try:
                     if rbsa_dict[column]['unit'] == 'kWh':    
                         column_map[rbsa_dict[column]['enduse']].append(column)
