@@ -74,7 +74,7 @@ class ApplyDevicemap(t.Task):
             if rbsa_dict[key]['unit'] == 'kWh':
                 enduses.add(rbsa_dict[key]['enduse'])
 
-        initialize_master = True
+        master_y1 = pd.DataFrame()
 
         for filename in self.Y1_files:
             logger.info(f'Cleaning {filename}')
@@ -104,14 +104,9 @@ class ApplyDevicemap(t.Task):
                 df[enduse] = df[column_map[enduse]].sum(axis=1)
                 
             df = df[list(column_map.keys())]
-            
-            if initialize_master:
-                master_y1 = df.copy(deep=True)
-                initialize_master = False
-            else:
-                master_y1 = pd.concat([master_y1, df])
+            master_y1 = pd.concat([master_y1, df])
 
-        initialize_master = True
+        master_y2 = pd.DataFrame()
 
         for filename in self.Y2_files:
             logger.info(f'Cleaning {filename}')
@@ -129,9 +124,9 @@ class ApplyDevicemap(t.Task):
                 try:
                     if rbsa_dict[column]['unit'] == 'kWh':    
                         column_map[rbsa_dict[column]['enduse']].append(column)
-                except:
+                except KeyError:
                     continue # unused columns
-                    
+                
             # remove unused
             column_map.pop('', None)
             column_map.pop('ignore', None)
@@ -140,12 +135,7 @@ class ApplyDevicemap(t.Task):
                 df[enduse] = df[column_map[enduse]].sum(axis=1)
                 
             df = df[list(column_map.keys())]
-            
-            if initialize_master:
-                master_y2 = df.copy(deep=True)
-                initialize_master = False
-            else:
-                master_y2 = pd.concat([master_y2, df])
+            master_y2 = pd.concat([master_y2, df])
 
         master_df = pd.concat([master_y1, master_y2])
         master_df = master_df.sort_values(by='siteid')
@@ -157,10 +147,7 @@ class ApplyDevicemap(t.Task):
                 master_df[enduse] = 0
                 logger.info(f'Adding {enduse} column with values set to 0.')
 
-        for column in self.unneded_columns:
-            if column in master_df.columns:
-                master_df = master_df.drop([column], axis=1)
-                logger.info(f'Removing column {column}.')
+        master_df = master_df.drop(self.unneded_columns, axis=1)
 
         logger.info(f'Removing sites {self.excluded_locations["sites"]}.')       
         master_df = master_df.loc[~master_df.index.get_level_values('siteid').isin(self.excluded_locations['sites'])]
