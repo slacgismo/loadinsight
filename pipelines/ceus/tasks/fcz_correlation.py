@@ -53,17 +53,11 @@ class FczCorrelation(t.Task):
         correlation_metrics = ['Temperature', 'Solar Zenith Angle', 'GHI', 'DHI', 'DNI', 'Wind Speed', 'Wind Direction', 'Relative Humidity']    
         correlation_matrix = pd.DataFrame(0, index=self.projection_locations, columns=self.fcz_names)
 
+        self.fcz_names = [x for x in self.fcz_names if x not in self.excluded_locations['base']]
+        self.projection_locations = [x for x in self.projection_locations if x not in self.excluded_locations['target']]
+
         for base in self.fcz_names:
-
-            if base in self.excluded_locations['base']:
-                logger.info(f'In task {self.name}, skipping base {base}')
-                continue
-                
             for target in self.projection_locations:
-
-                if target in self.excluded_locations['target']:
-                    logger.info(f'In task {self.name}, skipping target {target}')
-                    continue
                     
                 base_filename = f'{self.pipeline_artifact_dir}/ceus_tmy_base/{str(base)}.csv'
                 target_filename = f'{self.pipeline_artifact_dir}/ceus_tmy_target/{str(target)}.csv'

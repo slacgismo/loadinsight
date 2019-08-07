@@ -14,6 +14,13 @@ class GetMixed(t.Task):
     def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
+
+        self.study_periods = {
+            'winter_peak' : 8,
+            'spring_light' : 3,
+            'summer_peak' : 16
+            }
+
         self.input_artifact_residential_mix = f'{pipeline_artifact_dir}/residential_mix.csv'
         self.input_artifact_commercial_mix = f'{pipeline_artifact_dir}/commercial_mix.csv'
         self.input_artifact_mixed_mix = f'{pipeline_artifact_dir}/mixed_mix.csv'
@@ -67,12 +74,6 @@ class GetMixed(t.Task):
 
         self.output_normalization_flag = True
         self.summer_normalization = True
-
-        self.study_periods = {
-            'winter_peak' : [8],
-            'spring_light' : [3],
-            'summer_peak' : [16]
-        }
         
         self.commercial_enduses = data_map[self.input_artifact_commercial_enduses]
         self.residential_enduses = data_map[self.input_artifact_residential_enduse]
@@ -240,10 +241,9 @@ class GetMixed(t.Task):
         daytypes = self.study_periods.keys()
         study_hours_df = pd.DataFrame(columns=full_df.columns)
 
-        for daytype in daytypes:
-            for time in self.study_periods[daytype]:
-                day_df = full_df.loc[(full_df['daytype'] == daytype) & (full_df['time'] == time)]
-                study_hours_df = study_hours_df.append(day_df)
+        for (day, time) in self.study_periods.items():
+            day_df = full_df.loc[(full_df['daytype'] == day) & (full_df['time'] == time)]
+            study_hours_df = study_hours_df.append(day_df)
 
         return study_hours_df
 
