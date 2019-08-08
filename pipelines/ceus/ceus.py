@@ -144,7 +144,7 @@ class CeusPipeline():
         components_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_components'
         self._create_results_storage(components_plots_dir)
 
-        plotting_components = ['MotorA', 'MotorB', 'MotorC', 'MotorD', 'PE', 'Stat_P_Cur', 'Stat_P_Res']
+        plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
 
         logger.info('GENERATING CEUS NORMAL LOADSHAPE PLOTS')
 

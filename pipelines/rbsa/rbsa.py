@@ -5,6 +5,7 @@ from settings import base
 from generics import pipeline as p, task as t
 
 from pipelines.rbsa.tasks import (
+    apply_devicemap,
     group_sites, 
     undiscount_gas, 
     index_heatcool, 
@@ -28,6 +29,7 @@ class RbsaPipeline():
 
         # specify the logical directory structure for this pipeline execution
         self.artifact_root_dir = 'rbsa'
+        self.artifact_raw_dir = 'raw'
         self.artifact_noaa_dir = 'noaa'
         self.artifact_tmy_base_dir = 'tmy_base'
         self.artifact_tmy_target_dir = 'tmy_target'
@@ -53,6 +55,9 @@ class RbsaPipeline():
         self._create_results_storage(f'{base.LOCAL_PATH}/{self.run_dir}')
         
         # check for the artifact sub dirs
+        if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_raw_dir}'):
+            self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_raw_dir}')
+
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_noaa_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_noaa_dir}')
         
@@ -66,6 +71,10 @@ class RbsaPipeline():
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_target_weather_dir}')
 
     def create_tasks(self):
+
+        apply_devicemap_task = apply_devicemap.ApplyDevicemap('apply_devicemap_task', self.artifact_root_dir)
+        self.pipeline.add_task(apply_devicemap_task)
+
         site_grouping_task = group_sites.SitesGrouper('site_grouping_task', self.artifact_root_dir)
         self.pipeline.add_task(site_grouping_task)
 
@@ -138,7 +147,7 @@ class RbsaPipeline():
         base_enduses.remove('Cooling')
         ticks = np.arange(0, 25, 3) 
 
-        plotting_components = ['MotorA', 'MotorB', 'MotorC', 'MotorD', 'PE', 'Stat_P_Cur', 'Stat_P_Res']
+        plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
 
         normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/normal_loadshapes'
         self._create_results_storage(normal_plots_dir)

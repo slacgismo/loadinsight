@@ -17,19 +17,22 @@ class ZipcodeCorrelation(t.Task):
         self.task_function = self._task
         self.pipeline_artifact_dir = pipeline_artifact_dir
         self.input_artifact_projection_locations = 'PROJECTION_LOCATIONS.json'
+        self.input_artifact_excluded_locations = 'EXCLUDED_LOCATIONS.json'
         self.input_artifact_full_zipcodes = f'{pipeline_artifact_dir}/full_zipcodes.csv'
         self.output_artifact_correlation_matrix = f'{pipeline_artifact_dir}/correlation_matrix.csv'
         
         # these will be used to generate list of input files
         self.pre_data_files = [ 
             { 'name': self.input_artifact_full_zipcodes, 'read_type': SupportedFileReadType.DATA },
-            { 'name': self.input_artifact_projection_locations, 'read_type': SupportedFileReadType.CONFIG }
+            { 'name': self.input_artifact_projection_locations, 'read_type': SupportedFileReadType.CONFIG },
+            { 'name': self.input_artifact_excluded_locations, 'read_type': SupportedFileReadType.CONFIG }
         ]
 
     def _get_data(self):
         self.pre_data_map = self.load_data(self.pre_data_files) 
         self.full_zipcodes = list(self.pre_data_map[f'{self.pipeline_artifact_dir}/full_zipcodes.csv']['zipcodes'])  
         self.projection_locations = list(self.pre_data_map['PROJECTION_LOCATIONS.json']['cities'].keys())
+        self.excluded_locations = self.pre_data_map['EXCLUDED_LOCATIONS.json']['Residential']
 
         self.data_files = []
 
@@ -47,14 +50,13 @@ class ZipcodeCorrelation(t.Task):
         correlation_metrics = ['Temperature', 'Solar Zenith Angle', 'GHI', 'DHI', 'DNI', 'Wind Speed', 'Wind Direction', 'Relative Humidity']    
         correlation_matrix = pd.DataFrame(0, index=self.projection_locations, columns=self.full_zipcodes)
 
-        for base in self.full_zipcodes:
+        needed_zipcodes = [x for x in self.full_zipcodes if str(x) not in self.excluded_locations['base']]
+        needed_zipcodes = [x for x in needed_zipcodes if str(x)[:3] not in self.excluded_locations['base']]
+        self.projection_locations = [x for x in self.projection_locations if x not in self.excluded_locations['target']]
+
+        for base in needed_zipcodes:
             for target in self.projection_locations:
-                # this section will need to be fixed so it reads loadshapes file and skips skewed base zipcodes.
-                if base in [97239, 97008]:
-                    continue
-                if str(base)[:3] == '833': 
-                    continue
-                    
+
                 base_filename = f'{self.pipeline_artifact_dir}/tmy_base/{str(base)}.csv'
                 target_filename = f'{self.pipeline_artifact_dir}/tmy_target/{str(target)}.csv'
 

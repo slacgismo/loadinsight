@@ -79,6 +79,8 @@ class SitesGrouper(t.Task):
             zip_df.insert(loc=0, column='zipcode', value=zip3)
             area_loads = area_loads.append(zip_df)
 
+        area_loads['Appliances'] = 0
+
         self.validate(area_loads)
         self.on_complete({self.output_artifact_area_load: area_loads, self.output_artifact_full_zipcodes: full_zipcodes})  
     

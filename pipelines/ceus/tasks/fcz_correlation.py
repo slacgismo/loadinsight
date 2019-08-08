@@ -15,11 +15,13 @@ class FczCorrelation(t.Task):
         self.pipeline_artifact_dir = pipeline_artifact_dir
         self.input_artifact_normal_loads = f'{pipeline_artifact_dir}/ceus_normal_loads.csv'
         self.input_artifact_projection_locations = 'PROJECTION_LOCATIONS.json'
+        self.input_artifact_excluded_locations = 'EXCLUDED_LOCATIONS.json'
 
         # these will be used to generate list of input files
         self.pre_data_files = [ 
             { 'name': self.input_artifact_normal_loads, 'read_type': SupportedFileReadType.DATA },
-            { 'name': self.input_artifact_projection_locations, 'read_type': SupportedFileReadType.CONFIG }
+            { 'name': self.input_artifact_projection_locations, 'read_type': SupportedFileReadType.CONFIG },
+            { 'name': self.input_artifact_excluded_locations, 'read_type': SupportedFileReadType.CONFIG }
         ]
 
         self.task_function = self._task
@@ -32,6 +34,7 @@ class FczCorrelation(t.Task):
         self.pre_data_map = self.load_data(self.pre_data_files) 
         self.fcz_names = list(self.pre_data_map[self.input_artifact_normal_loads].fcz.unique())
         self.projection_locations = list(self.pre_data_map['PROJECTION_LOCATIONS.json']['cities'].keys())
+        self.excluded_locations = self.pre_data_map['EXCLUDED_LOCATIONS.json']['Commercial']
 
         self.data_files = []
 
@@ -49,6 +52,9 @@ class FczCorrelation(t.Task):
 
         correlation_metrics = ['Temperature', 'Solar Zenith Angle', 'GHI', 'DHI', 'DNI', 'Wind Speed', 'Wind Direction', 'Relative Humidity']    
         correlation_matrix = pd.DataFrame(0, index=self.projection_locations, columns=self.fcz_names)
+
+        self.fcz_names = [x for x in self.fcz_names if x not in self.excluded_locations['base']]
+        self.projection_locations = [x for x in self.projection_locations if x not in self.excluded_locations['target']]
 
         for base in self.fcz_names:
             for target in self.projection_locations:
