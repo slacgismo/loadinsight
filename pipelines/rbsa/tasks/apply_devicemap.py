@@ -14,7 +14,8 @@ class ApplyDevicemap(t.Task):
     def __init__(self, name, pipeline_artifact_dir):
         super().__init__(self)
         self.name = name
-        self.input_artifact_device_map = f'{pipeline_artifact_dir}/device_map.csv'
+        self.input_artifact_device_map = f'{pipeline_artifact_dir}/device_map.csv'        
+        self.input_artifact_hvac_type = f'{pipeline_artifact_dir}/raw/2011 RBSA Single Family Database-HVACcooling.csv'
         self.input_artifact_excluded_locations = 'EXCLUDED_LOCATIONS.json'
 
         self.input_artifact_y1_1 = f'{pipeline_artifact_dir}/raw/RBSAM_Y1_PART 1 OF 4.csv'
@@ -36,6 +37,7 @@ class ApplyDevicemap(t.Task):
         self.output_artifact_clean_data = f'{pipeline_artifact_dir}/rbsa_cleandata.csv'
         self.my_data_files = [
             { 'name': self.input_artifact_device_map, 'read_type': SupportedFileReadType.DATA },
+            { 'name': self.input_artifact_hvac_type, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_excluded_locations, 'read_type': SupportedFileReadType.CONFIG },
             { 'name': self.input_artifact_y1_1, 'read_type': SupportedFileReadType.DATA },
             { 'name': self.input_artifact_y1_2, 'read_type': SupportedFileReadType.DATA },
@@ -62,7 +64,13 @@ class ApplyDevicemap(t.Task):
         
         self.device_map = data_map[self.input_artifact_device_map]
         self.excluded_locations = data_map[self.input_artifact_excluded_locations]['Residential']
-   
+
+        self.hvac_df = data_map[self.input_artifact_hvac_type]
+
+        # print(self.hvac_df.loc[self.hvac_df['siteid'] == 10083]['HVACType'].iloc[0])
+        # # print(self.hvac_df.loc['10083']['HVACType'])
+        # self.hvac_df.loc[self.hvac_df['siteid'] == 10083]
+
         rbsa_dict = {} # device name to enduse
         enduses = set()
 
@@ -151,6 +159,22 @@ class ApplyDevicemap(t.Task):
 
         logger.info(f'Removing sites {self.excluded_locations["sites"]}.')       
         master_df = master_df.loc[~master_df.index.get_level_values('siteid').isin(self.excluded_locations['sites'])]
+
+        sites = master_df.index.get_level_values('siteid').unique()
+
+        unwanted_sites = [] 
+
+        for site in sites:
+            try:
+                hvac_type = self.hvac_df.loc[self.hvac_df['siteid'] == int(site)]['HVACType'].iloc[0]
+            except IndexError:
+                logger.info(f'Site {site} HVAC type cannot be identified.')       
+                continue
+
+            if (hvac_type != 'heatpump') | (hvac_type != 'centralAC') | (hvac_type != 'PTAC'):
+                unwanted_sites.append(site)
+
+        master_df = master_df.loc[~master_df.index.get_level_values('siteid').isin(unwanted_sites)]
 
         self.validate(master_df)
         self.on_complete({self.output_artifact_clean_data: master_df})           
