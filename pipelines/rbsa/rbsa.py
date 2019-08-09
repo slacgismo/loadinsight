@@ -6,6 +6,7 @@ from generics import pipeline as p, task as t
 
 from pipelines.rbsa.tasks import (
     apply_devicemap,
+    sitewise_gas_discount,
     group_sites, 
     undiscount_gas, 
     index_heatcool, 
@@ -74,6 +75,9 @@ class RbsaPipeline():
 
         apply_devicemap_task = apply_devicemap.ApplyDevicemap('apply_devicemap_task', self.artifact_root_dir)
         self.pipeline.add_task(apply_devicemap_task)
+
+        sitewise_gas_discount_task = sitewise_gas_discount.SitewiseGasDiscount('sitewise_gas_discount_task', self.artifact_root_dir)
+        self.pipeline.add_task(sitewise_gas_discount_task)
 
         site_grouping_task = group_sites.SitesGrouper('site_grouping_task', self.artifact_root_dir)
         self.pipeline.add_task(site_grouping_task)

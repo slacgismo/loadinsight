@@ -17,10 +17,10 @@ class SitesGrouper(t.Task):
         self.task_function = self._task
         self.input_artifact_zip_map = f'{pipeline_artifact_dir}/rbsa_zipmap.csv'
         self.output_artifact_area_load = f'{pipeline_artifact_dir}/area_loads.csv'
-        self.input_artifact_clean_data = f'{pipeline_artifact_dir}/rbsa_cleandata.csv'
+        self.input_artifact_rbsa_discounted = f'{pipeline_artifact_dir}/rbsa_discounted.csv'
         self.output_artifact_full_zipcodes = f'{pipeline_artifact_dir}/full_zipcodes.csv'
         self.my_data_files = [
-            { 'name': self.input_artifact_clean_data, 'read_type': SupportedFileReadType.DATA }, 
+            { 'name': self.input_artifact_rbsa_discounted, 'read_type': SupportedFileReadType.DATA }, 
             { 'name': self.input_artifact_zip_map, 'read_type': SupportedFileReadType.DATA }
         ]
 
@@ -30,7 +30,7 @@ class SitesGrouper(t.Task):
     def _task(self):
         data_map = self._get_data()
         
-        self.df = data_map[self.input_artifact_clean_data]
+        self.df = data_map[self.input_artifact_rbsa_discounted]
         self.zip_map = data_map[self.input_artifact_zip_map]
 
         # guarantee dataframe correct types
