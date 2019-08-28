@@ -6,9 +6,9 @@ from generics import pipeline as p, task as t
 
 from pipelines.rbsa.tasks import (
     apply_devicemap,
-    group_sites, 
-    undiscount_gas, 
-    index_heatcool, 
+    group_sites,
+    undiscount_gas,
+    index_heatcool,
     normalize_totals,
     find_sensitivities,
     zipcode_correlation,
@@ -45,7 +45,7 @@ class RbsaPipeline():
             self.create_tasks()
 
         self._verify_or_create_local_artifact_directory()
-    
+
     def _verify_or_create_local_artifact_directory(self):
         # check if an rbsa artifact folder exists in the local data
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}'):
@@ -53,20 +53,20 @@ class RbsaPipeline():
 
         # create the unique run folder for this run instance
         self._create_results_storage(f'{base.LOCAL_PATH}/{self.run_dir}')
-        
+
         # check for the artifact sub dirs
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_raw_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_raw_dir}')
 
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_noaa_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_noaa_dir}')
-        
+
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_tmy_base_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_tmy_base_dir}')
-        
+
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_tmy_target_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_tmy_target_dir}')
-        
+
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_target_weather_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_target_weather_dir}')
 
@@ -124,7 +124,7 @@ class RbsaPipeline():
         from generics.file_type_enum import SupportedFileReadType
 
         adm = ArtifactDataManager()
-        
+
         df =  adm.load_data([
             { 'name': f'{self.artifact_root_dir}/normal_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': f'{self.artifact_root_dir}/enduse_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
@@ -145,7 +145,7 @@ class RbsaPipeline():
         base_enduses.remove('daytype')
         base_enduses.remove('Heating')
         base_enduses.remove('Cooling')
-        ticks = np.arange(0, 25, 3) 
+        ticks = np.arange(0, 25, 3)
 
         plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
 
@@ -201,7 +201,7 @@ class RbsaPipeline():
                 day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                 plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')      
+                plt.ylabel('Load (pu. base total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=4d}'.format(image_index)
                 fig.savefig(f'{enduse_plots_dir}/{image_index_based_name}.png')
@@ -223,7 +223,7 @@ class RbsaPipeline():
                 day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                 plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')   
+                plt.ylabel('Load (pu. base total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=4d}'.format(image_index)
                 fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
@@ -244,12 +244,12 @@ class RbsaPipeline():
             city_df = city_df.reset_index()
             plot = city_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
             plt.xlabel('Hour-of-Day')
-            plt.ylabel('Load (pu. base total peak)')   
+            plt.ylabel('Load (pu. base total peak)')
             fig = plot.get_figure()
             image_index_based_name = '{0:0=4d}'.format(image_index)
             fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
             plt.close(fig)
-            image_index += 1      
+            image_index += 1
 
         logger.info('GENERATING RBSA COMPONENT PLOTS')
 
@@ -265,12 +265,12 @@ class RbsaPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')   
+                plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=4d}'.format(image_index)
                 fig.savefig(f'{components_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1   
+                image_index += 1
 
         # Fixed image name plots
 
@@ -322,7 +322,7 @@ class RbsaPipeline():
                 day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                 plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')      
+                plt.ylabel('Load (pu. base total peak)')
                 fig = plot.get_figure()
                 fig.savefig(f'{enduse_plots_dir}/{title}.png')
                 plt.close(fig)
@@ -341,7 +341,7 @@ class RbsaPipeline():
                 day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                 plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')   
+                plt.ylabel('Load (pu. base total peak)')
                 fig = plot.get_figure()
                 fig.savefig(f'{total_plots_dir}/{title}.png')
                 plt.close(fig)
@@ -352,17 +352,17 @@ class RbsaPipeline():
             city_df = loadshapes.loc[loadshapes.zipcode == city]
             max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
-            title = f'RBSA-{str(city).split(",")[0]}_{str(city).split(",")[1]}'
+            title = f'RBSA-{str(city)}'
             city_df['Baseload'] = city_df[base_enduses].sum(axis=1)
             city_df = city_df.iloc[:24]
             city_df = city_df.append(city_df.iloc[0])
             city_df = city_df.reset_index()
             plot = city_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
             plt.xlabel('Hour-of-Day')
-            plt.ylabel('Load (pu. base total peak)')   
+            plt.ylabel('Load (pu. base total peak)')
             fig = plot.get_figure()
             fig.savefig(f'{loadshapes_plots_dir}/{title}.png')
-            plt.close(fig)    
+            plt.close(fig)
 
         logger.info('GENERATING RBSA COMPONENT PLOTS')
 
@@ -377,7 +377,7 @@ class RbsaPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')   
+                plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
                 fig.savefig(f'{components_plots_dir}/{title}.png')
                 plt.close(fig)

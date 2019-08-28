@@ -5,7 +5,7 @@ from settings import base
 from generics import pipeline as p, task as t
 
 from pipelines.ceus.tasks import (
-    undiscount_gas, 
+    undiscount_gas,
     normalize_totals,
     find_sensitivities,
     fcz_correlation,
@@ -23,7 +23,7 @@ class CeusPipeline():
     def __init__(self, pipeline_configuration=None):
         self.name = 'ceus'
         self.pipeline = p.Pipeline(self.name)
-        
+
         # specify the logical directory structure for this pipeline execution
         self.artifact_root_dir = 'ceus'
         self.artifact_noaa_dir = 'ceus_noaa'
@@ -33,7 +33,7 @@ class CeusPipeline():
 
         # the local directory where all the output images are saved for this pipeline run
         self.run_dir = f'{time()}__{self.name}'
-        
+
         if pipeline_configuration:
             # TODO: establish a configuration scheme for this to run dynamically
             pass
@@ -49,17 +49,17 @@ class CeusPipeline():
 
         # create the unique run folder for this run instance
         self._create_results_storage(f'{base.LOCAL_PATH}/{self.run_dir}')
-        
+
         # check for the artifact sub dirs
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_noaa_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_noaa_dir}')
-        
+
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_tmy_base_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_tmy_base_dir}')
-        
+
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_tmy_target_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_tmy_target_dir}')
-        
+
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_target_weather_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}/{self.artifact_target_weather_dir}')
 
@@ -105,7 +105,7 @@ class CeusPipeline():
         from generics.file_type_enum import SupportedFileReadType
 
         adm = ArtifactDataManager()
-        
+
         df =  adm.load_data([
             { 'name': f'{self.artifact_root_dir}/ceus_normal_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': f'{self.artifact_root_dir}/ceus_enduse_loadshapes.csv', 'read_type': SupportedFileReadType.DATA },
@@ -127,7 +127,7 @@ class CeusPipeline():
         base_enduses.remove('daytype')
         base_enduses.remove('Heating')
         base_enduses.remove('Cooling')
-        ticks = np.arange(0, 25, 3) 
+        ticks = np.arange(0, 25, 3)
 
         normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_normal_loadshapes'
         self._create_results_storage(normal_plots_dir)
@@ -209,7 +209,7 @@ class CeusPipeline():
                     day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                     plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                     plt.xlabel('Hour-of-Day')
-                    plt.ylabel('Load (pu. base total peak)')      
+                    plt.ylabel('Load (pu. base total peak)')
                     fig = plot.get_figure()
                     image_index_based_name = '{0:0=4d}'.format(image_index)
                     fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
@@ -231,12 +231,12 @@ class CeusPipeline():
                 buildingtype_df = buildingtype_df.reset_index()
                 plot = buildingtype_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')   
+                plt.ylabel('Load (pu. base total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=4d}'.format(image_index)
                 fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1    
+                image_index += 1
 
         logger.info('GENERATING CEUS COMPONENT PLOTS')
 
@@ -254,12 +254,12 @@ class CeusPipeline():
                     day_df = day_df.reset_index()
                     plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                     plt.xlabel('Hour-of-Day')
-                    plt.ylabel('Load (pu. summer total peak)')   
+                    plt.ylabel('Load (pu. summer total peak)')
                     fig = plot.get_figure()
                     image_index_based_name = '{0:0=4d}'.format(image_index)
                     fig.savefig(f'{components_plots_dir}/{image_index_based_name}.png')
                     plt.close(fig)
-                    image_index += 1   
+                    image_index += 1
 
         # fixed image name plots
 
@@ -336,7 +336,7 @@ class CeusPipeline():
                     day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                     plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                     plt.xlabel('Hour-of-Day')
-                    plt.ylabel('Load (pu. base total peak)')      
+                    plt.ylabel('Load (pu. base total peak)')
                     fig = plot.get_figure()
                     fig.savefig(f'{total_plots_dir}/{title}.png')
                     plt.close(fig)
@@ -349,13 +349,13 @@ class CeusPipeline():
                 buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
                 max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
                 max_val = 1 if max_total <= 1 else int(max_total) + 1
-                title = f'CEUS-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(buildingtype)}'
+                title = f'CEUS-{str(city)}-{str(buildingtype)}'
                 buildingtype_df['Baseload'] = buildingtype_df[base_enduses].sum(axis=1)
                 buildingtype_df = buildingtype_df.iloc[:24]
                 buildingtype_df = buildingtype_df.reset_index()
                 plot = buildingtype_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')   
+                plt.ylabel('Load (pu. base total peak)')
                 fig = plot.get_figure()
                 fig.savefig(f'{loadshapes_plots_dir}/{title}.png')
                 plt.close(fig)
@@ -375,7 +375,7 @@ class CeusPipeline():
                     day_df = day_df.reset_index()
                     plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                     plt.xlabel('Hour-of-Day')
-                    plt.ylabel('Load (pu. summer total peak)')   
+                    plt.ylabel('Load (pu. summer total peak)')
                     fig = plot.get_figure()
                     fig.savefig(f'{components_plots_dir}/{title}.png')
                     plt.close(fig)

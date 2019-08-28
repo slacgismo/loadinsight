@@ -19,7 +19,7 @@ class MixedFeederPipeline():
 
         self.artifact_root_dir = 'mix'
         self.run_dir = f'{time()}__{self.name}'
-        
+
         if pipeline_configuration:
             # TODO: establish a configuration scheme for this to run dynamically
             pass
@@ -27,12 +27,12 @@ class MixedFeederPipeline():
             self.create_tasks()
 
         self._verify_or_create_local_artifact_directory()
-    
+
     def _verify_or_create_local_artifact_directory(self):
         # check if an rbsa artifact folder exists in the local data
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}')
-        
+
         # create the unique run folder for this run instance
         self._create_results_storage(f'{base.LOCAL_PATH}/{self.run_dir}')
 
@@ -53,7 +53,7 @@ class MixedFeederPipeline():
         """
         Run all the tasks in this pipeline
         """
-        try:            
+        try:
             self.pipeline.run()
             logger.info(f'Total Pipeline Run Time: {self.pipeline.total_pipeline_run_time}')
         except ValueError as ve:
@@ -68,7 +68,7 @@ class MixedFeederPipeline():
         from generics.file_type_enum import SupportedFileReadType
 
         adm = ArtifactDataManager()
-        
+
         df =  adm.load_data([
             { 'name': f'{self.artifact_root_dir}/suburban_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': f'{self.artifact_root_dir}/urban_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
@@ -90,7 +90,7 @@ class MixedFeederPipeline():
         mixed_mix_hour_norm = df[f'{self.artifact_root_dir}/mixed_mix_output_hour_norm.csv']
         rural_mix_hour_norm = df[f'{self.artifact_root_dir}/rural_mix_output_hour_norm.csv']
 
-        ticks = np.arange(0, 25, 3) 
+        ticks = np.arange(0, 25, 3)
 
         plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
 
@@ -133,12 +133,12 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')   
+                plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{residential_mix_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1   
+                image_index += 1
 
         logger.info('GENERATING URBAN MIX PLOTS')
 
@@ -154,12 +154,12 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{commercial_mix_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1   
+                image_index += 1
 
         logger.info('GENERATING MIXED MIX PLOTS')
 
@@ -175,12 +175,12 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{mixed_mix_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1   
+                image_index += 1
 
         logger.info('GENERATING RURAL MIX PLOTS')
 
@@ -196,12 +196,12 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{rural_mix_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1   
+                image_index += 1
 
 
         logger.info('GENERATING hour_norm SUBURBAN MIX PLOTS')
@@ -218,12 +218,12 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')   
+                plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{residential_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1   
+                image_index += 1
 
         logger.info('GENERATING hour_norm URBAN MIX PLOTS')
 
@@ -239,12 +239,12 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{commercial_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1   
+                image_index += 1
 
         logger.info('GENERATING hour_norm MIXED MIX PLOTS')
 
@@ -260,12 +260,12 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{mixed_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1   
+                image_index += 1
 
         logger.info('GENERATING hour_norm RURAL MIX PLOTS')
 
@@ -281,12 +281,12 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
                 image_index_based_name = '{0:0=2d}'.format(image_index)
                 fig.savefig(f'{rural_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
                 plt.close(fig)
-                image_index += 1   
+                image_index += 1
 
         # Fixed image name plots
 
@@ -328,7 +328,7 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')   
+                plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
                 fig.savefig(f'{residential_mix_plots_dir}/{title}.png')
                 plt.close(fig)
@@ -346,7 +346,7 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
                 fig.savefig(f'{commercial_mix_plots_dir}/{title}.png')
                 plt.close(fig)
@@ -364,9 +364,9 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
-                fig.savefig(f'{mixed_mix_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{mixed_mix_plots_dir}/{title}.png')
                 plt.close(fig)
 
         logger.info('GENERATING RURAL MIX PLOTS')
@@ -382,9 +382,9 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
-                fig.savefig(f'{rural_mix_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{rural_mix_plots_dir}/{title}.png')
                 plt.close(fig)
 
 
@@ -401,9 +401,9 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')   
+                plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
-                fig.savefig(f'{residential_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{residential_mix_hour_norm_plots_dir}/{title}.png')
                 plt.close(fig)
 
         logger.info('GENERATING hour_norm URBAN MIX PLOTS')
@@ -419,9 +419,9 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
-                fig.savefig(f'{commercial_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{commercial_mix_hour_norm_plots_dir}/{title}.png')
                 plt.close(fig)
 
         logger.info('GENERATING hour_norm MIXED MIX PLOTS')
@@ -437,10 +437,10 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
-                fig.savefig(f'{mixed_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig) 
+                fig.savefig(f'{mixed_mix_hour_norm_plots_dir}/{title}.png')
+                plt.close(fig)
 
         logger.info('GENERATING hour_norm RURAL MIX PLOTS')
 
@@ -455,9 +455,9 @@ class MixedFeederPipeline():
                 day_df = day_df.reset_index()
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. total peak)')
                 fig = plot.get_figure()
-                fig.savefig(f'{rural_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{rural_mix_hour_norm_plots_dir}/{title}.png')
                 plt.close(fig)
 
 
