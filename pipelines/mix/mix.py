@@ -322,7 +322,7 @@ class MixedFeederPipeline():
             max_total = city_df[plotting_components].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'SUBURBAN-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
+                title = f'SUBURBAN-norm-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
@@ -340,7 +340,7 @@ class MixedFeederPipeline():
             max_total = city_df[plotting_components].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'URBAN-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
+                title = f'URBAN-norm-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
@@ -358,7 +358,7 @@ class MixedFeederPipeline():
             max_total = city_df[plotting_components].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'MIXED-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
+                title = f'MIXED-norm-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
@@ -376,7 +376,7 @@ class MixedFeederPipeline():
             max_total = city_df[plotting_components].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'RURAL-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
+                title = f'RURAL-norm-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
