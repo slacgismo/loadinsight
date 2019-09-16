@@ -44,15 +44,15 @@ def init_logging():
     We may, however, in the future, plug in something like Papertrail
     """
     logger.setLevel(logging.DEBUG)
-    
+
     # set a common log format
     logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-    
+
     # setup our rotating file handler and assign our common formatter to it
     rotating_file_handler = RotatingFileHandler('lctk.log', maxBytes=200000, backupCount=10)
     rotating_file_handler.setFormatter(logFormatter)
     logger.addHandler(rotating_file_handler)
-    
+
     if LOCAL_DEBUG:
         # print to stdout if we are debugging
         stream_handler = logging.StreamHandler(sys.stdout)
@@ -71,16 +71,16 @@ def parse_cmd_line_opts(argv):
             if opt == '-h':
                 print(FILE_USAGE_EXPLANATAION)
                 sys.exit()
-            
+
             elif opt == '-d':
                 print('Running LCTK with DEBUG set to True')
                 LOCAL_DEBUG = True
-            
+
             elif opt == '-s':
                 custom_settings = importlib.import_module(arg)
                 print(f'Running LCTK with the {arg} settings file')
                 LOCAL_DEBUG = custom_settings.DEBUG
-                
+
     except getopt.GetoptError:
         logger.exc('Unrecognized option terminating LCTK execution')
 
@@ -110,31 +110,9 @@ def execute_lctk(argv):
     mix_pipeline = mix.MixedFeederPipeline()
     mix_pipeline.execute()
     mix_pipeline.generate_result_plots()
-    
+
     from utilities import image_stitcher
     from settings import base
-
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/normal_loadshapes/', 'normalized_loadshapes.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/enduse_loadshapes/', 'enduse_loadshapes.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/total_loadshapes/', 'total_loadshapes.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/loadshapes/', 'loadshapes.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/components/', 'components.png')
-
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_normal_loadshapes/', 'ceus_normal_loadshapes.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_enduse_loadshapes/', 'ceus_enduse_loadshapes.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_total_loadshapes/', 'ceus_total_loadshapes.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_loadshapes/', 'ceus_loadshapes.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_components/', 'ceus_components.png')
-
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/suburban_mix/', 'suburban_mix.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/urban_mix/', 'urban_mix.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/mixed_mix/', 'mixed_mix.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/rural_mix/', 'rural_mix.png')
-
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/suburban_mix_hour_norm/', 'suburban_mix_hour_norm.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/urban_mix_hour_norm/', 'urban_mix_hour_norm.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/mixed_mix_hour_norm/', 'mixed_mix_hour_norm.png')
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{mix_pipeline.run_dir}/rural_mix_hour_norm/', 'rural_mix_hour_norm.png')
 
 if __name__ == '__main__':
     try:
