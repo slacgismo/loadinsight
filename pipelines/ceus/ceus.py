@@ -147,199 +147,13 @@ class CeusPipeline():
         plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
 
         logger.info('GENERATING CEUS NORMAL LOADSHAPE PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(normal_loadshapes.target.unique()):
-            city_df = normal_loadshapes.loc[normal_loadshapes.target == city]
-            for zdx, buildingtype in enumerate(normal_loadshapes.buildingtype.unique()):
-                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
-                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-                max_val = 1 if max_total <= 1 else int(max_total) + 1
-                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
-                    title = f'{str(city)}-{str(buildingtype)}-{str(daytype)}'
-                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
-                    day_df = day_df.append(day_df.iloc[0])
-                    day_df = day_df.reset_index()
-                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                    fig = plot.get_figure()
-                    image_index_based_name = '{0:0=4d}'.format(image_index)
-                    fig.savefig(f'{normal_plots_dir}/{image_index_based_name}.png')
-                    plt.close(fig)
-                    image_index += 1
+        self.loadshapes_plotting(loadshapes=normal_loadshapes, directory=normal_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING CEUS ENDUSE LOADSHAPE PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(enduse_loadshapes.target.unique()):
-            city_df = enduse_loadshapes.loc[enduse_loadshapes.target == city]
-            for zdx, buildingtype in enumerate(enduse_loadshapes.buildingtype.unique()):
-                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
-                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-                max_val = 1 if max_total <= 1 else int(max_total) + 1
-                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
-                    title = f'{str(city)}-{str(buildingtype)}-{str(daytype)}'
-                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
-                    day_df = day_df.append(day_df.iloc[0])
-                    day_df = day_df.reset_index()
-                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                    plt.xlabel('Hour-of-Day')
-                    plt.ylabel('Load (pu. summer total peak)')
-                    fig = plot.get_figure()
-                    image_index_based_name = '{0:0=4d}'.format(image_index)
-                    fig.savefig(f'{enduse_plots_dir}/{image_index_based_name}.png')
-                    plt.close(fig)
-                    image_index += 1
+        self.loadshapes_plotting(loadshapes=enduse_loadshapes, directory=enduse_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING CEUS TOTAL LOADSHAPE PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(total_loadshapes.target.unique()):
-            city_df = total_loadshapes.loc[total_loadshapes.target == city]
-            for zdx, buildingtype in enumerate(total_loadshapes.buildingtype.unique()):
-                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
-                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-                max_val = 1 if max_total <= 1 else int(max_total) + 1
-                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
-                    title = f'{str(city)}-{str(buildingtype)}-{str(daytype)}'
-                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
-                    day_df = day_df.append(day_df.iloc[0])
-                    day_df = day_df.reset_index()
-                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                    plt.xlabel('Hour-of-Day')
-                    plt.ylabel('Load (pu. base total peak)')
-                    fig = plot.get_figure()
-                    image_index_based_name = '{0:0=4d}'.format(image_index)
-                    fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
-                    plt.close(fig)
-                    image_index += 1
-
-        logger.info('GENERATING CEUS LOADSHAPE PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(loadshapes.fcz.unique()):
-            city_df = loadshapes.loc[loadshapes.fcz == city]
-            for zdx, buildingtype in enumerate(loadshapes.buildingtype.unique()):
-                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
-                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-                max_val = 1 if max_total <= 1 else int(max_total) + 1
-                title = f'{str(city)}-{str(buildingtype)}'
-                buildingtype_df['Baseload'] = buildingtype_df[base_enduses].sum(axis=1)
-                buildingtype_df = buildingtype_df.iloc[:24]
-                buildingtype_df = buildingtype_df.reset_index()
-                plot = buildingtype_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=4d}'.format(image_index)
-                fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1
-
-        logger.info('GENERATING CEUS COMPONENT PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(components.target.unique()):
-            city_df = components.loc[components.target == city]
-            for zdx, buildingtype in enumerate(loadshapes.buildingtype.unique()):
-                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
-                max_total = buildingtype_df[plotting_components].sum(axis=1).max()
-                max_val = 1 if max_total <= 1 else int(max_total) + 1
-                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
-                    title = f'{str(city)}-{buildingtype}-{str(daytype)}'
-                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
-                    day_df = day_df.append(day_df.iloc[0])
-                    day_df = day_df.reset_index()
-                    plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
-                    plt.xlabel('Hour-of-Day')
-                    plt.ylabel('Load (pu. summer total peak)')
-                    fig = plot.get_figure()
-                    image_index_based_name = '{0:0=4d}'.format(image_index)
-                    fig.savefig(f'{components_plots_dir}/{image_index_based_name}.png')
-                    plt.close(fig)
-                    image_index += 1
-
-        # fixed image name plots
-
-        normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_normal_loadshapes_named'
-        self._create_results_storage(normal_plots_dir)
-
-        enduse_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_enduse_loadshapes_named'
-        self._create_results_storage(enduse_plots_dir)
-
-        total_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_total_loadshapes_named'
-        self._create_results_storage(total_plots_dir)
-
-        loadshapes_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_loadshapes_named'
-        self._create_results_storage(loadshapes_plots_dir)
-
-        components_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_components_named'
-        self._create_results_storage(components_plots_dir)
-
-        plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
-
-        logger.info('GENERATING CEUS NORMAL LOADSHAPE PLOTS')
-
-        for idx, city in enumerate(normal_loadshapes.target.unique()):
-            city_df = normal_loadshapes.loc[normal_loadshapes.target == city]
-            for zdx, buildingtype in enumerate(normal_loadshapes.buildingtype.unique()):
-                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
-                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-                max_val = 1 if max_total <= 1 else int(max_total) + 1
-                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
-                    title = f'CEUS-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(buildingtype)}-{str(daytype)}'
-                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
-                    day_df = day_df.append(day_df.iloc[0])
-                    day_df = day_df.reset_index()
-                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                    fig = plot.get_figure()
-                    fig.savefig(f'{normal_plots_dir}/{title}.png')
-                    plt.close(fig)
-
-        logger.info('GENERATING CEUS ENDUSE LOADSHAPE PLOTS')
-
-        for idx, city in enumerate(enduse_loadshapes.target.unique()):
-            city_df = enduse_loadshapes.loc[enduse_loadshapes.target == city]
-            for zdx, buildingtype in enumerate(enduse_loadshapes.buildingtype.unique()):
-                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
-                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-                max_val = 1 if max_total <= 1 else int(max_total) + 1
-                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
-                    title = f'CEUS-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(buildingtype)}-{str(daytype)}'
-                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
-                    day_df = day_df.append(day_df.iloc[0])
-                    day_df = day_df.reset_index()
-                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                    plt.xlabel('Hour-of-Day')
-                    plt.ylabel('Load (pu. summer total peak)')
-                    fig = plot.get_figure()
-                    fig.savefig(f'{enduse_plots_dir}/{title}.png')
-                    plt.close(fig)
-
-        logger.info('GENERATING CEUS TOTAL LOADSHAPE PLOTS')
-
-        for idx, city in enumerate(total_loadshapes.target.unique()):
-            city_df = total_loadshapes.loc[total_loadshapes.target == city]
-            for zdx, buildingtype in enumerate(total_loadshapes.buildingtype.unique()):
-                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
-                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-                max_val = 1 if max_total <= 1 else int(max_total) + 1
-                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
-                    title = f'CEUS-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(buildingtype)}-{str(daytype)}'
-                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
-                    day_df = day_df.append(day_df.iloc[0])
-                    day_df = day_df.reset_index()
-                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                    plt.xlabel('Hour-of-Day')
-                    plt.ylabel('Load (pu. base total peak)')
-                    fig = plot.get_figure()
-                    fig.savefig(f'{total_plots_dir}/{title}.png')
-                    plt.close(fig)
+        self.loadshapes_plotting(loadshapes=total_loadshapes, directory=total_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING CEUS LOADSHAPE PLOTS')
 
@@ -380,6 +194,29 @@ class CeusPipeline():
                     fig.savefig(f'{components_plots_dir}/{title}.png')
                     plt.close(fig)
 
+    def loadshapes_plotting(self, loadshapes, directory, base_enduses):
+        ######## Plotting helper function
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        ticks = np.arange(0, 25, 3)
+        
+        for idx, city in enumerate(loadshapes.target.unique()):
+            city_df = loadshapes.loc[loadshapes.target == city]
+            for zdx, buildingtype in enumerate(loadshapes.buildingtype.unique()):
+                buildingtype_df = city_df.loc[city_df.buildingtype == buildingtype]
+                max_total = buildingtype_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+                max_val = 1 if max_total <= 1 else int(max_total) + 1
+                for ydx, daytype in enumerate(buildingtype_df.daytype.unique()):
+                    title = f'CEUS-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(buildingtype)}-{str(daytype)}'
+                    day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
+                    day_df = day_df.append(day_df.iloc[0])
+                    day_df = day_df.reset_index()
+                    day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
+                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                    fig = plot.get_figure()
+                    fig.savefig(f'{directory}/{title}.png')
+                    plt.close(fig)
 
     def execute(self):
         """

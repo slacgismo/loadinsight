@@ -165,186 +165,13 @@ class RbsaPipeline():
         self._create_results_storage(components_plots_dir)
 
         logger.info('GENERATING RBSA NORMAL LOADSHAPE PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(normal_loadshapes.target.unique()):
-            city_df = normal_loadshapes.loc[normal_loadshapes.target == city]
-            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=4d}'.format(image_index)
-                fig.savefig(f'{normal_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1
+        self.loadshapes_plotting(loadshapes=normal_loadshapes, directory=normal_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING RBSA ENDUSE LOADSHAPE PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(enduse_loadshapes.target.unique()):
-            city_df = enduse_loadshapes.loc[enduse_loadshapes.target == city]
-            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=4d}'.format(image_index)
-                fig.savefig(f'{enduse_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1
+        self.loadshapes_plotting(loadshapes=enduse_loadshapes, directory=enduse_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING RBSA TOTAL LOADSHAPE PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(total_loadshapes.target.unique()):
-            city_df = total_loadshapes.loc[total_loadshapes.target == city]
-            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=4d}'.format(image_index)
-                fig.savefig(f'{total_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1
-
-        logger.info('GENERATING RBSA LOADSHAPE PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(loadshapes.zipcode.unique()):
-            city_df = loadshapes.loc[loadshapes.zipcode == city]
-            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            title = city
-            city_df['Baseload'] = city_df[base_enduses].sum(axis=1)
-            city_df = city_df.iloc[:24]
-            city_df = city_df.append(city_df.iloc[0])
-            city_df = city_df.reset_index()
-            plot = city_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-            plt.xlabel('Hour-of-Day')
-            plt.ylabel('Load (pu. base total peak)')
-            fig = plot.get_figure()
-            image_index_based_name = '{0:0=4d}'.format(image_index)
-            fig.savefig(f'{loadshapes_plots_dir}/{image_index_based_name}.png')
-            plt.close(fig)
-            image_index += 1
-
-        logger.info('GENERATING RBSA COMPONENT PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(components.target.unique()):
-            city_df = components.loc[components.target == city]
-            max_total = city_df[plotting_components].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=4d}'.format(image_index)
-                fig.savefig(f'{components_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1
-
-        # Fixed image name plots
-
-        normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/normal_loadshapes_named'
-        self._create_results_storage(normal_plots_dir)
-
-        enduse_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/enduse_loadshapes_named'
-        self._create_results_storage(enduse_plots_dir)
-
-        total_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/total_loadshapes_named'
-        self._create_results_storage(total_plots_dir)
-
-        loadshapes_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/loadshapes_named'
-        self._create_results_storage(loadshapes_plots_dir)
-
-        components_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/components_named'
-        self._create_results_storage(components_plots_dir)
-
-        logger.info('GENERATING RBSA NORMAL LOADSHAPE PLOTS')
-
-        for idx, city in enumerate(normal_loadshapes.target.unique()):
-            city_df = normal_loadshapes.loc[normal_loadshapes.target == city]
-            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'RBSA-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')
-                fig = plot.get_figure()
-                fig.savefig(f'{normal_plots_dir}/{title}.png')
-                plt.close(fig)
-
-        logger.info('GENERATING RBSA ENDUSE LOADSHAPE PLOTS')
-
-        for idx, city in enumerate(enduse_loadshapes.target.unique()):
-            city_df = enduse_loadshapes.loc[enduse_loadshapes.target == city]
-            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'RBSA-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')
-                fig = plot.get_figure()
-                fig.savefig(f'{enduse_plots_dir}/{title}.png')
-                plt.close(fig)
-
-        logger.info('GENERATING RBSA TOTAL LOADSHAPE PLOTS')
-
-        for idx, city in enumerate(total_loadshapes.target.unique()):
-            city_df = total_loadshapes.loc[total_loadshapes.target == city]
-            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'RBSA-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. base total peak)')
-                fig = plot.get_figure()
-                fig.savefig(f'{total_plots_dir}/{title}.png')
-                plt.close(fig)
+        self.loadshapes_plotting(loadshapes=total_loadshapes, directory=total_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING RBSA LOADSHAPE PLOTS')
 
@@ -381,6 +208,30 @@ class RbsaPipeline():
                 fig = plot.get_figure()
                 fig.savefig(f'{components_plots_dir}/{title}.png')
                 plt.close(fig)
+
+    def loadshapes_plotting(self, loadshapes, directory, base_enduses):
+        ######## Plotting helper function
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        ticks = np.arange(0, 25, 3)
+
+        for idx, city in enumerate(loadshapes.target.unique()):
+            city_df = loadshapes.loc[loadshapes.target == city]
+            max_total = city_df[['Heating', 'Cooling'] + base_enduses].sum(axis=1).max()
+            max_val = 1 if max_total <= 1 else int(max_total) + 1
+            for ydx, daytype in enumerate(city_df.daytype.unique()):
+                title = f'RBSA-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
+                day_df = city_df.loc[city_df.daytype == daytype]
+                day_df = day_df.append(day_df.iloc[0])
+                day_df = day_df.reset_index()
+                day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
+                plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                plt.xlabel('Hour-of-Day')
+                plt.ylabel('Load (pu. summer total peak)')
+                fig = plot.get_figure()
+                fig.savefig(f'{directory}/{title}.png')
+                plt.close(fig) 
 
     def execute(self):
         """
