@@ -3,6 +3,8 @@ import logging
 from time import time
 from settings import base
 from generics import pipeline as p, task as t
+import numpy as np
+import matplotlib.pyplot as plt
 
 from pipelines.mix.tasks import (
     get_mixed
@@ -138,9 +140,6 @@ class MixedFeederPipeline():
 
     def mix_type_plotting(self, mix_type, mix_type_name, normalization, directory):
         ######## Plotting helper function
-        import numpy as np
-        import matplotlib.pyplot as plt
-
         plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
         ticks = np.arange(0, 25, 3)
 
@@ -153,7 +152,7 @@ class MixedFeederPipeline():
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
+                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green', 'yellow', 'brown', 'blue', 'grey', 'black', 'red'])
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. {normalization})')
                 fig = plot.get_figure()

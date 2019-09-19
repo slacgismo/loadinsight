@@ -3,6 +3,8 @@ import logging
 from time import time
 from settings import base
 from generics import pipeline as p, task as t
+import numpy as np
+import matplotlib.pyplot as plt
 
 from pipelines.ceus.tasks import (
     undiscount_gas,
@@ -127,7 +129,6 @@ class CeusPipeline():
         base_enduses.remove('daytype')
         base_enduses.remove('Heating')
         base_enduses.remove('Cooling')
-        ticks = np.arange(0, 25, 3)
 
         normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_normal_loadshapes'
         self._create_results_storage(normal_plots_dir)
@@ -145,6 +146,7 @@ class CeusPipeline():
         self._create_results_storage(components_plots_dir)
 
         plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
+        self.ticks = np.arange(0, 25, 3) 
 
         logger.info('GENERATING CEUS NORMAL LOADSHAPE PLOTS')
         self.loadshapes_plotting(loadshapes=normal_loadshapes, directory=normal_plots_dir, base_enduses=base_enduses)
@@ -167,7 +169,7 @@ class CeusPipeline():
                 buildingtype_df['Baseload'] = buildingtype_df[base_enduses].sum(axis=1)
                 buildingtype_df = buildingtype_df.iloc[:24]
                 buildingtype_df = buildingtype_df.reset_index()
-                plot = buildingtype_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                plot = buildingtype_df[['Baseload', 'Heating', 'Cooling']].plot(title=title, grid=True, xticks=self.ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. base total peak)')
                 fig = plot.get_figure()
@@ -187,7 +189,7 @@ class CeusPipeline():
                     day_df = buildingtype_df.loc[buildingtype_df.daytype == daytype]
                     day_df = day_df.append(day_df.iloc[0])
                     day_df = day_df.reset_index()
-                    plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
+                    plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=self.ticks, ylim=(0, max_val), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
                     plt.xlabel('Hour-of-Day')
                     plt.ylabel('Load (pu. summer total peak)')
                     fig = plot.get_figure()
@@ -196,11 +198,6 @@ class CeusPipeline():
 
     def loadshapes_plotting(self, loadshapes, directory, base_enduses):
         ######## Plotting helper function
-        import numpy as np
-        import matplotlib.pyplot as plt
-
-        ticks = np.arange(0, 25, 3)
-        
         for idx, city in enumerate(loadshapes.target.unique()):
             city_df = loadshapes.loc[loadshapes.target == city]
             for zdx, buildingtype in enumerate(loadshapes.buildingtype.unique()):
@@ -213,7 +210,7 @@ class CeusPipeline():
                     day_df = day_df.append(day_df.iloc[0])
                     day_df = day_df.reset_index()
                     day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
-                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
+                    plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=self.ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                     fig = plot.get_figure()
                     fig.savefig(f'{directory}/{title}.png')
                     plt.close(fig)

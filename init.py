@@ -114,18 +114,6 @@ def execute_lctk(argv):
     from utilities import image_stitcher
     from settings import base
 
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/normal_loadshapes/', 'normalized_loadshapes.png')     
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/enduse_loadshapes/', 'enduse_loadshapes.png')        
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/total_loadshapes/', 'total_loadshapes.png')      
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/loadshapes/', 'loadshapes.png')      
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{rbsa_pipeline.run_dir}/components/', 'components.png')      
-
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_normal_loadshapes/', 'ceus_normal_loadshapes.png')     
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_enduse_loadshapes/', 'ceus_enduse_loadshapes.png')      
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_total_loadshapes/', 'ceus_total_loadshapes.png')        
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_loadshapes/', 'ceus_loadshapes.png')        
-    image_stitcher.stitch(f'{base.LOCAL_PATH}/{ceus_pipeline.run_dir}/ceus_components/', 'ceus_components.png')
-
 if __name__ == '__main__':
     try:
         # before we even attempt to run the pipeline the error reporting
