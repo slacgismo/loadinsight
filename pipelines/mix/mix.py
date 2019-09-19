@@ -3,6 +3,8 @@ import logging
 from time import time
 from settings import base
 from generics import pipeline as p, task as t
+import numpy as np
+import matplotlib.pyplot as plt
 
 from pipelines.mix.tasks import (
     get_mixed
@@ -19,7 +21,7 @@ class MixedFeederPipeline():
 
         self.artifact_root_dir = 'mix'
         self.run_dir = f'{time()}__{self.name}'
-        
+
         if pipeline_configuration:
             # TODO: establish a configuration scheme for this to run dynamically
             pass
@@ -27,12 +29,12 @@ class MixedFeederPipeline():
             self.create_tasks()
 
         self._verify_or_create_local_artifact_directory()
-    
+
     def _verify_or_create_local_artifact_directory(self):
         # check if an rbsa artifact folder exists in the local data
         if not os.path.isdir(f'{base.LOCAL_PATH}/{self.artifact_root_dir}'):
             self._create_results_storage(f'{base.LOCAL_PATH}/{self.artifact_root_dir}')
-        
+
         # create the unique run folder for this run instance
         self._create_results_storage(f'{base.LOCAL_PATH}/{self.run_dir}')
 
@@ -53,7 +55,7 @@ class MixedFeederPipeline():
         """
         Run all the tasks in this pipeline
         """
-        try:            
+        try:
             self.pipeline.run()
             logger.info(f'Total Pipeline Run Time: {self.pipeline.total_pipeline_run_time}')
         except ValueError as ve:
@@ -62,13 +64,11 @@ class MixedFeederPipeline():
 
     def generate_result_plots(self):
         ######## FOR DEBUG PURPOSES!
-        import numpy as np
-        import matplotlib.pyplot as plt
         from generics.artifact import ArtifactDataManager
         from generics.file_type_enum import SupportedFileReadType
 
         adm = ArtifactDataManager()
-        
+
         df =  adm.load_data([
             { 'name': f'{self.artifact_root_dir}/suburban_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
             { 'name': f'{self.artifact_root_dir}/urban_mix_output.csv', 'read_type': SupportedFileReadType.DATA },
@@ -89,10 +89,6 @@ class MixedFeederPipeline():
         commercial_mix_hour_norm = df[f'{self.artifact_root_dir}/urban_mix_output_hour_norm.csv']
         mixed_mix_hour_norm = df[f'{self.artifact_root_dir}/mixed_mix_output_hour_norm.csv']
         rural_mix_hour_norm = df[f'{self.artifact_root_dir}/rural_mix_output_hour_norm.csv']
-
-        ticks = np.arange(0, 25, 3) 
-
-        plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
 
         residential_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/suburban_mix'
         self._create_results_storage(residential_mix_plots_dir)
@@ -118,176 +114,50 @@ class MixedFeederPipeline():
         rural_mix_hour_norm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/rural_mix_hour_norm'
         self._create_results_storage(rural_mix_hour_norm_plots_dir)
 
-
         logger.info('GENERATING SUBURBAN MIX PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(residential_mix.target.unique()):
-            city_df = residential_mix.loc[residential_mix.target == city]
-            max_total = city_df[plotting_components].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')   
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{residential_mix_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1   
+        self.mix_type_plotting(mix_type=residential_mix, mix_type_name='SUBURBAN', normalization='summer total peak', directory=residential_mix_plots_dir)
 
         logger.info('GENERATING URBAN MIX PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(commercial_mix.target.unique()):
-            city_df = commercial_mix.loc[commercial_mix.target == city]
-            max_total = city_df[plotting_components].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{commercial_mix_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1   
+        self.mix_type_plotting(mix_type=commercial_mix, mix_type_name='URBAN', normalization='summer total peak', directory=commercial_mix_plots_dir)
 
         logger.info('GENERATING MIXED MIX PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(mixed_mix.target.unique()):
-            city_df = mixed_mix.loc[mixed_mix.target == city]
-            max_total = city_df[plotting_components].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{mixed_mix_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1   
+        self.mix_type_plotting(mix_type=mixed_mix, mix_type_name='MIXED', normalization='summer total peak', directory=mixed_mix_plots_dir)
 
         logger.info('GENERATING RURAL MIX PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(rural_mix.target.unique()):
-            city_df = rural_mix.loc[rural_mix.target == city]
-            max_total = city_df[plotting_components].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{rural_mix_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1   
-
+        self.mix_type_plotting(mix_type=rural_mix, mix_type_name='RURAL', normalization='summer total peak', directory=rural_mix_plots_dir)
 
         logger.info('GENERATING hour_norm SUBURBAN MIX PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(residential_mix_hour_norm.target.unique()):
-            city_df = residential_mix_hour_norm.loc[residential_mix_hour_norm.target == city]
-            max_total = city_df[plotting_components].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. summer total peak)')   
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{residential_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1   
+        self.mix_type_plotting(mix_type=residential_mix_hour_norm, mix_type_name='SUBURBAN', normalization='hour_norm', directory=residential_mix_hour_norm_plots_dir)
 
         logger.info('GENERATING hour_norm URBAN MIX PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(commercial_mix_hour_norm.target.unique()):
-            city_df = commercial_mix_hour_norm.loc[commercial_mix_hour_norm.target == city]
-            max_total = city_df[plotting_components].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{commercial_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1   
+        self.mix_type_plotting(mix_type=commercial_mix_hour_norm, mix_type_name='URBAN', normalization='hour_norm', directory=commercial_mix_hour_norm_plots_dir)
 
         logger.info('GENERATING hour_norm MIXED MIX PLOTS')
-
-        image_index = 0
-        for idx, city in enumerate(mixed_mix_hour_norm.target.unique()):
-            city_df = mixed_mix_hour_norm.loc[mixed_mix_hour_norm.target == city]
-            max_total = city_df[plotting_components].sum(axis=1).max()
-            max_val = 1 if max_total <= 1 else int(max_total) + 1
-            for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
-                day_df = city_df.loc[city_df.daytype == daytype]
-                day_df = day_df.append(day_df.iloc[0])
-                day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
-                plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
-                fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{mixed_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
-                plt.close(fig)
-                image_index += 1   
+        self.mix_type_plotting(mix_type=mixed_mix_hour_norm, mix_type_name='MIXED', normalization='hour_norm', directory=mixed_mix_hour_norm_plots_dir)
 
         logger.info('GENERATING hour_norm RURAL MIX PLOTS')
+        self.mix_type_plotting(mix_type=rural_mix_hour_norm, mix_type_name='RURAL', normalization='hour_norm', directory=rural_mix_hour_norm_plots_dir)
 
-        image_index = 0
-        for idx, city in enumerate(rural_mix_hour_norm.target.unique()):
-            city_df = rural_mix_hour_norm.loc[rural_mix_hour_norm.target == city]
+    def mix_type_plotting(self, mix_type, mix_type_name, normalization, directory):
+        ######## Plotting helper function
+        plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
+        ticks = np.arange(0, 25, 3)
+
+        for idx, city in enumerate(mix_type.target.unique()):
+            city_df = mix_type.loc[mix_type.target == city]
             max_total = city_df[plotting_components].sum(axis=1).max()
             max_val = 1 if max_total <= 1 else int(max_total) + 1
             for ydx, daytype in enumerate(city_df.daytype.unique()):
-                title = f'{str(city)}-{str(daytype)}'
+                title = f'{mix_type_name}-{normalization}-{str(city).split(",")[0]}_{str(city).split(",")[1]}-{str(daytype)}'
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
-                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1), linewidth=2, color=['green','yellow','brown','blue','grey','black','red'])
+                plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green', 'yellow', 'brown', 'blue', 'grey', 'black', 'red'])
                 plt.xlabel('Hour-of-Day')
-                plt.ylabel('Load (pu. total peak)')   
+                plt.ylabel('Load (pu. {normalization})')
                 fig = plot.get_figure()
-                image_index_based_name = '{0:0=2d}'.format(image_index)
-                fig.savefig(f'{rural_mix_hour_norm_plots_dir}/{image_index_based_name}.png')
+                fig.savefig(f'{directory}/{title}.png')
                 plt.close(fig)
-                image_index += 1   
-
 
     def on_failure(self):
         logger.info('Performing pipeline cleanup')
