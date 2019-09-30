@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.8
+      - image: circleci/python:3.7.4
 
     working_directory: ~/loadinsight
     steps:
@@ -16,7 +16,7 @@ jobs:
           
   deploy:
     docker:
-      - image: circleci/python:3.6.8
+      - image: circleci/python:3.7.4
 
     working_directory: ~/loadinsight
     steps:
@@ -33,4 +33,6 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: 
+                - master
+                - cmu
