@@ -1,9 +1,13 @@
 from django.contrib.auth.models import User
-from rest_framework import permissions, status
+from rest_framework import permissions, status, viewsets, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer, UserSerializerWithToken
+from .serializers import UserSerializer, UserSerializerWithToken, VerifyCodeSerializer
+from random import choice
+from django.core.mail import send_mail
+from .models import EmailVerifyCode
+
 
 
 @api_view(['GET'])
@@ -31,3 +35,57 @@ class UserList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view()
+def null_view(request):
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view()
+def complete_view(request):
+    return Response("Email account is activated")
+
+
+def generate_code():
+    seeds = '1234567890qwertyuiopasdfghjklzxcvbnm'
+    random_str = []
+    for i in range(6):
+        random_str.append(choice(seeds))
+    return ''.join(random_str)
+
+
+# def send_email(email, send_type='register'):
+#     code = generate_code()
+#     email_record = EmailVerifyCode()
+#     email_record.email = email
+#     email_record.code = code
+#     email_record.send_type = 'register'
+#     if send_type == 'register':
+#         email_title = 'loadinsight registration verification code'
+#         email_body = 'the verification code is： {0}'.format(code)
+#         send_mail(email_title, email_body, 'webzhengyus@163.com', [email])
+#         email_record.save()
+#     return code
+
+
+@api_view(['GET', 'POST'])
+def sendEmail(request):
+    if request.method == 'GET':
+        return Response(request.data, status=status.HTTP_201_CREATED)
+
+    elif request.method == 'POST':
+        email = request.data
+        code = generate_code()
+        send_mail(subject="Verify your email address",
+                  message="Your code for verification is: " + code,
+                  from_email="webzhengyus@163.com",
+                  recipient_list=["webzhengyus@163.com"]
+                  )
+        # send_status = send_mail(code, [email])
+        # code = send_email(email, 'register')
+        print("good request")
+        return Response({
+            'email': email,
+            'code': code,
+        }, status=status.HTTP_201_CREATED)
