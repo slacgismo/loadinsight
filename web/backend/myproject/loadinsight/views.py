@@ -31,8 +31,15 @@ class UserList(APIView):
     # create a new user
     def post(self, request, format=None):
         serializer = UserSerializerWithToken(data=request.data)
+        code = generate_code()
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            user.is_active = False
+            send_mail(subject="welcome to loadinsight",
+                      message=" ",
+                      from_email="webzhengyus@163.com",
+                      recipient_list=[serializer.data['email']]
+                      )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

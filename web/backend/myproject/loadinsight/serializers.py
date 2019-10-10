@@ -16,6 +16,7 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 
     token = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(max_length=50)
 
     def get_token(self, obj):
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -33,9 +34,14 @@ class UserSerializerWithToken(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    # def save(self, request):
+    #     user = super(UserSerializerWithToken, self).save(request)
+    #     user.is_active = False
+    #     return user
+
     class Meta:
         model = User
-        fields = ('token', 'username', 'password')
+        fields = ('token', 'username', 'password', 'email')
 
 
 class VerifyCodeSerializer(serializers.Serializer):
