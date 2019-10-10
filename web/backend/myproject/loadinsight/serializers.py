@@ -1,19 +1,21 @@
+import datetime
+
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 from django.contrib.auth.models import User
+from .models import EmailVerifyCode
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
-        fields = ('username',)
+        fields = ('username', 'email')
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):
-
     token = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(max_length=50)
 
     def get_token(self, obj):
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -31,6 +33,23 @@ class UserSerializerWithToken(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    # def save(self, request):
+    #     user = super(UserSerializerWithToken, self).save(request)
+    #     user.is_active = False
+    #     return user
+
     class Meta:
         model = User
-        fields = ('token', 'username', 'password')
+        fields = ('token', 'username', 'password', 'email')
+
+
+class VerifyCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=50)
+
+    def validate_email(self, email):
+        if UserSerializer.filter(email=email):
+            raise serializers.ValidationError('the user has already existed')
+        # one_minute_age = datetime.now() - datetime.timedelta(minutes=1)
+        # if EmailVerifyCode.objects.filter(add_time__gt=one_minute_age, email=email):
+        #     raise serializers.ValidationError('still within 60s....')
+        return email

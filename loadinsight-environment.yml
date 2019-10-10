@@ -9,3 +9,5 @@ dependencies:
     - requests
     - Pillow
     - awscli
+    - djangorestframework
+    - djangorestframework-jwt
