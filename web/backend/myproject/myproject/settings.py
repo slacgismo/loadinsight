@@ -143,7 +143,7 @@ EMAIL_USE_SSL = True    #whether use SSL for encryption
 EMAIL_HOST = 'smtp.163.com'   #SMTP server
 EMAIL_PORT = 465     #port of SMTF server
 EMAIL_HOST_USER = 'webzhengyus@163.com'    #sender's email address
-EMAIL_HOST_PASSWORD = '*********'         #password of sender's email address
+EMAIL_HOST_PASSWORD = '********'         #password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
 # DEFAULT_FROM_EMAIL = 'webzhengyus@163.com'
 
