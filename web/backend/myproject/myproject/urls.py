@@ -19,15 +19,8 @@ from django.conf.urls import url, include
 
 
 
-urlpatterns = [
-
-    ...
-]
-
 
 urlpatterns = [
-    #path('', include('loadinsight.urls')),
-    #path(r'^auth/', include('loadinsight.urls')),
     url(r'^auth/', include('loadinsight.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 

@@ -26,7 +26,7 @@ SECRET_KEY = '@=dd@hf(quaim(*xu1f%g8&1ig0lnrg8-_w3^ho89705cc+pw6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -92,8 +92,12 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'loadinsight',#database name
+        'USER': 'user',#database owner
+        'PASSWORD': 'password',#password
+        'HOST': 'localhost',#default
+        'PORT': ''
     }
 }
 
@@ -143,7 +147,7 @@ EMAIL_USE_SSL = True    #whether use SSL for encryption
 EMAIL_HOST = 'smtp.163.com'   #SMTP server
 EMAIL_PORT = 465     #port of SMTF server
 EMAIL_HOST_USER = 'webzhengyus@163.com'    #sender's email address
-EMAIL_HOST_PASSWORD = '*********'         #password of sender's email address
+EMAIL_HOST_PASSWORD = '******'         #password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
 # DEFAULT_FROM_EMAIL = 'webzhengyus@163.com'
 
