@@ -1,0 +1,6 @@
+{
+	"version": 1,
+	"application": "loadinsight",
+	"name": "TMY_DATA",
+	"TODO": "specify how TMY data is downloaded and managed locally"
+}

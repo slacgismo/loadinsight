@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.urls import reverse
 from rest_framework import permissions, status, viewsets, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -39,8 +40,11 @@ class UserList(APIView):
         if serializer.is_valid():
             user = serializer.save()
             user.is_active = False
-            send_mail(subject="welcome to loadinsight",
-                      message=" ",
+            email_body = """Thank you for the registration of LoadInsight! Please click the following link to activate your account: http://registration/confirm-email/%s""" \
+                         % (serializer.data['token'])
+
+            send_mail(subject="subject",
+                      message=email_body,
                       from_email="webzhengyus@163.com",
                       recipient_list=[serializer.data['email']]
                       )
@@ -64,20 +68,6 @@ def generate_code():
     for i in range(6):
         random_str.append(choice(seeds))
     return ''.join(random_str)
-
-
-# def send_email(email, send_type='register'):
-#     code = generate_code()
-#     email_record = EmailVerifyCode()
-#     email_record.email = email
-#     email_record.code = code
-#     email_record.send_type = 'register'
-#     if send_type == 'register':
-#         email_title = 'loadinsight registration verification code'
-#         email_body = 'the verification code is： {0}'.format(code)
-#         send_mail(email_title, email_body, 'webzhengyus@163.com', [email])
-#         email_record.save()
-#     return code
 
 
 @api_view(['GET', 'POST'])

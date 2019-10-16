@@ -19,6 +19,7 @@ urlpatterns = [
     path('signup/', UserList.as_view()),
     path('registration/', sendEmail),
     path('execute/',execute_piplines),
+    path(r'^registration/confirm-email/$', current_user, name='confirm'),
     # # Override urls
     # url(r'^registration/account-email-verification-sent/', views.null_view, name='account_email_verification_sent'),
     # url(r'^registration/account-confirm-email/(?P<key>[-:\w]+)/$', ConfirmEmailView.as_view(),name='account_confirm_email'),

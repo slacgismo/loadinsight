@@ -23,7 +23,7 @@ SECRET_KEY = '@=dd@hf(quaim(*xu1f%g8&1ig0lnrg8-_w3^ho89705cc+pw6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'loadinsight',
-    'load_model',
+    'load_model'
 ]
 
 MIDDLEWARE = [
@@ -90,8 +90,12 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'loadinsight',#database name
+        'USER': 'user',#database owner
+        'PASSWORD': 'password',#password
+        'HOST': 'localhost',#default
+        'PORT': ''
     }
 }
 
@@ -118,7 +122,6 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     # Authentication settings
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',  # enables simple command line authentication
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication'
@@ -136,11 +139,15 @@ JWT_AUTH = {
 
 
 # Email backend settings for Django
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'dannishi1996@gmail.com'
-EMAIL_HOST_PASSWORD = 'sdnssj431431'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_USE_TLS = False   #whether use TLS
+EMAIL_USE_SSL = True    #whether use SSL for encryption
+EMAIL_HOST = 'smtp.163.com'   #SMTP server
+EMAIL_PORT = 465     #port of SMTF server
+EMAIL_HOST_USER = 'webzhengyus@163.com'    #sender's email address
+EMAIL_HOST_PASSWORD = '********'         #password of sender's email address
+EMAIL_FROM = EMAIL_HOST_USER
+# DEFAULT_FROM_EMAIL = 'webzhengyus@163.com'
 
 # django-allauth settings
 SITE_ID = 1

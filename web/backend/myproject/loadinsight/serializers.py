@@ -33,11 +33,6 @@ class UserSerializerWithToken(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    # def save(self, request):
-    #     user = super(UserSerializerWithToken, self).save(request)
-    #     user.is_active = False
-    #     return user
-
     class Meta:
         model = User
         fields = ('token', 'username', 'password', 'email')
@@ -49,7 +44,4 @@ class VerifyCodeSerializer(serializers.Serializer):
     def validate_email(self, email):
         if UserSerializer.filter(email=email):
             raise serializers.ValidationError('the user has already existed')
-        # one_minute_age = datetime.now() - datetime.timedelta(minutes=1)
-        # if EmailVerifyCode.objects.filter(add_time__gt=one_minute_age, email=email):
-        #     raise serializers.ValidationError('still within 60s....')
         return email

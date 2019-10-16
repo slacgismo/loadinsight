@@ -10,6 +10,16 @@ pip install djangorestframework
 ```
 pip install djangorestframework-jwt
 ```
+You may also need to install django-rest-auth and django-allauth :
+```
+pip install django-rest-auth 
+pip install django-allauth
+```
+
+## Install psycopg2
+```
+pip install psycopg2
+```
 
 ## Start the project
 ### Migrate before run the project
