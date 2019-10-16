@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'loadinsight'
+    'loadinsight',
+    'load_model',
 ]
 
 MIDDLEWARE = [
@@ -117,6 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     # Authentication settings
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',  # enables simple command line authentication
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication'
@@ -136,7 +138,7 @@ JWT_AUTH = {
 # Email backend settings for Django
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'dannishi1996@gmail.com'
-EMAIL_HOST_PASSWORD = 'sdn0225443311'
+EMAIL_HOST_PASSWORD = 'sdnssj431431'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 

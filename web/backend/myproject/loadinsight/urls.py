@@ -5,7 +5,7 @@ from rest_framework_jwt.views import obtain_jwt_token
 from .views import *
 from . import views
 from django.conf.urls import url, include
-from allauth.account.views import ConfirmEmailView
+
 
 
 
@@ -18,6 +18,7 @@ urlpatterns = [
     path('current_user/', current_user),
     path('signup/', UserList.as_view()),
     path('registration/', sendEmail),
+    path('execute/',execute_piplines),
     # # Override urls
     # url(r'^registration/account-email-verification-sent/', views.null_view, name='account_email_verification_sent'),
     # url(r'^registration/account-confirm-email/(?P<key>[-:\w]+)/$', ConfirmEmailView.as_view(),name='account_confirm_email'),
