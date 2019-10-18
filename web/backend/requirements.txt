@@ -1,0 +1,14 @@
+django==2.2.6
+django-allauth==0.40.0
+django-rest-auth==0.9.5
+djangorestframework==3.10.3
+djangorestframework-jwt==1.11.0
+gunicorn==19.6.0
+dj-database-url>=0.5
+psycopg2>=2.7
+pandas==0.25.1
+boto3==1.9.228
+requests==2.22.0
+pillow==6.1.0
+awscli==1.16.238
+matplotlib==3.1.1
