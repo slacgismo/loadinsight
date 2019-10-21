@@ -90,6 +90,11 @@ class MixedFeederPipeline():
         mixed_mix_hour_norm = df[f'{self.artifact_root_dir}/mixed_mix_output_hour_norm.csv']
         rural_mix_hour_norm = df[f'{self.artifact_root_dir}/rural_mix_output_hour_norm.csv']
 
+
+        plot_csv_dir = f'{base.LOCAL_PATH}/{self.run_dir}/plot_csv'
+        self._create_results_storage(plot_csv_dir)
+        self.plot_csv_dir = plot_csv_dir
+
         residential_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/suburban_mix'
         self._create_results_storage(residential_mix_plots_dir)
 
@@ -140,6 +145,7 @@ class MixedFeederPipeline():
 
     def mix_type_plotting(self, mix_type, mix_type_name, normalization, directory):
         ######## Plotting helper function
+        csv_components = ['target', 'mix', 'daytype', 'PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD']
         plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
         ticks = np.arange(0, 25, 3)
 
@@ -152,6 +158,7 @@ class MixedFeederPipeline():
                 day_df = city_df.loc[city_df.daytype == daytype]
                 day_df = day_df.append(day_df.iloc[0])
                 day_df = day_df.reset_index()
+                day_df[csv_components].to_csv(f'{self.plot_csv_dir}/{title}.csv', index=False)
                 plot = day_df[plotting_components].plot(kind='area', title=title, grid=True, xticks=ticks, ylim=(0, 1.2), linewidth=2, color=['green', 'yellow', 'brown', 'blue', 'grey', 'black', 'red'])
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. {normalization})')
