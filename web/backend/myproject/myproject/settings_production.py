@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import dj_database_url
 from django.urls import reverse_lazy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -88,19 +89,19 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.postgresql_psycopg2',
-       'NAME': 'loadinsight',#database name
-       'USER': 'user',#database owner
-       'PASSWORD': 'password',#password
-       'HOST': 'localhost',#default
-       'PORT': ''
-   }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#        'NAME': 'loadinsight',#database name
+#        'USER': 'user',#database owner
+#        'PASSWORD': 'password',#password
+#        'HOST': 'localhost',#default
+#        'PORT': ''
+#    }
+#}
 
-# DATABASES = {}
-# DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 
 
