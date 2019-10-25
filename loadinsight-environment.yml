@@ -4,6 +4,7 @@ dependencies:
   - pandas
   - numpy
   - matplotlib
+  - pip
   - pip:
     - boto3
     - requests
@@ -11,3 +12,6 @@ dependencies:
     - awscli
     - djangorestframework
     - djangorestframework-jwt
+    - dj-database-url
+    - django-rest-auth
+    - django-allauth
