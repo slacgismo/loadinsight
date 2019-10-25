@@ -12,6 +12,6 @@ urlpatterns = [
     path('api/current_user/', current_user),
     path('api/signup/', UserList.as_view()),
     path('api/registration/', sendEmail),
-    path('execute/', execute_piplines),
+    path('api/execute/', execute_piplines),
     path('api/registration/confirm-email/', current_user, name='confirm')
 ]
