@@ -24,4 +24,4 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^auth/', include('loadinsight.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # DO NOT USE THIS IN PRODUCTION
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) # DO NOT USE THIS IN PRODUCTION
