@@ -12,3 +12,4 @@ dependencies:
     - djangorestframework
     - djangorestframework-jwt
     - dj-database-url
+    - psycopg2
