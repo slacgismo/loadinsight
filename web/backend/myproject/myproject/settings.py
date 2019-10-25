@@ -89,14 +89,10 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.postgresql_psycopg2',
-       'NAME': 'loadinsight',#database name
-       'USER': 'user',#database owner
-       'PASSWORD': 'password',#password
-       'HOST': 'localhost',#default
-       'PORT': ''
-   }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
+    }
 }
 
 # DATABASES = {}
