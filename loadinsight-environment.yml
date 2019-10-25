@@ -11,3 +11,4 @@ dependencies:
     - awscli
     - djangorestframework
     - djangorestframework-jwt
+    - dj-database-url
