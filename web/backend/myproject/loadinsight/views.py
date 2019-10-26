@@ -1,17 +1,15 @@
 from django.contrib.auth.models import User
 from django.urls import reverse
-from rest_framework import permissions, status, viewsets, mixins
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import permissions, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer, UserSerializerWithToken, VerifyCodeSerializer
-from random import choice
+from .serializers import UserSerializer, UserSerializerWithToken
 from django.core.mail import send_mail
 import sys
-import getopt
 import logging
-import importlib
-from logging.handlers import RotatingFileHandler
 from load_model.execute_pipelines import init_error_reporting as  init_error_reporting
 from load_model.execute_pipelines import execute_lctk as execute_lctk
 
@@ -34,9 +32,10 @@ class UserList(APIView):
     queryset = User.objects.all()
 
     # create a new user
+    # change the decorator to `ensure_csrf_cookie` in production
+    @method_decorator(csrf_exempt)
     def post(self, request, format=None):
         serializer = UserSerializerWithToken(data=request.data)
-        code = generate_code()
         if serializer.is_valid():
             user = serializer.save()
             user.is_active = False
@@ -60,36 +59,6 @@ def null_view(request):
 @api_view()
 def complete_view(request):
     return Response("Email account is activated")
-
-
-def generate_code():
-    seeds = '1234567890qwertyuiopasdfghjklzxcvbnm'
-    random_str = []
-    for i in range(6):
-        random_str.append(choice(seeds))
-    return ''.join(random_str)
-
-
-@api_view(['GET', 'POST'])
-def sendEmail(request):
-    if request.method == 'GET':
-        return Response(request.data, status=status.HTTP_201_CREATED)
-
-    elif request.method == 'POST':
-        email = request.data
-        code = generate_code()
-        send_mail(subject="Verify your email address",
-                  message="Your code for verification is: " + code,
-                  from_email="webzhengyus@163.com",
-                  recipient_list=["webzhengyus@163.com"]
-                  )
-        # send_status = send_mail(code, [email])
-        # code = send_email(email, 'register')
-        print("good request")
-        return Response({
-            'email': email,
-            'code': code,
-        }, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
 def execute_piplines(request):
