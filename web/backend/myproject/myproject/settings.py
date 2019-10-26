@@ -139,14 +139,17 @@ JWT_AUTH = {
 
 # Email backend settings for Django
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_USE_TLS = False   #whether use TLS
-EMAIL_USE_SSL = True    #whether use SSL for encryption
-EMAIL_HOST = 'smtp.163.com'   #SMTP server
-EMAIL_PORT = 465     #port of SMTF server
-EMAIL_HOST_USER = 'webzhengyus@163.com'    #sender's email address
-EMAIL_HOST_PASSWORD = '********'         #password of sender's email address
+EMAIL_USE_TLS = True   #whether use TLS
+EMAIL_HOST = 'smtp.gmail.com'   #SMTP server
+EMAIL_PORT = 587     #port of SMTF server
+EMAIL_HOST_USER = 'sunzhengyu01@gmail.com'    #sender's email address
+EMAIL_HOST_PASSWORD = '*********'         #password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
-# DEFAULT_FROM_EMAIL = 'webzhengyus@163.com'
+
+
+
+
+
 
 # django-allauth settings
 SITE_ID = 1

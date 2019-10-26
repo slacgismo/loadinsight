@@ -3,11 +3,12 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import UserSerializer, UserSerializerWithToken
 from django.core.mail import send_mail
+from rest_framework.permissions import IsAuthenticated
 import sys
 import logging
 from load_model.execute_pipelines import init_error_reporting as  init_error_reporting
@@ -39,12 +40,12 @@ class UserList(APIView):
         if serializer.is_valid():
             user = serializer.save()
             user.is_active = False
-            email_body = """Thank you for the registration of LoadInsight! Please click the following link to activate your account: http://registration/confirm-email/%s""" \
-                         % (serializer.data['token'])
-
+            email_body = """Thank you for the registration of LoadInsight! Please click the following link to activate your account: http://%s%s""" \
+                %(request.get_host(), reverse('confirm', args=(serializer.data['username'], serializer.data['token'])).replace("\\", "/"))
+            #   % (serializer.data['token'])
             send_mail(subject="subject",
                       message=email_body,
-                      from_email="webzhengyus@163.com",
+                      from_email="sunzhengyu01@gmail.com",
                       recipient_list=[serializer.data['email']]
                       )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -57,7 +58,10 @@ def null_view(request):
 
 
 @api_view()
-def complete_view(request):
+@permission_classes([IsAuthenticated])
+def complete_view(request, username, token):
+    user = UserSerializerWithToken(username = username, token = token)
+    user.is_active = True
     return Response("Email account is activated")
 
 @api_view(['GET'])
