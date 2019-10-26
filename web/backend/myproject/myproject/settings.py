@@ -143,7 +143,7 @@ EMAIL_USE_TLS = True   #whether use TLS
 EMAIL_HOST = 'smtp.gmail.com'   #SMTP server
 EMAIL_PORT = 587     #port of SMTF server
 EMAIL_HOST_USER = 'sunzhengyu01@gmail.com'    #sender's email address
-EMAIL_HOST_PASSWORD = '*********'         #password of sender's email address
+EMAIL_HOST_PASSWORD = '********'         #password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
 
 

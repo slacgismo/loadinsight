@@ -58,10 +58,12 @@ def null_view(request):
 
 
 @api_view()
-@permission_classes([IsAuthenticated])
+@permission_classes([permissions.AllowAny])
 def complete_view(request, username, token):
-    user = UserSerializerWithToken(username = username, token = token)
+
+    user = UserSerializerWithToken.get_user_by_name(UserSerializerWithToken,username)
     user.is_active = True
+    user.save()
     return Response("Email account is activated")
 
 @api_view(['GET'])

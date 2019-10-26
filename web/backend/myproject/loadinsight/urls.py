@@ -12,7 +12,7 @@ urlpatterns = [
     path('api/signup/', UserList.as_view()),
     path('api/execute/', execute_piplines),
     path('api/registration/confirm-email/', current_user, name='account_confirm_complete'),
-    path(r'api/^<username><token>', complete_view, name='confirm'),
+    path(r'api/^<username>/<token>', complete_view, name='confirm'),
     # keep the path below at bottom because it is used to catch all other urls served by react
     re_path('', TemplateView.as_view(template_name='index.html'), name='index')
 ]
