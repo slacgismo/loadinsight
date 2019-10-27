@@ -64,13 +64,14 @@ DJOSER = {
     "ACTIVATION_URL": "#/activate/{uid}/{token}",
 }
 
+# PLEASE DO NOT LEAVE ANY SENSITIVE INFO REGARDING PASSWORD HERE
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-DEFAULT_FROM_EMAIL = '550de45ffd017c'  # this should be exactly the same as EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = ''  # this should be exactly the same as EMAIL_HOST_USER
 EMAIL_USE_TLS = True   #whether use TLS
-EMAIL_HOST = 'smtp.mailtrap.io'   #SMTP server
-EMAIL_PORT = 2525     #port of SMTF server
+EMAIL_HOST = ''   #SMTP server.
+EMAIL_PORT = 1234     #port of SMTF server
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL    #sender's email address
-EMAIL_HOST_PASSWORD = 'de1e687d7c0ddb'         #password of sender's email address
+EMAIL_HOST_PASSWORD = ''         #password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
 
 
