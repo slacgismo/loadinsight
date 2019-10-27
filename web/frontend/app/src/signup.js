@@ -12,6 +12,7 @@ import {Link as RouterLink} from "react-router-dom";
 import { Formik, Field, Form } from 'formik';
 import { TextField } from 'formik-material-ui';
 import * as Yup from 'yup';
+import axios from "axios"
 
 function Copyright() {
   return (
@@ -50,7 +51,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SignupSchema = Yup.object().shape({
-  username: Yup.string().email('Invalid email').required('Required'),
+  username: Yup.string().required('Required'),
+  email: Yup.string().email('Invalid email').required('Required'),
   password: Yup.string().required('Required'),
   repeatPassword: Yup.string().required('Required')
     .test('same-passwords', 'Passwords should be the same', function (val) {
@@ -58,7 +60,7 @@ const SignupSchema = Yup.object().shape({
   })
 })
 
-export default function SignUp() {
+export default function SignUp(props) {
   const classes = useStyles();
 
   return (
@@ -71,24 +73,22 @@ export default function SignUp() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-
         <Formik
           initialValues={{
             username: '',
+            email: '',
             password: '',
             repeatPassword: ''
         }}
           validationSchema={SignupSchema}
-          onSubmit={({username, password}, actions) => {
-            fetch('/api/signup/', {
-              method: 'post',
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({username, password})
+          onSubmit={({username, email, password}, actions) => {
+            axios.post('/auth/users/', {
+              username, email, password
             }).then(response => {
-              console.log(response);
-            })
+              console.log(response.data);
+            }).catch(error => {
+              console.log(error);
+            });
           }}
         >
           {({errors, status, touched, isSubmitting}) => (
@@ -97,16 +97,29 @@ export default function SignUp() {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Field
-                type="email"
+                type="text"
                 name="username"
+                label="Username"
+                component={TextField}
+                autoComplete="username"
+                variant="outlined"
+                required
+                fullWidth
+                id="username"
+                autoFocus
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Field
+                type="email"
+                name="email"
                 label="Email Address"
                 component={TextField}
                 autoComplete="email"
                 variant="outlined"
                 required
                 fullWidth
-                id="username"
-                autoFocus
+                id="email"
               />
             </Grid>
             <Grid item xs={12}>

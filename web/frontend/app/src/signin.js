@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SigninSchema = Yup.object().shape({
-  username: Yup.string().email('Invalid email').required('Required'),
+  username: Yup.string().required('Required'),
   password: Yup.string().required('Required')
 })
 
@@ -81,26 +81,27 @@ export default function SignIn(props) {
             axios.post('/api/signin/', {
               username, password
             }).then(response => {
-              localStorage.setItem('jwt_token', response.data.token);
-              props.history.push('/signup');
-            })
+              localStorage.setItem('auth_token', response.data.token);
+              props.history.push('/dashboard');
+            }).catch(error => {
+              console.log(error);
+            });
           }}
         >
           {({errors, status, touched, isSubmitting}) =>
            (<Form className={classes.form}>
-            <Field
-              type="email"
-              label="Email"
-              name="username"
-              component={TextField}
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="username"
-              autoComplete="email"
-              autoFocus
-            />
+             <Field
+               type="text"
+               name="username"
+               label="Username"
+               component={TextField}
+               autoComplete="username"
+               variant="outlined"
+               required
+               fullWidth
+               id="username"
+               autoFocus
+             />
             <Field
               name="password"
               label="Password"
@@ -134,7 +135,7 @@ export default function SignIn(props) {
               </Grid>
               <Grid item>
                 <RouterLink to="/signup" variant="body2">
-                    "Don't have an account? Sign Up"
+                    Don't have an account? Sign Up
                 </RouterLink>
               </Grid>
             </Grid>

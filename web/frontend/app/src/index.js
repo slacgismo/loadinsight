@@ -11,7 +11,7 @@ const PrivateRoute = ({component: Component, ...rest}) => (
   <Route
     {...rest}
     render={props =>
-      localStorage.getItem('jwt_token')
+      localStorage.getItem('auth_token')
         ? <Component {...props}/>
         : <Redirect to={{pathname: '/signin', state: {from: props.location}}}/>
     }
@@ -22,7 +22,7 @@ const PublicRoute = ({component: Component, ...rest}) => (
   <Route
     {...rest}
     render={props =>
-      localStorage.getItem('jwt_token')
+      localStorage.getItem('auth_token')
         ? <Redirect to={{pathname: '/dashboard', state: {from: props.location}}}/>
         : <Component {...props}/>
     }
