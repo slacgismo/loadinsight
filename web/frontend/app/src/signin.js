@@ -2,7 +2,6 @@ import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
@@ -13,6 +12,10 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {Link as RouterLink} from "react-router-dom";
+import { Formik, Field, Form } from 'formik';
+import { TextField } from 'formik-material-ui';
+import * as Yup from 'yup';
+import axios from 'axios';
 
 function Copyright() {
   return (
@@ -50,7 +53,12 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function SignIn() {
+const SigninSchema = Yup.object().shape({
+  username: Yup.string().email('Invalid email').required('Required'),
+  password: Yup.string().required('Required')
+})
+
+export default function SignIn(props) {
   const classes = useStyles();
 
   return (
@@ -63,55 +71,75 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="username"
-            label="username"
-            name="username"
-            autoComplete="username"
-            autoFocus
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Sign In
-          </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
+        <Formik
+          initialValues={{
+            username: '',
+            password: '',
+          }}
+          validationSchema={SigninSchema}
+          onSubmit={({username, password}, actions) => {
+            axios.post('/api/signin/', {
+              username, password
+            }).then(response => {
+              localStorage.setItem('jwt_token', response.data.token);
+              props.history.push('/signup');
+            })
+          }}
+        >
+          {({errors, status, touched, isSubmitting}) =>
+           (<Form className={classes.form}>
+            <Field
+              type="email"
+              label="Email"
+              name="username"
+              component={TextField}
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              autoComplete="email"
+              autoFocus
+            />
+            <Field
+              name="password"
+              label="Password"
+              type="password"
+              component={TextField}
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="password"
+              autoComplete="current-password"
+            />
+            <FormControlLabel
+              control={<Checkbox value="remember" color="primary" />}
+              label="Remember me"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Sign In
+            </Button>
+            <Grid container>
+              <Grid item xs>
+                <Link href="#" variant="body2">
+                  Forgot password?
+                </Link>
+              </Grid>
+              <Grid item>
+                <RouterLink to="/signup" variant="body2">
+                    "Don't have an account? Sign Up"
+                </RouterLink>
+              </Grid>
             </Grid>
-            <Grid item>
-              <RouterLink to="/signup" variant="body2">
-                  "Don't have an account? Sign Up"
-              </RouterLink>
-            </Grid>
-          </Grid>
-        </form>
+          </Form>)}
+        </Formik>
       </div>
       <Box mt={8}>
         <Copyright />

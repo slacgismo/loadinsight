@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserSerializerWithToken(serializers.ModelSerializer):
     token = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True)
-    email = serializers.EmailField(max_length=50)
+    # email = serializers.EmailField(max_length=50)
 
     def get_token(self, obj):
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -35,13 +35,4 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('token', 'username', 'password', 'email')
-
-
-class VerifyCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=50)
-
-    def validate_email(self, email):
-        if UserSerializer.filter(email=email):
-            raise serializers.ValidationError('the user has already existed')
-        return email
+        fields = ('token', 'username', 'password')

@@ -45,7 +45,7 @@ class UserList(APIView):
             send_mail(subject="subject",
                       message=email_body,
                       from_email="webzhengyus@163.com",
-                      recipient_list=[serializer.data['email']]
+                      recipient_list=[serializer.data['username']]
                       )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

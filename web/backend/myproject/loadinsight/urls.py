@@ -7,7 +7,7 @@ from .views import *
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
-    path('api/login/', obtain_jwt_token),
+    path('api/signin/', obtain_jwt_token),
     path('api/current_user/', current_user),
     path('api/signup/', UserList.as_view()),
     path('api/execute/', execute_piplines),

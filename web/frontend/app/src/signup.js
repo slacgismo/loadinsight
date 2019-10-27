@@ -50,8 +50,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SignupSchema = Yup.object().shape({
-  username: Yup.string().required('Required'),
-  email: Yup.string().email('Invalid email').required('Required'),
+  username: Yup.string().email('Invalid email').required('Required'),
   password: Yup.string().required('Required'),
   repeatPassword: Yup.string().required('Required')
     .test('same-passwords', 'Passwords should be the same', function (val) {
@@ -76,18 +75,17 @@ export default function SignUp() {
         <Formik
           initialValues={{
             username: '',
-            email: '',
             password: '',
             repeatPassword: ''
         }}
           validationSchema={SignupSchema}
-          onSubmit={({username, email, password}, actions) => {
+          onSubmit={({username, password}, actions) => {
             fetch('/api/signup/', {
               method: 'post',
               headers: {
                 "Content-Type": "application/json"
               },
-              body: JSON.stringify({username, email, password})
+              body: JSON.stringify({username, password})
             }).then(response => {
               console.log(response);
             })
@@ -99,29 +97,16 @@ export default function SignUp() {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Field
-                type="text"
+                type="email"
                 name="username"
-                label="Username"
+                label="Email Address"
                 component={TextField}
-                autoComplete="username"
+                autoComplete="email"
                 variant="outlined"
                 required
                 fullWidth
                 id="username"
                 autoFocus
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Field
-                type="email"
-                label="Email Address"
-                name="email"
-                component={TextField}
-                variant="outlined"
-                required
-                fullWidth
-                id="email"
-                autoComplete="email"
               />
             </Grid>
             <Grid item xs={12}>
