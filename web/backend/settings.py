@@ -73,9 +73,9 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 DEFAULT_FROM_EMAIL = ''  # this should be exactly the same as EMAIL_HOST_USER
 EMAIL_USE_TLS = True   #whether use TLS
 EMAIL_HOST = 'smtp.mailtrap.io'   #SMTP server.
-EMAIL_PORT = '2525'     #port of SMTF server
-EMAIL_HOST_USER = '362408430cf190'  #sender's email address
-EMAIL_HOST_PASSWORD = '6ed83b7380749d'        #password of sender's email address
+EMAIL_PORT = ''     #port of SMTF server
+EMAIL_HOST_USER = ''  #sender's email address
+EMAIL_HOST_PASSWORD = ''        #password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
 
 
