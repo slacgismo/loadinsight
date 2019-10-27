@@ -16,3 +16,4 @@ dependencies:
     - django-rest-auth
     - django-allauth
     - psycopg2
+    - djoser
