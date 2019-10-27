@@ -10,10 +10,8 @@ dependencies:
     - requests
     - Pillow
     - awscli
-    - djangorestframework
-    - djangorestframework-jwt
-    - dj-database-url
-    - django-rest-auth
-    - django-allauth
-    - psycopg2
-    - djoser
+    - Django==2.2.6
+    - djangorestframework==3.10.3
+    - django-templated-mail==1.1.1
+    - djoser==2.0.3
+    - djet==0.2.2

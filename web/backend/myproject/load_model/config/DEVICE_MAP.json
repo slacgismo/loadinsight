@@ -1,9 +1,0 @@
-{
-	"version": 1,
-	"application": "loadinsight",
-	"name": "DEVICE_MAP",
-	"devices" :
-	{
-		"TODO": "add device to enduse map here"
-	}
-}
