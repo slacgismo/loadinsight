@@ -31,7 +31,7 @@ INSTALLED_APPS = (
     "backend",
 )
 
-BUILD_DIR = os.path.join(BASE_DIR, '../../frontend/app/build')
+BUILD_DIR = os.path.join(BASE_DIR, '../frontend/app/build')
 
 STATICFILES_DIRS = [
     os.path.join(BUILD_DIR, 'static'),
@@ -49,7 +49,11 @@ REST_FRAMEWORK = {
 ROOT_URLCONF = "urls"
 
 TEMPLATES = [
-    {"BACKEND": "django.template.backends.django.DjangoTemplates", "APP_DIRS": True}
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BUILD_DIR],
+        "APP_DIRS": True
+    }
 ]
 
 AUTHENTICATION_BACKENDS = [
