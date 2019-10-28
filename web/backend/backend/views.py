@@ -15,7 +15,7 @@ import djoser.permissions
 @api_view(['GET'])
 # TODO: Please note here why we use djoser.permissions.CurrentUserOrAdmin. It is because the auth is done via djoser.
 #  https://djoser.readthedocs.io/en/latest/settings.html#permissions
-#  Also, we shouldn't allow any people to be able to execute the pipelines,
+#  Also, we shouldn't allow any people without auth to be able to execute the pipelines,
 #  because it is dangerous and prone to excessive resource usage,
 #  e.g, somebody run a script to execute 10000 times to attack your server.
 #  You can have a try to replace this with rest_framework.permissions.IsAuthenticated ,
