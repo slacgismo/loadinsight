@@ -25,7 +25,7 @@ logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
 class RbsaPipeline():
-    def __init__(self, pipeline_configuration=None):
+    def __init__(self, pipeline_configuration=None, user_id=None):
         self.name = 'rbsa'
         self.pipeline = p.Pipeline(self.name)
 
@@ -36,10 +36,9 @@ class RbsaPipeline():
         self.artifact_tmy_base_dir = 'tmy_base'
         self.artifact_tmy_target_dir = 'tmy_target'
         self.artifact_target_weather_dir = 'target_weather'
-
         # the local directory where all the output images are saved for this pipeline run
-        self.run_dir = f'{time()}__{self.name}'
-
+        # change the run dir name: add user_id in the dir
+        self.run_dir = f'{user_id}__{time()}__{self.name}'
         if pipeline_configuration:
             # TODO: establish a configuration scheme for this to run dynamically
             pass

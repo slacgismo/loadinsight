@@ -15,12 +15,13 @@ logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
 class MixedFeederPipeline():
-    def __init__(self, pipeline_configuration=None):
+    def __init__(self, pipeline_configuration=None, user_id=None):
         self.name = 'mixed_commercial_residential'
         self.pipeline = p.Pipeline(self.name)
 
         self.artifact_root_dir = 'mix'
-        self.run_dir = f'{time()}__{self.name}'
+        # change the run dir name: add user_id in the dir
+        self.run_dir = f'{user_id}__{time()}__{self.name}'
 
         if pipeline_configuration:
             # TODO: establish a configuration scheme for this to run dynamically

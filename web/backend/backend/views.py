@@ -2,15 +2,28 @@ import os
 import sys
 import logging
 
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 
 from backend.models import Executions
+from backend.tests.serializers import *
 from load_model.execute_pipelines import init_error_reporting as  init_error_reporting
 from load_model.execute_pipelines import execute_lctk as execute_lctk
 import djoser.permissions
+from background_task import background
+from django.contrib.auth import get_user_model
 
+
+@background(schedule=timezone.now())
+def execute_task(algorithm, user_id):
+    # before we even attempt to run the pipeline the error reporting
+    init_error_reporting()
+    # start the pipeline
+    execute_lctk(algorithm, user_id)
+    user = get_user_model().objects.get(pk=user_id)
+    user.email_user('Here is a notification', 'Your pipeline has been executed successfully!')
 
 @api_view(['GET'])
 # TODO: Please note here why we use djoser.permissions.CurrentUserOrAdmin. It is because the auth is done via djoser.
@@ -25,10 +38,7 @@ def execute_piplines(request, algorithm):
     exe = Executions(user_id=request.user, algorithm=algorithm)
     exe.save()
     try:
-        # before we even attempt to run the pipeline the error reporting
-        init_error_reporting()
-        # start the pipeline
-        execute_lctk(algorithm)
+        execute_task(algorithm, request.user.id)
         return Response(status=status.HTTP_200_OK)
     except Exception as exc:
         logging.exception(exc)
@@ -40,13 +50,24 @@ def execute_piplines(request, algorithm):
 #  If there is necessity that you should push the unfinished part first (say, in case you lost them)
 #  and you want to avoid create a temp separate branch,
 #  please do add TO-DO comment or something obvious to note these part should be ignored by other readers.
-# @api_view(['GET'])
-# @permission_classes([permissions.AllowAny])
-# def get_images(request, timestamp, algorithm):
-#     file_dir = os.path.dirname(os.path.realpath('__file__'))
-#     dir = file_dir + '/load_model/load_data/' + timestamp + '__' + algorithm
-#     if not os.path.exists(dir):
-#         return Response(status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_executions(request, execution_id=None, result_dir=None, image_name=None):
+    if execution_id is None:
+        # get user's all executions as a list
+        executions = Executions.objects.filter(user_id=request.user)
+        serializer = ExecutionsSerializer(executions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    elif result_dir is None:
+        # TODO: get one execution's all directories name as a list
+        execution = Executions.objects.get(id=int(execution_id))
+    elif image_name is None:
+        # TODO: get all images name in one directory of an execution as a list
+        pass
+    else:
+        # TODO: get an image by name
+        pass
+
 
 
 
