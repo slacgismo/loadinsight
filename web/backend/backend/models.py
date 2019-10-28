@@ -1,5 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, User
 from django.db import models
 
 
@@ -7,7 +7,7 @@ class CustomUserManager(BaseUserManager):
     use_in_migrations = True
 
     def create_user(
-        self, custom_username, custom_email=None, password=None, **extra_fields
+            self, custom_username, custom_email=None, password=None, **extra_fields
     ):
         if not custom_username:
             raise ValueError("The given custom_username must be set")
@@ -51,3 +51,10 @@ class ExampleUser(AbstractBaseUser):
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
+
+
+class Executions(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    algorithm = models.CharField(max_length=50)
+    # status of executions
+    create_time = models.DateTimeField(auto_now_add=True)
