@@ -59,7 +59,24 @@ export default function ActivateEmail(props) {
     }).catch(error => {
       setEmailActivated(false);
     });
-  });
+  }, []);
+
+  let content = ``;
+  let link = '';
+  let linkText = ``;
+
+  if (emailActivated !== null) {
+    if (emailActivated === true) {
+      content = `Your account has been activated!`;
+      link = '/signin';
+      linkText = 'Sign In';
+    } else {
+      content = `The activation link is either broken or expired, please try wtih a valid one.`;
+      link = '/signup';
+      linkText = 'Sign Up';
+    }
+  }
+
 
   const classes = useStyles();
   return (
@@ -70,21 +87,13 @@ export default function ActivateEmail(props) {
           <EmailIcon />
         </Avatar>
         <Typography variant="body1">
-          { (emailActivated !== null && emailActivated === true)
-            ? `Your account has been activated!`
-            : `The activation link is either broken or expired, please try wtih a valid one.`
-          }
+          { content }
         </Typography>
         <Grid container justify="center">
           <Grid item>
-            { (emailActivated !== null && emailActivated === true)
-              ?  <RouterLink to="/signin" variant="body1">
-                Sign In
-              </RouterLink>
-              : <RouterLink to="/signup" variant="body1">
-                Sign Up
-              </RouterLink>
-            }
+            <RouterLink to={link} variant="body1">
+              {linkText}
+            </RouterLink>
           </Grid>
         </Grid>
       </div>

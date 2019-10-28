@@ -77,7 +77,7 @@ export default function SignIn(props) {
           }}
           validationSchema={SigninSchema}
           onSubmit={({username, password}, actions) => {
-            axios.post('/api/signin/', {
+            axios.post('/auth/token/login/', {
               username, password
             }).then(response => {
               localStorage.setItem('auth_token', response.data.token);
