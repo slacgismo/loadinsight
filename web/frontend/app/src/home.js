@@ -16,9 +16,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        LoadInsight
-      </Link>{' '}
+        LoadInsight {' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -113,12 +111,12 @@ export default function Home() {
             </Link>
           </nav>
           <RouterLink to="/signin">
-            <Button href="#" color="primary" variant="outlined" className={classes.link}>
+            <Button color="primary" variant="outlined" className={classes.link}>
               Sign In
             </Button>
           </RouterLink>
           <RouterLink to="/signup">
-            <Button href="#" color="primary" variant="outlined" className={classes.link}>
+            <Button color="primary" variant="outlined" className={classes.link}>
               Sign Up
             </Button>
           </RouterLink>
