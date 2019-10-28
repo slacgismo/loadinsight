@@ -228,7 +228,7 @@ class RbsaPipeline():
                 plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
                 fig.savefig(f'{directory}/{title}.png')
-                plt.close(fig) 
+                plt.close(fig)
 
     def execute(self):
         """
