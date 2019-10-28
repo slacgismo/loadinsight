@@ -17,11 +17,11 @@ from django.contrib.auth import get_user_model
 
 
 @background(schedule=timezone.now())
-def execute_task(algorithm, user_id):
+def execute_task(algorithm, user_id, execution_id):
     # before we even attempt to run the pipeline the error reporting
     init_error_reporting()
     # start the pipeline
-    execute_lctk(algorithm, user_id)
+    execute_lctk(algorithm, execution_id)
     user = get_user_model().objects.get(pk=user_id)
     user.email_user('Here is a notification', 'Your pipeline has been executed successfully!')
 
@@ -38,7 +38,7 @@ def execute_piplines(request, algorithm):
     exe = Executions(user_id=request.user, algorithm=algorithm)
     exe.save()
     try:
-        execute_task(algorithm, request.user.id)
+        execute_task(algorithm, request.user.id, exe.id)
         return Response(status=status.HTTP_200_OK)
     except Exception as exc:
         logging.exception(exc)

@@ -91,7 +91,7 @@ def parse_cmd_line_opts(argv):
     if not using_custom_settings:
         base = importlib.import_module('settings.base')
 
-def execute_lctk(algorithm, user_id):
+def execute_lctk(algorithm, execution_id):
     """
     Perform the necessary setup before starting
     """
@@ -103,15 +103,15 @@ def execute_lctk(algorithm, user_id):
     logger.info('Starting the LCTK main program')
     ### PRIMARILY USING FOR DEBUG PURPOSES - WILL MOVE THIS TO AN ORCHESTRATION FILE
     if algorithm == "rbsa":
-        rbsa_pipeline = rbsa.RbsaPipeline(user_id=user_id)
+        rbsa_pipeline = rbsa.RbsaPipeline(execution_id=execution_id)
         rbsa_pipeline.execute()
         rbsa_pipeline.generate_result_plots()
     elif algorithm == "ceus":
-        ceus_pipeline = ceus.CeusPipeline(user_id=user_id)
+        ceus_pipeline = ceus.CeusPipeline(execution_id=execution_id)
         ceus_pipeline.execute()
         ceus_pipeline.generate_result_plots()
     elif algorithm == "mix":
-        mix_pipeline = mix.MixedFeederPipeline(user_id=user_id)
+        mix_pipeline = mix.MixedFeederPipeline(execution_id=execution_id)
         mix_pipeline.execute()
         mix_pipeline.generate_result_plots()
 
