@@ -76,13 +76,13 @@ AUTHENTICATION_BACKENDS = [
 
 DJOSER = {
     "SEND_ACTIVATION_EMAIL": True,
-    "PASSWORD_RESET_CONFIRM_URL": "/password/reset/confirm/{uid}/{token}",
-    "USERNAME_RESET_CONFIRM_URL": "/username/reset/confirm/{uid}/{token}",
-    "ACTIVATION_URL": "/activate/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
+    "USERNAME_RESET_CONFIRM_URL": "username/reset/confirm/{uid}/{token}",
+    "ACTIVATION_URL": "activate/{uid}/{token}",
 }
 
 # PLEASE DO NOT LEAVE ANY SENSITIVE INFO REGARDING PASSWORD HERE
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = ''  # this should be exactly the same as EMAIL_HOST_USER
 EMAIL_USE_TLS = True   #whether use TLS
 EMAIL_HOST = ''   #SMTP server.
