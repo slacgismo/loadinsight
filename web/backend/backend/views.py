@@ -1,6 +1,8 @@
+import json
 import os
-import sys
 import logging
+from os import listdir
+from os.path import isfile, join, isdir
 
 from django.utils import timezone
 from rest_framework.response import Response
@@ -15,6 +17,13 @@ import djoser.permissions
 from background_task import background
 from django.contrib.auth import get_user_model
 
+import django.core.serializers
+
+from django.core.serializers import deserialize
+# from web.backend.backend.tests.serializers import ExecutionsSerializer
+from backend.tests.serializers import ExecutionsSerializer
+
+path = "./load_model/local_data/"
 
 @background(schedule=timezone.now())
 def execute_task(algorithm, user_id, execution_id):
@@ -52,21 +61,76 @@ def execute_piplines(request, algorithm):
 #  please do add TO-DO comment or something obvious to note these part should be ignored by other readers.
 @api_view(['GET'])
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
-def get_executions(request, execution_id=None, result_dir=None, image_name=None):
-    if execution_id is None:
+def get_executions(request):
+    #if execution_id is None:
         # get user's all executions as a list
-        executions = Executions.objects.filter(user_id=request.user)
+    executions = Executions.objects.filter(user_id=request.user)
+    if executions:
         serializer = ExecutionsSerializer(executions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    elif result_dir is None:
-        # TODO: get one execution's all directories name as a list
-        execution = Executions.objects.get(id=int(execution_id))
-    elif image_name is None:
-        # TODO: get all images name in one directory of an execution as a list
-        pass
-    else:
-        # TODO: get an image by name
-        pass
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_executions_by_id(request, execution_id=None):
+    if execution_id is not None:
+        response_list = []
+        executions = Executions.objects.filter(user_id=request.user)
+        if executions:
+            if os.path.exists(path) is False:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+            for dir in alldirs:
+                if dir.startswith(execution_id):
+                    new_path = path + dir
+                    if os.path.exists(new_path) is False:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                    response_list = [f for f in listdir(new_path) if isdir(join(new_path, f))]
+            response = {"execution_dirs": response_list}
+            return Response(response, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_executions_by_result_dir(request, execution_id=None, result_dir=None):
+    if execution_id is not None and result_dir is not None:
+        executions = Executions.objects.filter(user_id=request.user)
+        print("enter:", executions)
+        if executions:
+            if os.path.exists(path) is False:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+            for dir in alldirs:
+                if dir.startswith(execution_id):
+                    new_path = path + dir + "/" + result_dir
+                    if os.path.exists(new_path) is False:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                    response_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                    response = {"execution_result_dirs": response_list}
+                    return Response(response, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_executions_by_image(request, execution_id=None, result_dir=None, image_name=None):
+    if execution_id is not None and result_dir is not None and image_name is not None:
+        executions = Executions.objects.filter(user_id=request.user)
+        if executions:
+            if os.path.exists(path) is False:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+            for dir in alldirs:
+                if dir.startswith(execution_id):
+                    new_path = path + dir + "/" + result_dir + "/" + image_name
+                    if os.path.exists(new_path) is False:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                    response = {"execution_images": image_name}
+                    return Response(response, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
