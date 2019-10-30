@@ -6,7 +6,7 @@ import SignIn from "./signin";
 import SignUp from "./signup";
 import ActivateEmail from "./activateEmail";
 import Dashboard from "./dashboard";
-
+import Demo from './Demo';
 
 const PrivateRoute = ({component: Component, ...rest}) => (
   <Route
@@ -39,6 +39,7 @@ function App() {
         <PublicRoute path="/signin" component={SignIn} />
         <PublicRoute path="/signup" component={SignUp} />
         <PublicRoute path="/activate/:uid/:token" component={ActivateEmail} />
+        <PublicRoute path="/demo" component={Demo} />
         <PrivateRoute path="/dashboard" component={Dashboard} />
       </Switch>
     </BrowserRouter>
