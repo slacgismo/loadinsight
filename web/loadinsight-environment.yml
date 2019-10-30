@@ -15,3 +15,4 @@ dependencies:
     - django-templated-mail==1.1.1
     - djoser==2.0.3
     - djet==0.2.2
+    - django-background-tasks

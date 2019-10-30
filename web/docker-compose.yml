@@ -15,8 +15,9 @@ services:
       DATABASE_URL: postgres://app_user:loadinsight@db/app_db
       DJANGO_MANAGEPY_MIGRATE: "on"
     build:
-      context: ../
-      dockerfile: web/Dockerfile
+      context: . 
+      dockerfile: ./Dockerfile
+    image: loadinsight:1.0
     # links:
     #   - db:db
     ports:
