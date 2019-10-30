@@ -4,6 +4,7 @@ import logging
 from os import listdir
 from os.path import isfile, join, isdir
 
+from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework import permissions, status
@@ -68,7 +69,7 @@ def get_executions(request):
     if executions:
         serializer = ExecutionsSerializer(executions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -79,17 +80,17 @@ def get_executions_by_id(request, execution_id=None):
         executions = Executions.objects.filter(user_id=request.user)
         if executions:
             if os.path.exists(path) is False:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_404_NOT_FOUND)
             alldirs = [f for f in listdir(path) if isdir(join(path, f))]
             for dir in alldirs:
                 if dir.startswith(execution_id):
                     new_path = path + dir
                     if os.path.exists(new_path) is False:
-                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                        return Response(status=status.HTTP_404_NOT_FOUND)
                     response_list = [f for f in listdir(new_path) if isdir(join(new_path, f))]
             response = {"execution_dirs": response_list}
             return Response(response, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -100,17 +101,17 @@ def get_executions_by_result_dir(request, execution_id=None, result_dir=None):
         print("enter:", executions)
         if executions:
             if os.path.exists(path) is False:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_404_NOT_FOUND)
             alldirs = [f for f in listdir(path) if isdir(join(path, f))]
             for dir in alldirs:
                 if dir.startswith(execution_id):
                     new_path = path + dir + "/" + result_dir
                     if os.path.exists(new_path) is False:
-                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                        return Response(status=status.HTTP_404_NOT_FOUND)
                     response_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
                     response = {"execution_result_dirs": response_list}
                     return Response(response, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -120,15 +121,18 @@ def get_executions_by_image(request, execution_id=None, result_dir=None, image_n
         executions = Executions.objects.filter(user_id=request.user)
         if executions:
             if os.path.exists(path) is False:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_404_NOT_FOUND)
             alldirs = [f for f in listdir(path) if isdir(join(path, f))]
             for dir in alldirs:
                 if dir.startswith(execution_id):
                     new_path = path + dir + "/" + result_dir + "/" + image_name
                     if os.path.exists(new_path) is False:
-                        return Response(status=status.HTTP_400_BAD_REQUEST)
-                    response = {"execution_images": image_name}
-                    return Response(response, status=status.HTTP_200_OK)
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                    with open(new_path, "rb") as fp:
+                        file = fp.read()
+                    response = HttpResponse(file, content_type='image/png')
+                    response['Content-Disposition'] = "attachment; filename=" + image_name
+                    return response
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
