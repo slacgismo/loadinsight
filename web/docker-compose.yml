@@ -1,24 +1,14 @@
 version: '2'
 
 services:
-  # db:
-  #   environment:
-  #     POSTGRES_DB: app_db
-  #     POSTGRES_USER: app_user
-  #     POSTGRES_PASSWORD: loadinsight
-  #   restart: always
-  #   image: postgres:11.2
-  #   expose:
-  #     - "5432"
   app:
     environment:
-      DATABASE_URL: postgres://app_user:loadinsight@db/app_db
+      # TODO: Please modify the database URL accordingly 
+      DATABASE_URL: postgres://USER:PASSWORD@HOST:PORT/NAME
       DJANGO_MANAGEPY_MIGRATE: "on"
     build:
       context: . 
       dockerfile: ./Dockerfile
     image: loadinsight:1.0
-    # links:
-    #   - db:db
     ports:
       - "8000:8000"

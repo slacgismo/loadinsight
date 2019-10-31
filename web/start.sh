@@ -13,13 +13,10 @@ npm run build
 
 popd
 
-# check database status
-# until psql $DATABASE_URL -c '\l'; do
-# 	>&2 echo "Postgres is unavailable - sleeping"
-# 	sleep 1
-# done
+# Check database status
+psql $DATABASE_URL -c '\l' || (>&2 echo "Postgres is unavailable" && exit 1)
 
-# >&2 echo "Postgres is up - continuing"
+>&2 echo "Postgres is up - continuing"
 
 pushd /usr/src/app/backend/
 

@@ -62,10 +62,9 @@ RUN buildDeps='xz-utils' \
 # Install postgresql client (client must be sufficient as we will connect to a remote databse)
 RUN set -ex \
     && echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list \ 
-    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - \ 
-    && sudo apt-get update \ 
-    && apt-get install \ 
-    && postgresql-client-11 && rm -rf /var/lib/apt/lists/*
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \ 
+    && apt-get update \ 
+    && apt-get install postgresql-client-11 && rm -rf /var/lib/apt/lists/*
 
 
 WORKDIR "/usr/src/app/"
