@@ -136,7 +136,107 @@ def get_executions_by_image(request, execution_id=None, result_dir=None, image_n
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_executions_by_city(request, execution_id=None, result_dir=None, city_name=None):
+    if execution_id is not None and result_dir is not None and city_name is not None:
+        executions = Executions.objects.filter(user_id=request.user)
+        if executions:
+            if os.path.exists(path) is False:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+            for dir in alldirs:
+                if dir.startswith(execution_id):
+                    new_path = path + dir + "/" + result_dir
+                    if os.path.exists(new_path) is False:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                    image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                    response_list = []
+                    for image_name in image_list:
+                        city = image_name.split("-")[1].split("_")[0]
+                        if city == str(city_name):
+                            response_list.append(image_name)
+                    response = {"execution_result_by_city": response_list}
+                    if len(response_list) != 0:
+                        return Response(response, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_executions_by_state(request, execution_id=None, result_dir=None, state_name=None):
+    if execution_id is not None and result_dir is not None and state_name is not None:
+        executions = Executions.objects.filter(user_id=request.user)
+        if executions:
+            if os.path.exists(path) is False:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+            for dir in alldirs:
+                if dir.startswith(execution_id):
+                    new_path = path + dir + "/" + result_dir
+                    if os.path.exists(new_path) is False:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                    image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                    response_list = []
+                    for image_name in image_list:
+                        state = image_name.split("-")[1].split("_")[1]
+                        if state == str(state_name):
+                            response_list.append(image_name)
+                    response = {"execution_result_by_state": response_list}
+                    if len(response_list) != 0:
+                        return Response(response, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_executions_by_content(request, execution_id=None, result_dir=None, content_name=None):
+    if execution_id is not None and result_dir is not None and content_name is not None:
+        executions = Executions.objects.filter(user_id=request.user)
+        if executions:
+            if os.path.exists(path) is False:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+            for dir in alldirs:
+                if dir.startswith(execution_id):
+                    new_path = path + dir + "/" + result_dir
+                    if os.path.exists(new_path) is False:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                    image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                    response_list = []
+                    for image_name in image_list:
+                        content = image_name.split("-")[2].split(".")[0]
+                        if content == str(content_name):
+                            response_list.append(image_name)
+                    response = {"execution_result_by_content": response_list}
+                    if len(response_list) != 0:
+                        return Response(response, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_executions_by_city_and_content(request, execution_id=None, result_dir=None, city_name=None,
+                                       content_name=None):
+    if execution_id is None or result_dir is None or city_name is None or content_name is None:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    executions = Executions.objects.filter(user_id=request.user)
+    if executions:
+        if os.path.exists(path) is False:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        for dir in alldirs:
+            if dir.startswith(execution_id):
+                new_path = path + dir + "/" + result_dir
+                if os.path.exists(new_path) is False:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                for image_name in image_list:
+                    city = image_name.split("-")[1].split("_")[0]
+                    content = image_name.split("-")[2].split(".")[0]
+                    if city == str(city_name) and content == str(content_name):
+                        new_path = path + dir + "/" + result_dir + "/" + image_name
+                        with open(new_path, "rb") as fp:
+                            file = fp.read()
+                        response = HttpResponse(file, content_type='image/png')
+                        response['Content-Disposition'] = "attachment; filename=" + image_name
+                        return response
+    return Response(status=status.HTTP_404_NOT_FOUND)
