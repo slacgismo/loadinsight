@@ -3,8 +3,16 @@ version: '2'
 services:
   app:
     environment:
+      # Specify the setting files to be used 
+      DJANGO_SETTINGS_MODULE: deploy_settings
       # TODO: Please modify the database URL accordingly 
       DATABASE_URL: postgres://USER:PASSWORD@HOST:PORT/NAME
+      # TODO: Please specify the email adress
+      EMAIL: "example@gmail.com"
+      # TODO: Please specify the email host
+      EMAIL_HOST: "smtp.gmail.com"
+      # TODO: Please specify the email password
+      EMAIL_APP_PWD: "xxx"
       DJANGO_MANAGEPY_MIGRATE: "on"
     build:
       context: . 
