@@ -1,9 +1,12 @@
 """
 This is the setting file for deployment
 
+IMPORTANT: DO NOT TOUCH THIS FILE WHEN YOU ARE DOING LOCAL DEVELOPMENT
+
 The main differences between this setting file with the original one are:
 1. Different database settings. 
 2. Different the email settings. 
+3. Allowed_HOST
 """
 
 import os
@@ -20,8 +23,16 @@ BASE_DIR = os.path.dirname(__file__)
 # The database url was configed in environment variables
 # DATABASE_URL = postgres://USER:PASSWORD@HOST:PORT/NAME
 
-DATABASE = {}
+DATABASES = {}
 DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+# -----------------------
+
+
+# -----------------------
+# Add allowed hosts Please add ALLOWED_HOSTS accordingly 
+
+ALLOWED_HOSTS = [os.environ['ALLOWED_HOSTS']]
+
 # -----------------------
 
 

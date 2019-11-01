@@ -17,9 +17,7 @@ COPY . /usr/src/app
 RUN set -ex \
     && apt-get update \
     && apt-get install -y gcc libssl-dev nginx \
-    && rm -rf /var/lib/apt/lists/* \
-    && conda config --add channels conda-forge \
-    && conda env create --quiet -f /usr/src/app/loadinsight-environment.yml
+    && rm -rf /var/lib/apt/lists/* 
 
 # Install nodejs
 ENV NODE_VERSION 13.0.1
@@ -64,7 +62,12 @@ RUN set -ex \
     && echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list \ 
     && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \ 
     && apt-get update \ 
-    && apt-get install postgresql-client-11 && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y postgresql-client-11 libpq-dev && rm -rf /var/lib/apt/lists/* 
+
+# Create conda env 
+RUN set -ex \
+    && conda config --add channels conda-forge \
+    && conda env create --quiet -f /usr/src/app/loadinsight-environment.yml
 
 
 WORKDIR "/usr/src/app/"
