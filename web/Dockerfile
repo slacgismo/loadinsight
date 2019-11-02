@@ -4,6 +4,9 @@
 # FROM directive instructing base image to build upon
 FROM continuumio/miniconda3
 
+# Add a user for uwsgi uder www-data group 
+#RUN useradd --gid www-data uwsgi-user
+
 # COPY startup script into known file location in container
 # COPY start.sh /usr/src/app/start.sh
 
@@ -12,6 +15,8 @@ EXPOSE 8000
 
 RUN mkdir -p /usr/src/app
 COPY . /usr/src/app
+# Assign priviledges to uwsgi-user
+#RUN chown -R uwsgi-user:www-data /usr/src/app
 
 # Install nginx
 RUN set -ex \
