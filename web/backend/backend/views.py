@@ -11,7 +11,7 @@ from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 
 from backend.models import Executions
-from backend.tests.serializers import *
+from backend.serializers import *
 from load_model.execute_pipelines import init_error_reporting as  init_error_reporting
 from load_model.execute_pipelines import execute_lctk as execute_lctk
 import djoser.permissions
@@ -22,16 +22,15 @@ import django.core.serializers
 
 from django.core.serializers import deserialize
 # from web.backend.backend.tests.serializers import ExecutionsSerializer
-from backend.tests.serializers import ExecutionsSerializer
 
 path = "./load_model/local_data/"
 
 @background(schedule=timezone.now())
-def execute_task(algorithm, user_id, execution_id):
+def execute_task(algorithm, user_id, execution_id, config_data):
     # before we even attempt to run the pipeline the error reporting
     init_error_reporting()
     # start the pipeline
-    execute_lctk(algorithm, execution_id)
+    execute_lctk(algorithm, execution_id, config_data)
     user = get_user_model().objects.get(pk=user_id)
     user.email_user('Here is a notification', 'Your pipeline has been executed successfully!')
 
@@ -39,32 +38,18 @@ def execute_task(algorithm, user_id, execution_id):
 @api_view(['POST'])
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
 def run_pipeline(request, pipeline_name):
-    config = request.post
-    try:
-       config = json.loads(config)
+    config_data = request.data
 
-    except json.JSONDecodeError:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['GET'])
-# TODO: Please note here why we use djoser.permissions.CurrentUserOrAdmin. It is because the auth is done via djoser.
-#  https://djoser.readthedocs.io/en/latest/settings.html#permissions
-#  Also, we shouldn't allow any people without auth to be able to execute the pipelines,
-#  because it is dangerous and prone to excessive resource usage,
-#  e.g, somebody run a script to execute 10000 times to attack your server.
-#  You can have a try to replace this with rest_framework.permissions.IsAuthenticated ,
-#  to understand the difference between these 2 permissions.
-@permission_classes([djoser.permissions.CurrentUserOrAdmin])
-def execute_piplines(request, algorithm):
-    exe = Executions(user_id=request.user, algorithm=algorithm)
+    exe = Executions(user_id=request.user, algorithm=pipeline_name)
     exe.save()
+
     try:
-        execute_task(algorithm, request.user.id, exe.id)
+        execute_task(pipeline_name, request.user.id, exe.id, config_data)
         return Response(status=status.HTTP_200_OK)
     except Exception as exc:
         logging.exception(exc)
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # TODO: Please try to refrain from leaving unused code or comments in a pushed comment.
 #  This can bring inconvenience in understanding the code.

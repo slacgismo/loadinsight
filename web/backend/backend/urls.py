@@ -6,7 +6,6 @@ from django.urls import path
 
 urlpatterns = [
     path('api/run_pipeline/<str:pipeline_name>/', run_pipeline),
-    path('api/execute/<str:algorithm>/', execute_piplines),
     path('api/my_executions/', get_executions),
     # path('api/my_executions/<str:execution_id>/', get_executions_by_id),
     # path('api/my_executions/<str:execution_id>/results/<str:result_dir>/', get_executions_by_result_dir),
