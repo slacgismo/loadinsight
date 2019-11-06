@@ -35,6 +35,18 @@ def execute_task(algorithm, user_id, execution_id):
     user = get_user_model().objects.get(pk=user_id)
     user.email_user('Here is a notification', 'Your pipeline has been executed successfully!')
 
+
+@api_view(['POST'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def run_pipeline(request, pipeline_name):
+    config = request.post
+    try:
+       config = json.loads(config)
+
+    except json.JSONDecodeError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET'])
 # TODO: Please note here why we use djoser.permissions.CurrentUserOrAdmin. It is because the auth is done via djoser.
 #  https://djoser.readthedocs.io/en/latest/settings.html#permissions
