@@ -4,6 +4,9 @@
 # FROM directive instructing base image to build upon
 FROM continuumio/miniconda3
 
+# Add a user for uwsgi uder www-data group 
+#RUN useradd --gid www-data uwsgi-user
+
 # COPY startup script into known file location in container
 # COPY start.sh /usr/src/app/start.sh
 
@@ -12,14 +15,14 @@ EXPOSE 8000
 
 RUN mkdir -p /usr/src/app
 COPY . /usr/src/app
+# Assign priviledges to uwsgi-user
+#RUN chown -R uwsgi-user:www-data /usr/src/app
 
 # Install nginx
 RUN set -ex \
     && apt-get update \
     && apt-get install -y gcc libssl-dev nginx \
-    && rm -rf /var/lib/apt/lists/* \
-    && conda config --add channels conda-forge \
-    && conda env create --quiet -f /usr/src/app/loadinsight-environment.yml
+    && rm -rf /var/lib/apt/lists/* 
 
 # Install nodejs
 ENV NODE_VERSION 13.0.1
@@ -58,6 +61,18 @@ RUN buildDeps='xz-utils' \
     && rm "node-v$NODE_VERSION-linux-$ARCH.tar.xz" SHASUMS256.txt.sig SHASUMS256.txt \
     && apt-get purge -y --auto-remove $buildDeps \
     && ln -s /usr/local/bin/node /usr/local/bin/nodejs
+
+# Install postgresql client (client must be sufficient as we will connect to a remote databse)
+RUN set -ex \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list \ 
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \ 
+    && apt-get update \ 
+    && apt-get install -y postgresql-client-11 libpq-dev && rm -rf /var/lib/apt/lists/* 
+
+# Create conda env 
+RUN set -ex \
+    && conda config --add channels conda-forge \
+    && conda env create --quiet -f /usr/src/app/loadinsight-environment.yml
 
 
 WORKDIR "/usr/src/app/"

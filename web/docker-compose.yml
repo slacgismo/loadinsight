@@ -1,24 +1,24 @@
 version: '2'
 
 services:
-  # db:
-  #   environment:
-  #     POSTGRES_DB: app_db
-  #     POSTGRES_USER: app_user
-  #     POSTGRES_PASSWORD: loadinsight
-  #   restart: always
-  #   image: postgres:11.2
-  #   expose:
-  #     - "5432"
   app:
     environment:
-      DATABASE_URL: postgres://app_user:loadinsight@db/app_db
+      # Specify the setting files to be used 
+      DJANGO_SETTINGS_MODULE: deploy_settings
+      # TODO: Please modify the database URL accordingly 
+      DATABASE_URL: "postgres://USER:PASSWORD@HOST:PORT/NAME"
+      # TODO: Please specify the email adress
+      EMAIL: "example@gmail.com"
+      # TODO: Please specify the email host
+      EMAIL_HOST: "smtp.gmail.com"
+      # TODO: Please specify the email password
+      EMAIL_APP_PWD: "xxx"
+      # TODO: Please specify the host of this website
+      ALLOWED_HOSTS: "ec2xxxx.compute.amazonaws.com"
       DJANGO_MANAGEPY_MIGRATE: "on"
     build:
       context: . 
       dockerfile: ./Dockerfile
     image: loadinsight:1.0
-    # links:
-    #   - db:db
     ports:
-      - "8000:8000"
+      - "80:8000"
