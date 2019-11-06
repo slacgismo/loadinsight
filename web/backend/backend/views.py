@@ -252,3 +252,151 @@ def get_executions_by_city_and_content(request, execution_id=None, result_dir=No
                         response['Content-Disposition'] = "attachment; filename=" + image_name
                         return response
     return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_executions_result(request, execution_id=None, result_dir=None, city_name=None,
+                          state_name=None, content_name=None):
+    if os.path.exists(path) is False:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if execution_id is not None and execution_id!='None':
+        if result_dir is None or result_dir=='None':
+            response_list = filter_executions_by_id(request, execution_id)
+            if len(response_list) == 0:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            response = {"execution_dirs": response_list}
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            if city_name is None or city_name=='None':
+                response_list = filter_executions_by_result_dir(request, execution_id, result_dir)
+                if len(response_list) == 0:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                response = {"execution_result_dirs": response_list}
+                return Response(response, status=status.HTTP_200_OK)
+            else:
+                if state_name is None or state_name == 'None':
+                    if content_name is None or content_name =='None':
+                        response_list = filter_executions_by_city(request, execution_id, result_dir, city_name)
+                        response = {"execution_result_by_city": response_list}
+                        if len(response_list) == 0:
+                            return Response(status=status.HTTP_404_NOT_FOUND)
+                        return Response(response, status=status.HTTP_200_OK)
+                    filter_executions_by_city_and_content(request, execution_id, result_dir, city_name, content_name)
+                else:
+                    if content_name is None or content_name =='None':
+                        response_list = filter_executions_by_state(request, execution_id, result_dir, state_name)
+                        response = {"execution_result_by_state": response_list}
+                        if len(response_list) == 0:
+                            return Response(status=status.HTTP_404_NOT_FOUND)
+                        return Response(response, status=status.HTTP_200_OK)
+                    return filter_executions_by_city_and_content(request, execution_id, result_dir, city_name, content_name)
+    return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+def filter_executions_by_id(request, execution_id=None):
+    response_list = []
+    executions = Executions.objects.filter(user_id=request.user)
+    if executions:
+        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        for dir in alldirs:
+            if dir.startswith(execution_id):
+                new_path = path + dir
+                if os.path.exists(new_path) is False:
+                    return response_list
+                response_list = [f for f in listdir(new_path) if isdir(join(new_path, f))]
+    return response_list
+
+
+def filter_executions_by_result_dir(request, execution_id=None, result_dir=None):
+    response_list = []
+    executions = Executions.objects.filter(user_id=request.user)
+    if executions:
+        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        for dir in alldirs:
+            if dir.startswith(execution_id):
+                new_path = path + dir + "/" + result_dir
+                if os.path.exists(new_path) is False:
+                    return response_list
+                response_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+    return response_list
+
+
+def filter_executions_by_city(request, execution_id=None, result_dir=None, city_name=None):
+    response_list=[]
+    executions = Executions.objects.filter(user_id=request.user)
+    if executions:
+        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        for dir in alldirs:
+            if dir.startswith(execution_id):
+                new_path = path + dir + "/" + result_dir
+                if os.path.exists(new_path) is False:
+                    return response_list
+                image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                for image_name in image_list:
+                    city = image_name.split("-")[1].split("_")[0]
+                    if city == str(city_name):
+                        response_list.append(image_name)
+    return response_list
+
+
+def filter_executions_by_state(request, execution_id=None, result_dir=None, state_name=None):
+    response_list = []
+    executions = Executions.objects.filter(user_id=request.user)
+    if executions:
+        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        for dir in alldirs:
+            if dir.startswith(execution_id):
+                new_path = path + dir + "/" + result_dir
+                if os.path.exists(new_path) is False:
+                    return response_list
+                image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                for image_name in image_list:
+                    state = image_name.split("-")[1].split("_")[1]
+                    if state == str(state_name):
+                        response_list.append(image_name)
+    return response_list
+
+
+def filter_executions_by_content(request, execution_id=None, result_dir=None, content_name=None):
+    response_list = []
+    executions = Executions.objects.filter(user_id=request.user)
+    if executions:
+        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        for dir in alldirs:
+            if dir.startswith(execution_id):
+                new_path = path + dir + "/" + result_dir
+                if os.path.exists(new_path) is False:
+                    return response_list
+                image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                for image_name in image_list:
+                    content = image_name.split("-")[2].split(".")[0]
+                    if content == str(content_name):
+                        response_list.append(image_name)
+    return response_list
+
+
+def filter_executions_by_city_and_content(request, execution_id=None, result_dir=None, city_name=None,
+                                       content_name=None):
+
+    executions = Executions.objects.filter(user_id=request.user)
+    if executions:
+        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        for dir in alldirs:
+            if dir.startswith(execution_id):
+                new_path = path + dir + "/" + result_dir
+                if os.path.exists(new_path) is False:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                for image_name in image_list:
+                    city = image_name.split("-")[1].split("_")[0]
+                    content = image_name.split("-")[2].split(".")[0]
+                    if city == str(city_name) and content == str(content_name):
+                        new_path = path + dir + "/" + result_dir + "/" + image_name
+                        with open(new_path, "rb") as fp:
+                            file = fp.read()
+                        response = HttpResponse(file, content_type='image/png')
+                        response['Content-Disposition'] = "attachment; filename=" + image_name
+                        return response
+    return Response(status=status.HTTP_404_NOT_FOUND)
