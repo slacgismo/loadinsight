@@ -17,7 +17,10 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
-import Executions from './executions';
+import ResultDirs from './result_dir';
+import AuthImg from "./AuthImg";
+import useSWR from "@zeit/swr";
+import axios from "axios"
 
 function Copyright() {
   return (
@@ -111,7 +114,22 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Dashboard(props) {
+export default function DashboardImage(props) {
+  const token = localStorage.getItem('auth_token');
+  const { data, error } = useSWR(
+    `/api/my_executions/${props.match.params.execution_id}/results/${props.match.params.result_dir}`,
+    async (key) => {
+      const image_list = await axios.get(`http://localhost:8000/api/my_executions/${props.match.params.execution_id}/results/${props.match.params.result_dir}/`, {headers: {'Authorization': `Token ${token}`}});
+      return image_list.data.execution_result_dirs;
+    },
+    {
+      revalidateOnFocus: false,
+      refreshWhenHidden: false,
+      shouldRetryOnError: false
+    }
+  );
+
+
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -121,6 +139,9 @@ export default function Dashboard(props) {
     setOpen(false);
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+
+
+
 
   return (
     <div className={classes.root}>
@@ -169,7 +190,8 @@ export default function Dashboard(props) {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <Executions {...props}/>
+                {/*<ResultDirs {...props}/>*/}
+                {data && data.map(image_url => (<AuthImg src={`http://localhost:8000/api/my_executions/${props.match.params.execution_id}/results/${props.match.params.result_dir}/images/${image_url}/`}/>))}
               </Paper>
             </Grid>
           </Grid>

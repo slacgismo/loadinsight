@@ -17,7 +17,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
-import Executions from './executions';
+import ResultDirs from './result_dir';
 
 function Copyright() {
   return (
@@ -111,7 +111,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Dashboard(props) {
+export default function DashboardResultDir(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -169,7 +169,7 @@ export default function Dashboard(props) {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <Executions {...props}/>
+                <ResultDirs {...props}/>
               </Paper>
             </Grid>
           </Grid>

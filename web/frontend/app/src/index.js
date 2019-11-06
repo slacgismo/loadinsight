@@ -6,7 +6,8 @@ import SignIn from "./signin";
 import SignUp from "./signup";
 import ActivateEmail from "./activateEmail";
 import Dashboard from "./dashboard";
-import Demo from './Demo';
+import DashBoardResultDir from './dashboard_result_dir';
+import DashboardImage from "./dashboard_image";
 
 const PrivateRoute = ({component: Component, ...rest}) => (
   <Route
@@ -39,7 +40,8 @@ function App() {
         <PublicRoute path="/signin" component={SignIn} />
         <PublicRoute path="/signup" component={SignUp} />
         <PublicRoute path="/activate/:uid/:token" component={ActivateEmail} />
-        <PublicRoute path="/demo" component={Demo} />
+        <PrivateRoute path="/dashboard/executions/:execution_id/results/:result_dir" component={DashboardImage} />
+        <PrivateRoute path="/dashboard/executions/:execution_id" component={DashBoardResultDir} />
         <PrivateRoute path="/dashboard" component={Dashboard} />
       </Switch>
     </BrowserRouter>
