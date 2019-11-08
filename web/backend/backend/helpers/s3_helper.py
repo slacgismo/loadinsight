@@ -1,6 +1,8 @@
 import logging
 import boto3
 import json
+import uuid
+import os
 from botocore.exceptions import ClientError
 
 s3_client = boto3.client('s3')
@@ -27,14 +29,27 @@ def upload_file(file_name, bucket, object_name=None):
     return True
 
 
-def download_file(bucket, object_name, file_name):
+def read_file_binary(path):
     '''Download file from s3
 
     :param file_name: File to download, the name you save
     :param bucket: Bucket to download from
     :param object_name: S3 object name, the whole path
     '''
-    s3_client.download_file(bucket, object_name, file_name)
+    temp_filename = str(uuid.uuid4())
+    bucket, object_name = path.split('/', 1)
+    try:
+        s3_client.download_file(bucket, object_name, temp_filename)
+    except ClientError as e:
+        logging.error(e)
+        return None
+    
+    file = None
+    with open(temp_filename, "rb") as fp:
+        file = fp.read()
+        fp.close()
+        os.remove(temp_filename)
+    return file
 
 
 def list_files_in_dir(s3_path):
@@ -47,10 +62,18 @@ def list_files_in_dir(s3_path):
         s3_path += '/'
 
     bucket, prefix = s3_path.split('/', 1)
-    response = s3_client.list_objects(
-        Bucket=bucket,
-        Prefix=prefix
-    )
+    response = None
+    if prefix == '':
+        # list root dir of bucket
+        response = s3_client.list_objects(
+            Bucket=bucket
+        )
+    else:
+        # list sub dir
+        response = s3_client.list_objects(
+            Bucket=bucket,
+            Prefix=prefix
+        )
 
     # directory not found
     if 'Contents' not in response:
@@ -62,7 +85,7 @@ def list_files_in_dir(s3_path):
 
     # extract file and dir
     for obj in content_list:
-        suffix = obj['Key'].split(prefix, 1)[1]
+        suffix = obj['Key'] if prefix == '' else obj['Key'].split(prefix, 1)[1]
         if suffix == '':
             continue
         if '/' not in suffix:
@@ -76,4 +99,8 @@ def list_files_in_dir(s3_path):
 
 if __name__ == "__main__":
     # upload_file('a.txt', 'loadinsight-bucket', 'a/b/a.txt')
-    list_files_in_dir('loadinsight-bucket/a/b')
+    dir_name = 'loadinsight-bucket/a/'
+    for f in list_files_in_dir(dir_name):
+        if not f.endswith('/'):
+            print(dir_name + f)
+            print(read_file_binary(dir_name + f))

@@ -12,6 +12,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 from backend.models import Executions
 from backend.serializers import *
+from backend.helpers import s3_helper
 from load_model.execute_pipelines import init_error_reporting as  init_error_reporting
 from load_model.execute_pipelines import execute_lctk as execute_lctk
 import djoser.permissions
@@ -364,6 +365,26 @@ def filter_executions_by_content(request, execution_id=None, result_dir=None, co
 
 def filter_executions_by_city_and_content(request, execution_id=None, result_dir=None, city_name=None,
                                        content_name=None):
+
+    '''
+    s3 ex:
+    dir_name = 'loadinsight-bucket/a/'  # '<bucket-name>/dir/subdir/'
+    for f in s3_helper.list_files_in_dir(dir_name):
+        if not f.endswith('/'):
+            file s3_helper.read_file_binary(dir_name + f)
+
+
+    list_files_in_dir:
+    Return: 
+        1. list of file and dir: ['a.txt', 'a/', 'b/'], could be empty, dir ends with '/'
+        2. None: dir input path not found
+
+    read_file_binary:
+    Return:
+        1. binary content of file
+        2. None: file not found
+    
+    '''
 
     executions = Executions.objects.filter(user_id=request.user)
     if executions:
