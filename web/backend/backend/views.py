@@ -17,6 +17,7 @@ from load_model.execute_pipelines import init_error_reporting as  init_error_rep
 from load_model.execute_pipelines import execute_lctk as execute_lctk
 import djoser.permissions
 from background_task import background
+from background_task.models_completed import CompletedTask
 from django.contrib.auth import get_user_model
 
 import django.core.serializers
@@ -45,12 +46,40 @@ def run_pipeline(request, pipeline_name):
     exe.save()
 
     try:
-        execute_task(pipeline_name, request.user.id, exe.id, config_data)
+        # creator is used to identify the owner of this task
+        # verbose_name is used to associate the Execution objects 
+        # with the database objects in Django-background-tasks (Tasks and Completed_Tasks)
+        execute_task(pipeline_name, request.user.id, exe.id, config_data, \
+                                creator = request.user, verbose_name = str(exe))
         return Response(status=status.HTTP_200_OK)
     except Exception as exc:
         logging.exception(exc)
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def get_all_completed_exes(user_id, exe_id = None):
+    """
+        This function accept a user object and get all completed executions for this user 
+        Args: 
+            user_id: user object
+            exe_id: str, a specific execution id, optional 
+            TODO: need more discussions about whether we need support query completed executions with 
+                  a execution id list. 
+        Output:
+            executions: a Execution queryset, all executions are completed. If exe_id is provided, will
+                        Return a Execution queryset with this exe_id if this task has completed.
+    """
+    user = user_id
+    
+    completed_tasks = CompletedTask.objects.created_by(user).succeeded()
+
+    exe_ids = [int(task.verbose_name.split('_')[0]) for task in completed_tasks]
+    if exe_id is None: 
+        # Specific exe_id not provided 
+        return Executions.objects.filter(pk__in=exe_ids)
+    else:
+        exe_id = int(exe_id)
+        exe_ids = [exe_id] if exe_id in exe_ids else []
+        return Executions.objects.filter(pk__in=exe_ids)
 
 # TODO: Please try to refrain from leaving unused code or comments in a pushed comment.
 #  This can bring inconvenience in understanding the code.
@@ -63,7 +92,7 @@ def run_pipeline(request, pipeline_name):
 def get_executions(request):
     #if execution_id is None:
         # get user's all executions as a list
-    executions = Executions.objects.filter(user_id=request.user)
+    executions = get_all_completed_exes(user_id=request.user)
     if executions:
         serializer = ExecutionsSerializer(executions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -96,7 +125,6 @@ def get_executions_by_id(request, execution_id=None):
 def get_executions_by_result_dir(request, execution_id=None, result_dir=None):
     if execution_id is not None and result_dir is not None:
         executions = Executions.objects.filter(user_id=request.user)
-        print("enter:", executions)
         if executions:
             if os.path.exists(path) is False:
                 return Response(status=status.HTTP_404_NOT_FOUND)
@@ -283,7 +311,7 @@ def get_executions_result(request, execution_id=None, result_dir=None, city_name
 
 def filter_executions_by_id(request, execution_id=None):
     response_list = []
-    executions = Executions.objects.filter(user_id=request.user)
+    executions = get_all_completed_exes(request.user, execution_id)
     if executions:
         alldirs = [f for f in listdir(path) if isdir(join(path, f))]
         for dir in alldirs:
@@ -297,7 +325,7 @@ def filter_executions_by_id(request, execution_id=None):
 
 def filter_executions_by_result_dir(request, execution_id=None, result_dir=None):
     response_list = []
-    executions = Executions.objects.filter(user_id=request.user)
+    executions = get_all_completed_exes(request.user, execution_id)
     if executions:
         alldirs = [f for f in listdir(path) if isdir(join(path, f))]
         for dir in alldirs:
@@ -311,7 +339,7 @@ def filter_executions_by_result_dir(request, execution_id=None, result_dir=None)
 
 def filter_executions_by_city(request, execution_id=None, result_dir=None, city_name=None):
     response_list=[]
-    executions = Executions.objects.filter(user_id=request.user)
+    executions = get_all_completed_exes(request.user, execution_id)
     if executions:
         alldirs = [f for f in listdir(path) if isdir(join(path, f))]
         for dir in alldirs:
@@ -329,7 +357,7 @@ def filter_executions_by_city(request, execution_id=None, result_dir=None, city_
 
 def filter_executions_by_state(request, execution_id=None, result_dir=None, state_name=None):
     response_list = []
-    executions = Executions.objects.filter(user_id=request.user)
+    executions = get_all_completed_exes(request.user, execution_id)
     if executions:
         alldirs = [f for f in listdir(path) if isdir(join(path, f))]
         for dir in alldirs:
@@ -347,7 +375,7 @@ def filter_executions_by_state(request, execution_id=None, result_dir=None, stat
 
 def filter_executions_by_content(request, execution_id=None, result_dir=None, content_name=None):
     response_list = []
-    executions = Executions.objects.filter(user_id=request.user)
+    executions = get_all_completed_exes(request.user, execution_id)
     if executions:
         alldirs = [f for f in listdir(path) if isdir(join(path, f))]
         for dir in alldirs:
@@ -365,7 +393,6 @@ def filter_executions_by_content(request, execution_id=None, result_dir=None, co
 
 def filter_executions_by_city_and_content(request, execution_id=None, result_dir=None, city_name=None,
                                        content_name=None):
-
     '''
     s3 ex:
     dir_name = 'loadinsight-bucket/a/'  # '<bucket-name>/dir/subdir/'
@@ -386,7 +413,7 @@ def filter_executions_by_city_and_content(request, execution_id=None, result_dir
     
     '''
 
-    executions = Executions.objects.filter(user_id=request.user)
+    executions = get_all_completed_exes(request.user, execution_id)
     if executions:
         alldirs = [f for f in listdir(path) if isdir(join(path, f))]
         for dir in alldirs:
