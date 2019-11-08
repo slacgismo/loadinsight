@@ -9,3 +9,6 @@ class Executions(models.Model):
     algorithm = models.CharField(max_length=50)
     # status of executions
     create_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '_'.join([str(self.id), str(self.user_id.id)]) 
