@@ -129,6 +129,10 @@ def execute_lctk(algorithm, execution_id, config_data):
         ceus_pipeline.execute()
         ceus_pipeline.generate_result_plots()
     elif algorithm == "mix":
+        rbsa_pipeline = rbsa.RbsaPipeline(execution_id=execution_id)
+        rbsa_pipeline.execute()
+        ceus_pipeline = ceus.CeusPipeline(execution_id=execution_id)
+        ceus_pipeline.execute()
         mix_pipeline = mix.MixedFeederPipeline(execution_id=execution_id)
         mix_pipeline.execute()
         mix_pipeline.generate_result_plots()
