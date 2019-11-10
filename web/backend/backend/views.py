@@ -50,7 +50,12 @@ def run_pipeline(request, pipeline_name = None):
         exe.save()
 
         try:
-            execute_task(pipeline_name, request.user.id, exe.id, config_data)
+            # creator is used to identify the owner of this task
+            # verbose_name is used to associate the Execution objects 
+            # with the database objects in Django-background-tasks (Tasks and Completed_Tasks)
+            # IMPORTANT: DO NOT MODIFY THIS PART THANKS!
+            execute_task(pipeline_name, request.user.id, exe.id, config_data, \
+                                        creator = request.user, verbose_name = str(exe))
             return Response(status=status.HTTP_200_OK)
         except Exception as exc:
             logging.exception(exc)
