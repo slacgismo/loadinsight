@@ -39,24 +39,40 @@ def execute_task(algorithm, user_id, execution_id, config_data):
     user.email_user('Here is a notification', 'Your pipeline has been executed successfully!')
 
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
-def run_pipeline(request, pipeline_name):
-    config_data = request.data
+def run_pipeline(request, pipeline_name = None):
+    if request.method == "POST":
 
-    exe = Executions(user_id=request.user, algorithm=pipeline_name)
-    exe.save()
+        config_data = request.data
 
-    try:
-        # creator is used to identify the owner of this task
-        # verbose_name is used to associate the Execution objects 
-        # with the database objects in Django-background-tasks (Tasks and Completed_Tasks)
-        execute_task(pipeline_name, request.user.id, exe.id, config_data, \
-                                creator = request.user, verbose_name = str(exe))
-        return Response(status=status.HTTP_200_OK)
-    except Exception as exc:
-        logging.exception(exc)
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        exe = Executions(user_id=request.user, algorithm=pipeline_name)
+        exe.save()
+
+        try:
+            execute_task(pipeline_name, request.user.id, exe.id, config_data)
+            return Response(status=status.HTTP_200_OK)
+        except Exception as exc:
+            logging.exception(exc)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    elif request.method == "GET":
+        # get all config file in json data
+        fileDir = os.path.dirname(os.path.realpath('__file__'))
+        root_dir = os.path.join(fileDir, 'load_model/config/')
+        config_json = {}
+        config_file_name = ['DAYTYPE_DEFINITIONS.json', 'EXCLUDED_LOCATIONS.json', 'GAS_FRACTIONS.json', 'SENSITIVITY_TEMPERATURES.json']
+        for src_dir, dirs, files in os.walk(root_dir):
+            for file_ in files:
+                file_name = os.path.join(src_dir, file_)
+                if file_ in config_file_name:
+                    with open(file_name, 'r') as json_file:
+                        data = json.load(json_file)
+                    config_json[file_] = data
+
+        return Response(config_json, status=status.HTTP_200_OK)
+
+
 
 def get_all_completed_exes(user_id, exe_id = None):
     """
