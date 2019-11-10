@@ -82,13 +82,22 @@ DJOSER = {
 }
 
 # PLEASE DO NOT LEAVE ANY SENSITIVE INFO REGARDING PASSWORD HERE
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# DEFAULT_FROM_EMAIL = ''  # this should be exactly the same as EMAIL_HOST_USER
+# EMAIL_USE_TLS = True  # whether use TLS
+# EMAIL_HOST = 'smtp.mailtrap.io'  # SMTP server.
+# EMAIL_PORT = 2525  # port of SMTF server
+# EMAIL_HOST_USER = DEFAULT_FROM_EMAIL  # sender's email address
+# EMAIL_HOST_PASSWORD = ''  # password of sender's email address
+# EMAIL_FROM = EMAIL_HOST_USER
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-DEFAULT_FROM_EMAIL = ''  # this should be exactly the same as EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = 'fathertest251@gmail.com'  # this should be exactly the same as EMAIL_HOST_USER
 EMAIL_USE_TLS = True  # whether use TLS
-EMAIL_HOST = 'smtp.mailtrap.io'  # SMTP server.
-EMAIL_PORT = 2525  # port of SMTF server
+EMAIL_HOST = 'smtp.gmail.com'  # SMTP server.
+EMAIL_PORT = 587  # port of SMTF server
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL  # sender's email address
-EMAIL_HOST_PASSWORD = ''  # password of sender's email address
+EMAIL_HOST_PASSWORD = 'kxvubkwkmnovmsff'  # password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
 
 WSGI_APPLICATION = 'wsgi.application'

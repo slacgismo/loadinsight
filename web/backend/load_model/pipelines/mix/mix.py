@@ -3,6 +3,7 @@ import logging
 from time import time
 from load_model.settings import base
 from load_model.generics import pipeline as p, task as t
+from backend.helpers import s3_helper
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -92,54 +93,62 @@ class MixedFeederPipeline():
         rural_mix_hour_norm = df[f'{self.artifact_root_dir}/rural_mix_output_hour_norm.csv']
 
         residential_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/suburban_mix'
+        s3_residential_mix_plots_dir = f'{self.run_dir}/suburban_mix'
         self._create_results_storage(residential_mix_plots_dir)
 
         commercial_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/urban_mix'
+        s3_commercial_mix_plots_dir = f'{self.run_dir}/urban_mix'
         self._create_results_storage(commercial_mix_plots_dir)
 
         mixed_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/mixed_mix'
+        s3_mixed_mix_plots_dir = f'{self.run_dir}/mixed_mix'
         self._create_results_storage(mixed_mix_plots_dir)
 
         rural_mix_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/rural_mix'
+        s3_rural_mix_plots_dir = f'{self.run_dir}/rural_mix'
         self._create_results_storage(rural_mix_plots_dir)
 
         residential_mix_hour_norm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/suburban_mix_hour_norm'
+        s3_residential_mix_hour_norm_plots_dir = f'{self.run_dir}/suburban_mix_hour_norm'
         self._create_results_storage(residential_mix_hour_norm_plots_dir)
 
         commercial_mix_hour_norm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/urban_mix_hour_norm'
+        s3_commercial_mix_hour_norm_plots_dir = f'{self.run_dir}/urban_mix_hour_norm'
         self._create_results_storage(commercial_mix_hour_norm_plots_dir)
 
         mixed_mix_hour_norm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/mixed_mix_hour_norm'
+        s3_mixed_mix_hour_norm_plots_dir = f'{self.run_dir}/mixed_mix_hour_norm'
         self._create_results_storage(mixed_mix_hour_norm_plots_dir)
 
         rural_mix_hour_norm_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/rural_mix_hour_norm'
+        s3_rural_mix_hour_norm_plots_dir = f'{self.run_dir}/rural_mix_hour_norm'
         self._create_results_storage(rural_mix_hour_norm_plots_dir)
 
         logger.info('GENERATING SUBURBAN MIX PLOTS')
-        self.mix_type_plotting(mix_type=residential_mix, mix_type_name='SUBURBAN', normalization='summer total peak', directory=residential_mix_plots_dir)
+        self.mix_type_plotting(mix_type=residential_mix, mix_type_name='SUBURBAN', normalization='summer total peak', directory=residential_mix_plots_dir, s3_directory=s3_residential_mix_plots_dir)
 
         logger.info('GENERATING URBAN MIX PLOTS')
-        self.mix_type_plotting(mix_type=commercial_mix, mix_type_name='URBAN', normalization='summer total peak', directory=commercial_mix_plots_dir)
+        self.mix_type_plotting(mix_type=commercial_mix, mix_type_name='URBAN', normalization='summer total peak', directory=commercial_mix_plots_dir, s3_directory=s3_commercial_mix_plots_dir)
 
         logger.info('GENERATING MIXED MIX PLOTS')
-        self.mix_type_plotting(mix_type=mixed_mix, mix_type_name='MIXED', normalization='summer total peak', directory=mixed_mix_plots_dir)
+        self.mix_type_plotting(mix_type=mixed_mix, mix_type_name='MIXED', normalization='summer total peak', directory=mixed_mix_plots_dir, s3_directory=s3_mixed_mix_plots_dir)
 
         logger.info('GENERATING RURAL MIX PLOTS')
-        self.mix_type_plotting(mix_type=rural_mix, mix_type_name='RURAL', normalization='summer total peak', directory=rural_mix_plots_dir)
+        self.mix_type_plotting(mix_type=rural_mix, mix_type_name='RURAL', normalization='summer total peak', directory=rural_mix_plots_dir, s3_directory=s3_rural_mix_plots_dir)
 
         logger.info('GENERATING hour_norm SUBURBAN MIX PLOTS')
-        self.mix_type_plotting(mix_type=residential_mix_hour_norm, mix_type_name='SUBURBAN', normalization='hour_norm', directory=residential_mix_hour_norm_plots_dir)
+        self.mix_type_plotting(mix_type=residential_mix_hour_norm, mix_type_name='SUBURBAN', normalization='hour_norm', directory=residential_mix_hour_norm_plots_dir, s3_directory=s3_residential_mix_hour_norm_plots_dir)
 
         logger.info('GENERATING hour_norm URBAN MIX PLOTS')
-        self.mix_type_plotting(mix_type=commercial_mix_hour_norm, mix_type_name='URBAN', normalization='hour_norm', directory=commercial_mix_hour_norm_plots_dir)
+        self.mix_type_plotting(mix_type=commercial_mix_hour_norm, mix_type_name='URBAN', normalization='hour_norm', directory=commercial_mix_hour_norm_plots_dir, s3_directory=s3_commercial_mix_hour_norm_plots_dir)
 
         logger.info('GENERATING hour_norm MIXED MIX PLOTS')
-        self.mix_type_plotting(mix_type=mixed_mix_hour_norm, mix_type_name='MIXED', normalization='hour_norm', directory=mixed_mix_hour_norm_plots_dir)
+        self.mix_type_plotting(mix_type=mixed_mix_hour_norm, mix_type_name='MIXED', normalization='hour_norm', directory=mixed_mix_hour_norm_plots_dir, s3_directory=s3_mixed_mix_hour_norm_plots_dir)
 
         logger.info('GENERATING hour_norm RURAL MIX PLOTS')
-        self.mix_type_plotting(mix_type=rural_mix_hour_norm, mix_type_name='RURAL', normalization='hour_norm', directory=rural_mix_hour_norm_plots_dir)
+        self.mix_type_plotting(mix_type=rural_mix_hour_norm, mix_type_name='RURAL', normalization='hour_norm', directory=rural_mix_hour_norm_plots_dir, s3_directory=s3_rural_mix_hour_norm_plots_dir)
 
-    def mix_type_plotting(self, mix_type, mix_type_name, normalization, directory):
+    def mix_type_plotting(self, mix_type, mix_type_name, normalization, directory, s3_directory):
         ######## Plotting helper function
         plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
         ticks = np.arange(0, 25, 3)
@@ -157,7 +166,9 @@ class MixedFeederPipeline():
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. {normalization})')
                 fig = plot.get_figure()
-                fig.savefig(f'{directory}/{title}.png')
+                local_file_name = f'{directory}/{title}.png'
+                fig.savefig(local_file_path)
+                s3_helper.upload_file(local_file_name, base.S3_OUTPUT_BUCKET_PATH, f'{s3_directory}/{title}.png')
                 plt.close(fig)
 
     def on_failure(self):

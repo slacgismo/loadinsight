@@ -3,6 +3,7 @@ import logging
 from time import time
 from load_model.settings import base
 from load_model.generics import pipeline as p, task as t
+from backend.helpers import s3_helper
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -131,31 +132,36 @@ class CeusPipeline():
         base_enduses.remove('Cooling')
 
         normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_normal_loadshapes'
+        s3_normal_plots_dir = f'{self.run_dir}/ceus_normal_loadshapes'
         self._create_results_storage(normal_plots_dir)
 
         enduse_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_enduse_loadshapes'
+        s3_enduse_plots_dir = f'{self.run_dir}/ceus_enduse_loadshapes'
         self._create_results_storage(enduse_plots_dir)
 
         total_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_total_loadshapes'
+        s3_total_plots_dir = f'{self.run_dir}/ceus_total_loadshapes'
         self._create_results_storage(total_plots_dir)
 
         loadshapes_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_loadshapes'
+        s3_loadshapes_plots_dir = f'{self.run_dir}/ceus_loadshapes'
         self._create_results_storage(loadshapes_plots_dir)
 
         components_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/ceus_components'
+        s3_components_plots_dir = f'{self.run_dir}/ceus_components'
         self._create_results_storage(components_plots_dir)
 
         plotting_components = ['PE', 'Stat_P_Cur', 'Stat_P_Res', 'MotorC', 'MotorB', 'MotorA', 'MotorD'] # bottom up
         self.ticks = np.arange(0, 25, 3) 
 
         logger.info('GENERATING CEUS NORMAL LOADSHAPE PLOTS')
-        self.loadshapes_plotting(loadshapes=normal_loadshapes, directory=normal_plots_dir, base_enduses=base_enduses)
+        self.loadshapes_plotting(loadshapes=normal_loadshapes, directory=normal_plots_dir, s3_directory=s3_normal_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING CEUS ENDUSE LOADSHAPE PLOTS')
-        self.loadshapes_plotting(loadshapes=enduse_loadshapes, directory=enduse_plots_dir, base_enduses=base_enduses)
+        self.loadshapes_plotting(loadshapes=enduse_loadshapes, directory=enduse_plots_dir, s3_directory=s3_enduse_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING CEUS TOTAL LOADSHAPE PLOTS')
-        self.loadshapes_plotting(loadshapes=total_loadshapes, directory=total_plots_dir, base_enduses=base_enduses)
+        self.loadshapes_plotting(loadshapes=total_loadshapes, directory=total_plots_dir, s3_directory=s3_total_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING CEUS LOADSHAPE PLOTS')
 
@@ -173,7 +179,9 @@ class CeusPipeline():
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. base total peak)')
                 fig = plot.get_figure()
-                fig.savefig(f'{loadshapes_plots_dir}/{title}.png')
+                local_file_name = f'{loadshapes_plots_dir}/{title}.png'
+                fig.savefig(local_file_name)
+                s3_helper.upload_file(local_file_name, base.S3_OUTPUT_BUCKET_PATH, f'{s3_loadshapes_plots_dir}/{title}.png')
                 plt.close(fig)
 
         logger.info('GENERATING CEUS COMPONENT PLOTS')
@@ -193,10 +201,12 @@ class CeusPipeline():
                     plt.xlabel('Hour-of-Day')
                     plt.ylabel('Load (pu. summer total peak)')
                     fig = plot.get_figure()
-                    fig.savefig(f'{components_plots_dir}/{title}.png')
+                    local_file_name = f'{components_plots_dir}/{title}.png'
+                    fig.savefig(local_file_name)
+                    s3_helper.upload_file(local_file_name, base.S3_OUTPUT_BUCKET_PATH, f'{s3_components_plots_dir}/{title}.png')
                     plt.close(fig)
 
-    def loadshapes_plotting(self, loadshapes, directory, base_enduses):
+    def loadshapes_plotting(self, loadshapes, directory, s3_directory, base_enduses):
         ######## Plotting helper function
         for idx, city in enumerate(loadshapes.target.unique()):
             city_df = loadshapes.loc[loadshapes.target == city]
@@ -212,7 +222,9 @@ class CeusPipeline():
                     day_df['Baseload'] = day_df[base_enduses].sum(axis=1)
                     plot = day_df[['Baseload', 'Heating', 'Cooling']].plot(kind='area', title=title, grid=True, xticks=self.ticks, ylim=(0, max_val), linewidth=2, color=['black','red','blue'])
                     fig = plot.get_figure()
-                    fig.savefig(f'{directory}/{title}.png')
+                    local_file_name = f'{directory}/{title}.png'
+                    fig.savefig(local_file_name)
+                    s3_helper.upload_file(local_file_name, base.S3_OUTPUT_BUCKET_PATH, f'{s3_directory}/{title}.png')
                     plt.close(fig)
 
     def execute(self):

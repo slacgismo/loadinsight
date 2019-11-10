@@ -7,6 +7,15 @@ from botocore.exceptions import ClientError
 
 s3_client = boto3.client('s3')
 
+
+def delete_file(file_name, bucket):
+    response = s3_client.delete_object(
+        Bucket=bucket,
+        Key=file_name
+    )
+
+
+
 def upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
 
@@ -99,8 +108,9 @@ def list_files_in_dir(s3_path):
 
 if __name__ == "__main__":
     # upload_file('a.txt', 'loadinsight-bucket', 'a/b/a.txt')
-    dir_name = 'loadinsight-bucket/a/'
-    for f in list_files_in_dir(dir_name):
-        if not f.endswith('/'):
-            print(dir_name + f)
-            print(read_file_binary(dir_name + f))
+    file_name = 'loadinsight-bucket/a.txt'
+    delete_file('a.txt', 'loadinsight-bucket')
+    # for f in list_files_in_dir(dir_name):
+    #     if not f.endswith('/'):
+    #         print(dir_name + f)
+    #         print(read_file_binary(dir_name + f))

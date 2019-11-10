@@ -4,6 +4,9 @@ DEBUG = False
 # path to the local copies of the data
 LOCAL_PATH = 'load_model/local_data'
 
+# path of s3 output files
+S3_OUTPUT_BUCKET_PATH = 'loadinsight-bucket'
+
 # path to the remove data store
 REMOTE_PATH = 'lctk.data'
 
