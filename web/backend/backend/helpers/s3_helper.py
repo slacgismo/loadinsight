@@ -70,46 +70,60 @@ def list_files_in_dir(s3_path):
     if not s3_path.endswith('/'):
         s3_path += '/'
 
-    bucket, prefix = s3_path.split('/', 1)
-    response = None
-    if prefix == '':
-        # list root dir of bucket
-        response = s3_client.list_objects(
-            Bucket=bucket
-        )
-    else:
-        # list sub dir
-        response = s3_client.list_objects(
-            Bucket=bucket,
-            Prefix=prefix
-        )
-
-    # directory not found
-    if 'Contents' not in response:
-        return None
-
-    content_list = response['Contents']
     result_list = []
-    dir_set = set()
 
-    # extract file and dir
-    for obj in content_list:
-        suffix = obj['Key'] if prefix == '' else obj['Key'].split(prefix, 1)[1]
-        if suffix == '':
-            continue
-        if '/' not in suffix:
-            result_list.append(suffix)
-        else:
-            dir_set.add(suffix.split('/')[0] + '/')
+    bucket, prefix = s3_path.split('/', 1)
+    continuation_token = None
+    # get all objects name in current dir
+    while True:
+        response = None
+        request_kwargs = {
+            'Bucket':bucket,
+            'Delimiter':'/'
+        }
+        # list sub dir
+        if prefix != '':
+            request_kwargs['Prefix'] = prefix
 
-    result_list.extend(list(dir_set))
-    return result_list
+        # get next trunk
+        if continuation_token:
+            request_kwargs['ContinuationToken'] = continuation_token
+
+        response = s3_client.list_objects_v2(**request_kwargs)
+
+        # directory not found
+        if 'Contents' not in response and 'CommonPrefixes' not in response:
+            return None
+
+        # extract file
+        if 'Contents' in response:
+            for obj in response['Contents']:
+                suffix = obj['Key'] if prefix == '' else obj['Key'].split(prefix, 1)[1]
+                if suffix == '':
+                    continue
+                if '/' not in suffix:
+                    result_list.append(suffix)
+
+        # extract dir
+        if 'CommonPrefixes' in response:
+            for obj in response['CommonPrefixes']:
+                dir_levels = obj['Prefix'].split('/')
+                suffix = dir_levels[-2] + '/' if len(dir_levels) > 2 else obj['Prefix']
+                result_list.append(suffix)
+
+        # at the end of the list
+        if not response['IsTruncated']:  
+            break
+        continuation_token = response['NextContinuationToken']
+        
+    return list(set(result_list))
 
 
 if __name__ == "__main__":
     # upload_file('a.txt', 'loadinsight-bucket', 'a/b/a.txt')
-    file_name = 'loadinsight-bucket/a.txt'
-    delete_file('a.txt', 'loadinsight-bucket')
+    # file_name = 'loadinsight-bucket/a.txt'
+
+    print(list_files_in_dir('loadinsight-bucket/'))
     # for f in list_files_in_dir(dir_name):
     #     if not f.endswith('/'):
     #         print(dir_name + f)
