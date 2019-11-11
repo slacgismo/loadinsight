@@ -340,7 +340,6 @@ def filter_executions_by_id(request, execution_id=None):
         data = json.loads(json.dumps(serializer.data))
         algorithm = data[0]['algorithm']
         alldirs = list_files_in_dir(path)
-        print("alldirs:", alldirs)
         for dir in alldirs:
             if dir.startswith(execution_id) and dir.__contains__(algorithm):
                 new_path = path + dir
@@ -480,7 +479,7 @@ def filter_executions_by_city_and_content(request, execution_id=None, result_dir
                     if content == str(content_name):
                         response_list.append(image_name)
                 if len(response_list) == 1:
-                    new_path = path + dir + result_dir + response_list[0]
+                    new_path = path + dir + result_dir + "/" + response_list[0]
                     file = read_file_binary(new_path)
                     response = HttpResponse(file, content_type='image/png')
                     response['Content-Disposition'] = "attachment; filename=" + response_list[0]
@@ -513,7 +512,7 @@ def filter_executions_by_state_and_content(request, execution_id=None, result_di
                     if content == str(content_name):
                         response_list.append(image_name)
                 if len(response_list) ==1:
-                    new_path = path + dir + result_dir + response_list[0]
+                    new_path = path + dir + result_dir + "/" + response_list[0]
                     file = read_file_binary(new_path)
                     response = HttpResponse(file, content_type='image/png')
                     response['Content-Disposition'] = "attachment; filename=" + response_list[0]
