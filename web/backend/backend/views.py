@@ -20,7 +20,6 @@ import djoser.permissions
 from background_task import background
 from background_task.models_completed import CompletedTask
 from django.contrib.auth import get_user_model
-
 import django.core.serializers
 
 from django.core.serializers import deserialize
@@ -291,8 +290,9 @@ def get_executions_by_image(request, execution_id=None, result_dir=None, image_n
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
 def get_executions_result(request, execution_id=None, result_dir=None, city_name=None,
                           state_name=None, content_name=None):
-    if os.path.exists(path) is False:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    # if os.path.exists(path) is False:
+    #     print("path:", path)
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
     exe_id_flag = execution_id is None or execution_id =='None'
     result_dir_flag = result_dir is None or result_dir =='None'
     city_flag = city_name is  None or city_name =='None'
@@ -335,55 +335,55 @@ def get_executions_result(request, execution_id=None, result_dir=None, city_name
 def filter_executions_by_id(request, execution_id=None):
     response_list = []
     executions = get_all_completed_exes(request.user, execution_id)
-    serializer = ExecutionsSerializer(executions, many=True)
-    data = json.loads(json.dumps(serializer.data))
-    algorithm = data[0]['algorithm']
     if executions:
-        # alldirs = [f for f in listdir(path) if isdir(join(path, f))]
-        print("before alldirs")
-        alldirs = [f for f in list_files_in_dir(path) if isdir(join(path, f))]
+        serializer = ExecutionsSerializer(executions, many=True)
+        data = json.loads(json.dumps(serializer.data))
+        algorithm = data[0]['algorithm']
+        alldirs = list_files_in_dir(path)
         print("alldirs:", alldirs)
         for dir in alldirs:
             if dir.startswith(execution_id) and dir.__contains__(algorithm):
                 new_path = path + dir
-                if os.path.exists(new_path) is False:
+                dir_list = list_files_in_dir(new_path)
+                if dir_list is None:
                     return response_list
-                response_list = [f for f in listdir(new_path) if isdir(join(new_path, f))]
+                response_list = dir_list
     return response_list
 
 
 def filter_executions_by_result_dir(request, execution_id=None, result_dir=None):
     response_list = []
     executions = get_all_completed_exes(request.user, execution_id)
-    serializer = ExecutionsSerializer(executions, many=True)
-    data = json.loads(json.dumps(serializer.data))
-    algorithm = data[0]['algorithm']
     if executions:
-        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        serializer = ExecutionsSerializer(executions, many=True)
+        data = json.loads(json.dumps(serializer.data))
+        algorithm = data[0]['algorithm']
+        alldirs = list_files_in_dir(path)
         for dir in alldirs:
             if dir.startswith(execution_id) and dir.__contains__(algorithm):
-                new_path = path + dir + "/" + result_dir
+                new_path = path + dir + result_dir
                 print("new path:", new_path)
-                if os.path.exists(new_path) is False:
+                dir_list = list_files_in_dir(new_path)
+                if dir_list is None:
                     return response_list
-                response_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
+                response_list = dir_list
     return response_list
 
 
 def filter_executions_by_city(request, execution_id=None, result_dir=None, city_name=None):
     response_list=[]
     executions = get_all_completed_exes(request.user, execution_id)
-    serializer = ExecutionsSerializer(executions, many=True)
-    data = json.loads(json.dumps(serializer.data))
-    algorithm = data[0]['algorithm']
     if executions:
-        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        serializer = ExecutionsSerializer(executions, many=True)
+        data = json.loads(json.dumps(serializer.data))
+        algorithm = data[0]['algorithm']
+        alldirs = list_files_in_dir(path)
         for dir in alldirs:
             if dir.startswith(execution_id) and dir.__contains__(algorithm):
-                new_path = path + dir + "/" + result_dir
-                if os.path.exists(new_path) is False:
+                new_path = path + dir + result_dir
+                image_list = list_files_in_dir(new_path)
+                if image_list is None:
                     return response_list
-                image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
                 for image_name in image_list:
                     if algorithm == "ceus":
                         city = image_name.split("-")[1].split("_")[0]
@@ -397,17 +397,17 @@ def filter_executions_by_city(request, execution_id=None, result_dir=None, city_
 def filter_executions_by_state(request, execution_id=None, result_dir=None, state_name=None):
     response_list = []
     executions = get_all_completed_exes(request.user, execution_id)
-    serializer = ExecutionsSerializer(executions, many=True)
-    data = json.loads(json.dumps(serializer.data))
-    algorithm = data[0]['algorithm']
     if executions:
-        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        serializer = ExecutionsSerializer(executions, many=True)
+        data = json.loads(json.dumps(serializer.data))
+        algorithm = data[0]['algorithm']
+        alldirs = list_files_in_dir(path)
         for dir in alldirs:
             if dir.startswith(execution_id) and dir.__contains__(algorithm):
-                new_path = path + dir + "/" + result_dir
-                if os.path.exists(new_path) is False:
+                new_path = path + dir + result_dir
+                image_list = list_files_in_dir(new_path)
+                if image_list is None:
                     return response_list
-                image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
                 for image_name in image_list:
                     if algorithm == "ceus":
                         state = image_name.split("-")[1].split("_")[1]
@@ -421,17 +421,17 @@ def filter_executions_by_state(request, execution_id=None, result_dir=None, stat
 def filter_executions_by_content(request, execution_id=None, result_dir=None, content_name=None):
     response_list = []
     executions = get_all_completed_exes(request.user, execution_id)
-    serializer = ExecutionsSerializer(executions, many=True)
-    data = json.loads(json.dumps(serializer.data))
-    algorithm = data[0]['algorithm']
     if executions:
-        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        serializer = ExecutionsSerializer(executions, many=True)
+        data = json.loads(json.dumps(serializer.data))
+        algorithm = data[0]['algorithm']
+        alldirs = list_files_in_dir(path)
         for dir in alldirs:
             if dir.startswith(execution_id) and dir.__contains__(algorithm):
-                new_path = path + dir + "/" + result_dir
-                if os.path.exists(new_path) is False:
+                new_path = path + dir + result_dir
+                image_list = list_files_in_dir(new_path)
+                if image_list is None:
                     return response_list
-                image_list = [f for f in listdir(new_path) if isfile(join(new_path, f))]
                 for image_name in image_list:
                     content = image_name.split("-")[-1].split(".")[0]
                     if content == str(content_name):
@@ -462,26 +462,26 @@ def filter_executions_by_city_and_content(request, execution_id=None, result_dir
     '''
 
     executions = get_all_completed_exes(request.user, execution_id)
-    serializer = ExecutionsSerializer(executions, many=True)
-    data = json.loads(json.dumps(serializer.data))
-    algorithm = data[0]['algorithm']
-    response_list = []
     if executions:
-        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
-        for dir in alldirs:
+        response_list = []
+        serializer = ExecutionsSerializer(executions, many=True)
+        data = json.loads(json.dumps(serializer.data))
+        algorithm = data[0]['algorithm']
+        dir_list = list_files_in_dir(path)
+        for dir in dir_list:
             if dir.startswith(execution_id) and dir.__contains__(algorithm):
-                new_path = path + dir + "/" + result_dir
-                if os.path.exists(new_path) is False:
+                new_path = path + dir + result_dir
+                image_list = list_files_in_dir(new_path)
+                if image_list is None:
                     return Response(status=status.HTTP_404_NOT_FOUND)
-                image_list = filter_executions_by_city(request, execution_id, result_dir,city_name)
+                image_list = filter_executions_by_city(request, execution_id, result_dir, city_name)
                 for image_name in image_list:
                     content = image_name.split("-")[-1].split(".")[0]
                     if content == str(content_name):
                         response_list.append(image_name)
                 if len(response_list) == 1:
-                    new_path = path + dir + "/" + result_dir + "/" + response_list[0]
-                    with open(new_path, "rb") as fp:
-                        file = fp.read()
+                    new_path = path + dir + result_dir + response_list[0]
+                    file = read_file_binary(new_path)
                     response = HttpResponse(file, content_type='image/png')
                     response['Content-Disposition'] = "attachment; filename=" + response_list[0]
                     return response
@@ -493,17 +493,19 @@ def filter_executions_by_city_and_content(request, execution_id=None, result_dir
 
 def filter_executions_by_state_and_content(request, execution_id=None, result_dir=None, state_name=None,
                                        content_name=None):
+
     executions = get_all_completed_exes(request.user, execution_id)
-    serializer = ExecutionsSerializer(executions, many=True)
-    data = json.loads(json.dumps(serializer.data))
-    algorithm = data[0]['algorithm']
-    response_list = []
     if executions:
-        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
-        for dir in alldirs:
+        response_list = []
+        serializer = ExecutionsSerializer(executions, many=True)
+        data = json.loads(json.dumps(serializer.data))
+        algorithm = data[0]['algorithm']
+        dir_list = list_files_in_dir(path)
+        for dir in dir_list:
             if dir.startswith(execution_id) and dir.__contains__(algorithm):
-                new_path = path + dir + "/" + result_dir
-                if os.path.exists(new_path) is False:
+                new_path = path + dir + result_dir
+                image_list = list_files_in_dir(new_path)
+                if image_list is None:
                     return Response(status=status.HTTP_404_NOT_FOUND)
                 image_list = filter_executions_by_state(request, execution_id, result_dir, state_name)
                 for image_name in image_list:
@@ -511,9 +513,8 @@ def filter_executions_by_state_and_content(request, execution_id=None, result_di
                     if content == str(content_name):
                         response_list.append(image_name)
                 if len(response_list) ==1:
-                    new_path = path + dir + "/" + result_dir + "/" + response_list[0]
-                    with open(new_path, "rb") as fp:
-                        file = fp.read()
+                    new_path = path + dir + result_dir + response_list[0]
+                    file = read_file_binary(new_path)
                     response = HttpResponse(file, content_type='image/png')
                     response['Content-Disposition'] = "attachment; filename=" + response_list[0]
                     return response
