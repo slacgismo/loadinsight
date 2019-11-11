@@ -12,7 +12,8 @@ from rest_framework.decorators import api_view, permission_classes
 
 from backend.models import Executions
 from backend.serializers import *
-from backend.helpers import s3_helper
+from .helpers import s3_helper
+from .helpers.s3_helper import *
 from load_model.execute_pipelines import init_error_reporting as  init_error_reporting
 from load_model.execute_pipelines import execute_lctk as execute_lctk
 import djoser.permissions
@@ -25,9 +26,9 @@ import django.core.serializers
 from django.core.serializers import deserialize
 # from web.backend.backend.tests.serializers import ExecutionsSerializer
 
-path = "./load_model/local_data/"
+# path = "./load_model/local_data/"
 
-# path = "loadinsight-bucket/"
+path = "loadinsight-bucket/"
 
 @background(schedule=timezone.now())
 def execute_task(algorithm, user_id, execution_id, config_data):
@@ -116,7 +117,6 @@ def get_executions(request):
     #if execution_id is None:
         # get user's all executions as a list
     executions = get_all_completed_exes(user_id=request.user)
-    print("here??")
     if executions:
         serializer = ExecutionsSerializer(executions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -339,7 +339,10 @@ def filter_executions_by_id(request, execution_id=None):
     data = json.loads(json.dumps(serializer.data))
     algorithm = data[0]['algorithm']
     if executions:
-        alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        # alldirs = [f for f in listdir(path) if isdir(join(path, f))]
+        print("before alldirs")
+        alldirs = [f for f in list_files_in_dir(path) if isdir(join(path, f))]
+        print("alldirs:", alldirs)
         for dir in alldirs:
             if dir.startswith(execution_id) and dir.__contains__(algorithm):
                 new_path = path + dir
