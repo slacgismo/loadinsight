@@ -99,6 +99,7 @@ EMAIL_PORT = 2525  # port of SMTF server
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL  # sender's email address
 EMAIL_HOST_PASSWORD = 'c2073b2f9ed832'  # password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
+EMAIL_RETRY_TIMES = 3
 
 WSGI_APPLICATION = 'wsgi.application'
 
