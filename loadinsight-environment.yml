@@ -18,3 +18,4 @@ dependencies:
     - django-background-tasks
     - dj-database-url==0.5.0
     - psycopg2==2.8.4
+    - Django

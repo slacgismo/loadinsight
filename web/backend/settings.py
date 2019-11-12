@@ -82,16 +82,32 @@ DJOSER = {
 }
 
 # PLEASE DO NOT LEAVE ANY SENSITIVE INFO REGARDING PASSWORD HERE
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# DEFAULT_FROM_EMAIL = ''  # this should be exactly the same as EMAIL_HOST_USER
+# EMAIL_USE_TLS = True  # whether use TLS
+# EMAIL_HOST = 'smtp.mailtrap.io'  # SMTP server.
+# EMAIL_PORT = 2525  # port of SMTF server
+# EMAIL_HOST_USER = DEFAULT_FROM_EMAIL  # sender's email address
+# EMAIL_HOST_PASSWORD = ''  # password of sender's email address
+# EMAIL_FROM = EMAIL_HOST_USER
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 DEFAULT_FROM_EMAIL = 'e66c570d962d14'  # this should be exactly the same as EMAIL_HOST_USER
 EMAIL_USE_TLS = True  # whether use TLS
 EMAIL_HOST = 'smtp.mailtrap.io'  # SMTP server.
 EMAIL_PORT = 2525  # port of SMTF server
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL  # sender's email address
-EMAIL_HOST_PASSWORD = '1aea8ee4c25f9f'  # password of sender's email address
+EMAIL_HOST_PASSWORD = 'c2073b2f9ed832'  # password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
 
 WSGI_APPLICATION = 'wsgi.application'
 
 # settings for Django Background Task
 MAX_ATTEMPTS = 1  # controls how many times a task will be attempted (default 25)
+
+S3_BUCKET_PATH = 'loadinsight-bucket/'
+
+USER_CUSTOMIZABLE_CONFIGS = ['DAYTYPE_DEFINITIONS.json',
+                             'EXCLUDED_LOCATIONS.json',
+                             'GAS_FRACTIONS.json',
+                             'SENSITIVITY_TEMPERATURES.json']

@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from backend.models import *
-from django.contrib.auth import get_user_model
+from backend.models import Executions
 
 
 class ExecutionsSerializer(serializers.ModelSerializer):
