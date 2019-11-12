@@ -123,7 +123,10 @@ if __name__ == "__main__":
     # upload_file('a.txt', 'loadinsight-bucket', 'a/b/a.txt')
     # file_name = 'loadinsight-bucket/a.txt'
 
-    print(list_files_in_dir('loadinsight-bucket/'))
+    # print(list_files_in_dir('loadinsight-bucket/'))
+    # delete_file('a.txt', 'loadinsight-bucket')
+    # print(list_files_in_dir("loadinsight-bucket/"))
+    print(read_file_binary("loadinsight-bucket/16__1573510050.2411442__rbsa/components/RBSA-Boston_MA-summer_peak.png"))
     # for f in list_files_in_dir(dir_name):
     #     if not f.endswith('/'):
     #         print(dir_name + f)
