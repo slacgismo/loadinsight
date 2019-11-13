@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
 export default function Executions(props) {
   const token = localStorage.getItem('auth_token');
   const { data, error } = useSWR(
-    '/api/my_executions/',
+    '/api/executions/',
     async (key) => {
       const response = await fetch(key, {
         headers: new Headers([['Authorization', `Token ${token}`]])});
@@ -37,7 +37,6 @@ export default function Executions(props) {
   function onClick(execution_id) {
     props.history.push(`/dashboard/executions/${execution_id}`);
   }
-
 
   const classes = useStyles();
   return (
@@ -65,11 +64,6 @@ export default function Executions(props) {
           }
         </TableBody>
       </Table>
-      <div className={classes.seeMore}>
-        <Link color="primary" href="">
-          See more executions
-        </Link>
-      </div>
     </React.Fragment>
   );
 }

@@ -119,7 +119,7 @@ export default function DashboardImage(props) {
   const { data, error } = useSWR(
     `/api/my_executions/${props.match.params.execution_id}/results/${props.match.params.result_dir}`,
     async (key) => {
-      const image_list = await axios.get(`http://localhost:8000/api/my_executions/${props.match.params.execution_id}/results/${props.match.params.result_dir}/`, {headers: {'Authorization': `Token ${token}`}});
+      const image_list = await axios.get(`http://localhost:8000/api/executions/${props.match.params.execution_id}/results/${props.match.params.result_dir}/`, {headers: {'Authorization': `Token ${token}`}});
       return image_list.data.execution_result_dirs;
     },
     {
@@ -191,7 +191,7 @@ export default function DashboardImage(props) {
             <Grid item xs={12}>
               <Paper className={classes.paper}>
                 {/*<ResultDirs {...props}/>*/}
-                {data && data.map(image_url => (<AuthImg src={`http://localhost:8000/api/my_executions/${props.match.params.execution_id}/results/${props.match.params.result_dir}/images/${image_url}/`}/>))}
+                {data && data.map(image_url => (<AuthImg src={`http://localhost:8000/api/executions/${props.match.params.execution_id}/results/${props.match.params.result_dir}/images/${image_url}/`}/>))}
               </Paper>
             </Grid>
           </Grid>

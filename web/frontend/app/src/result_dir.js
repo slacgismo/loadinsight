@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 export default function ResultDirs(props) {
   const token = localStorage.getItem('auth_token');
   const { data, error } = useSWR(
-    `/api/my_executions/${props.match.params.execution_id}/`,
+    `/api/executions/${props.match.params.execution_id}/`,
     async (key) => {
       const response = await fetch(key, {
         headers: new Headers([['Authorization', `Token ${token}`]])});
