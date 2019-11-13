@@ -99,9 +99,9 @@ export default function ImageGallery(props) {
           </Button>
         </Form>)}
     </Formik>
-      {imageUrls &&
+      {imageUrls && imageUrls.length > 0 &&
       <Grid container spacing={1}>
-        {[...Array(Math.floor(imageUrls.length/3))].map((_, rowIndex) => (
+        {[...Array(imageUrls.length >= 3 ? Math.floor(imageUrls.length/3) : 1)].map((_, rowIndex) => (
           <Grid container item xs={12} spacing={3}>
             <React.Fragment>
               {[...Array(3)].map((_, colIndex) => (
