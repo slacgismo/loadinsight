@@ -7,16 +7,18 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import List from '@material-ui/core/List';
 
-export const mainListItems = (
+export const History = function(props) {
+  return (
   <div>
     <ListItem button>
       <ListItemIcon>
         <BarChartIcon />
       </ListItemIcon>
-      <ListItemText primary="History" />
+      <ListItemText primary="History" onClick={() => {props.history.push(`/dashboard`)}}/>
     </ListItem>
   </div>
-);
+  );
+};
 
 
 

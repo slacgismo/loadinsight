@@ -378,3 +378,4 @@ $RECYCLE.BIN/
 # 
 # ignore all .idea files
 .idea
+custom_configs/
