@@ -5,9 +5,11 @@ import Home from './home';
 import SignIn from "./signin";
 import SignUp from "./signup";
 import ActivateEmail from "./activateEmail";
-import Dashboard from "./dashboard";
-import DashBoardResultDir from './dashboard_result_dir';
+import ResultDirs from './result_dir';
 import DashboardImage from "./dashboard_image";
+import BaseDashboard from "./baseDashboard"
+import Executions from "./executions";
+import ExecutePipeline from "./executePipeline";
 
 const PrivateRoute = ({component: Component, ...rest}) => (
   <Route
@@ -31,6 +33,7 @@ const PublicRoute = ({component: Component, ...rest}) => (
   />
 );
 
+const dashboard = (Component) => (props) => (<BaseDashboard {...props}><Component {...props}/></BaseDashboard>);
 
 function App() {
   return (
@@ -40,9 +43,10 @@ function App() {
         <PublicRoute path="/signin" component={SignIn} />
         <PublicRoute path="/signup" component={SignUp} />
         <PublicRoute path="/activate/:uid/:token" component={ActivateEmail} />
+        <PrivateRoute path="/dashboard/pipeline/:pipeline_name" component={dashboard(ExecutePipeline)} />
         <PrivateRoute path="/dashboard/executions/:execution_id/results/:result_dir" component={DashboardImage} />
-        <PrivateRoute path="/dashboard/executions/:execution_id" component={DashBoardResultDir} />
-        <PrivateRoute path="/dashboard" component={Dashboard} />
+        <PrivateRoute path="/dashboard/executions/:execution_id" component={dashboard(ResultDirs)} />
+        <PrivateRoute path="/dashboard" component={dashboard(Executions)}/>
       </Switch>
     </BrowserRouter>
   );

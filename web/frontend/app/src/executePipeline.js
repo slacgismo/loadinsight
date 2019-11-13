@@ -6,17 +6,16 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Title from './title';
 import useSWR from "@zeit/swr";
+import authedAxios from "./authedAxios";
 
 
-export default function ResultDirs(props) {
-  const token = localStorage.getItem('auth_token');
+export default function ExecutePipeline(props) {
   const { data, error } = useSWR(
-    `/api/executions/${props.match.params.execution_id}/`,
+    `/api/executions/configs/`,
     async (key) => {
-      const response = await fetch(key, {
-        headers: new Headers([['Authorization', `Token ${token}`]])});
-      const json = await response.json();
-      return json.execution_dirs;
+      const response = await authedAxios.get(key);
+      console.log(response.data);
+      return response.data;
     },
     {
       revalidateOnFocus: false,
@@ -40,13 +39,13 @@ export default function ResultDirs(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data &&
-          data.map(row => (
-            <TableRow hover={true} onClick={() => {onClick(row)}}>
-              <TableCell>{row}</TableCell>
-            </TableRow>
-          ))
-          }
+          {/*{data &&*/}
+          {/*data.map(row => (*/}
+          {/*  <TableRow hover={true} onClick={() => {onClick(row)}}>*/}
+          {/*    <TableCell>{row}</TableCell>*/}
+          {/*  </TableRow>*/}
+          {/*))*/}
+          {/*}*/}
         </TableBody>
       </Table>
     </React.Fragment>

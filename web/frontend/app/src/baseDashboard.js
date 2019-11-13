@@ -16,8 +16,8 @@ import Paper from '@material-ui/core/Paper';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
-import ResultDirs from './result_dir';
+import { mainListItems, Pipelines } from './listItems';
+
 
 function Copyright() {
   return (
@@ -111,7 +111,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function DashboardResultDir(props) {
+export default function BaseDashboard(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -161,7 +161,7 @@ export default function DashboardResultDir(props) {
         <Divider />
         <List>{mainListItems}</List>
         <Divider />
-        <List>{secondaryListItems}</List>
+        <Pipelines {...props}/>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -169,7 +169,7 @@ export default function DashboardResultDir(props) {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <ResultDirs {...props}/>
+                {props.children}
               </Paper>
             </Grid>
           </Grid>
