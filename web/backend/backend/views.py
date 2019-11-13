@@ -155,19 +155,19 @@ def get_executions_by_image(request, execution_id=None, result_dir=None, image_n
     if execution_id is not None and result_dir is not None and image_name is not None:
         executions = Executions.objects.filter(user_id=request.user)
         if executions:
-            if os.path.exists(S3_BUCKET_PATH) is False:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            all_dirs = [f for f in listdir(S3_BUCKET_PATH) if isdir(join(S3_BUCKET_PATH, f))]
+            serializer = ExecutionsSerializer(executions, many=True)
+            data = json.loads(json.dumps(serializer.data))
+            algorithm = data[0]['algorithm']
+            all_dirs = list_files_in_dir(S3_BUCKET_PATH)
             for _dir in all_dirs:
-                if _dir.startswith(execution_id):
-                    new_path = S3_BUCKET_PATH + _dir + "/" + result_dir + "/" + image_name
-                    if os.path.exists(new_path) is False:
-                        return Response(status=status.HTTP_404_NOT_FOUND)
-                    with open(new_path, "rb") as fp:
-                        file = fp.read()
-                    response = HttpResponse(file, content_type='image/png')
-                    response['Content-Disposition'] = "attachment; filename=" + image_name
-                    return response
+                if _dir.startswith(execution_id) and _dir.__contains__(algorithm):
+                    new_path = S3_BUCKET_PATH + _dir + result_dir + "/" + image_name
+                    response_list = list_files_in_dir(new_path)
+                    if len(response_list) == 1:
+                        file = read_file_binary(new_path)
+                        response = HttpResponse(file, content_type='image/png')
+                        response['Content-Disposition'] = "attachment; filename=" + image_name
+                        return response
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
