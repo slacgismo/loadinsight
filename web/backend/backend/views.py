@@ -153,66 +153,83 @@ def get_all_completed_exes(user_id, exe_id=None):
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
 def get_executions_by_image(request, execution_id=None, result_dir=None, image_name=None):
     if execution_id is not None and result_dir is not None and image_name is not None:
-        executions = Executions.objects.filter(user_id=request.user)
+        executions = get_all_completed_exes(request.user, execution_id)
         if executions:
-            if os.path.exists(S3_BUCKET_PATH) is False:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            all_dirs = [f for f in listdir(S3_BUCKET_PATH) if isdir(join(S3_BUCKET_PATH, f))]
+            serializer = ExecutionsSerializer(executions, many=True)
+            data = json.loads(json.dumps(serializer.data))
+            algorithm = data[0]['algorithm']
+            all_dirs = list_files_in_dir(S3_BUCKET_PATH)
             for _dir in all_dirs:
-                if _dir.startswith(execution_id):
-                    new_path = S3_BUCKET_PATH + _dir + "/" + result_dir + "/" + image_name
-                    if os.path.exists(new_path) is False:
-                        return Response(status=status.HTTP_404_NOT_FOUND)
-                    with open(new_path, "rb") as fp:
-                        file = fp.read()
-                    response = HttpResponse(file, content_type='image/png')
+                if _dir.startswith(execution_id) and _dir.__contains__(algorithm):
+                    new_path = S3_BUCKET_PATH + _dir + result_dir + "/" + image_name
+                    image = read_file_binary(new_path)
+                    response = HttpResponse(image, content_type='image/png')
                     response['Content-Disposition'] = "attachment; filename=" + image_name
                     return response
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+@permission_classes([djoser.permissions.CurrentUserOrAdmin])
+def get_result_dirs_of_execution(request, execution_id):
+    """
+        Get the result dirs of an execution given exe id
+        Args: 
+            exe_id: execution id 
+        Output:
+            execution_dirs: the result dirs of this execution
+    """
+    # Check if exe id is an integer
+    try:
+        exeid = int(execution_id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    response_list = filter_executions_by_id(request, execution_id)
+    response = {"execution_dirs": response_list}
+    if len(response_list) == 0:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(response, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
-def get_executions_result(request, execution_id=None, result_dir=None, city_name=None,
-                          state_name=None, content_name=None):
-    exe_id_flag = execution_id is None or execution_id == 'None'
-    result_dir_flag = result_dir is None or result_dir == 'None'
-    city_flag = city_name is None or city_name == 'None'
-    state_flag = state_name is None or state_name == 'None'
-    content_flag = content_name is None or content_name == 'None'
+def get_images_of_execution_result(request, execution_id, result_dir):
+    """
+        Get the images of an execution given parameters
+        Args: 
+            exe_id: execution id 
+            result_dir: dirs of this execution
+            request.data['city_name']: city filter 
+            request.data['state_name']: state filter 
+            request.data['content_name']: content filter 
+        Output:
+            execution_dirs: the result dirs of this execution
+    """
+    # Check if exe id is an integer
+    try:
+        exeid = int(execution_id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    city_name_filter = request.data.get("city_name", None)
+    state_name_filter = request.data.get('state_name', None)
+    content_name_filter = request.data.get('content_name', None)
 
-    if not exe_id_flag:
-        if result_dir_flag:
-            response_list = filter_executions_by_id(request, execution_id)
-            response = {"execution_dirs": response_list}
-        else:
-            if city_flag and state_flag and content_flag:
-                response_list = filter_executions_by_result_dir(request, execution_id, result_dir)
-                response = {"execution_result_dirs": response_list}
-            elif not city_flag and state_flag and content_flag:
-                response_list = filter_executions_by_city(request, execution_id, result_dir, city_name)
-                response = {"execution_result_by_city": response_list}
-            elif city_flag and not state_flag and content_flag:
-                response_list = filter_executions_by_state(request, execution_id, result_dir, state_name)
-                response = {"execution_result_by_state": response_list}
-            elif city_flag and state_flag and not content_flag:
-                response_list = filter_executions_by_content(request, execution_id, result_dir, content_name)
-                response = {"execution_result_by_content": response_list}
-            elif not city_flag and not content_flag:
-                return filter_executions_by_city_and_content(request, execution_id, result_dir,
-                                                             city_name, content_name)
-            elif not content_flag and not content_flag:
-                return filter_executions_by_state_and_content(request, execution_id, result_dir,
-                                                              state_name, content_name)
-            else:
-                response_list = filter_executions_by_city(request, execution_id, result_dir, city_name)
-                response = {"execution_result_by_city": response_list}
+    images = filter_executions_by_result_dir(request, execution_id, result_dir)
 
-        if len(response_list) == 0:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        return Response(response, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_404_NOT_FOUND)
-
+    response_list = []
+    for image in images:
+        image_name = image["image_name"]
+        state_name = image["state_name"]
+        city_name = image["city_name"]
+        content_name = image["content_name"]
+        if city_name_filter is None or city_name_filter == city_name:
+            if state_name_filter is None or state_name_filter == state_name:
+                if content_name_filter is None or content_name_filter == content_name:
+                    response_list.append(image_name)
+    response = {
+        "images": response_list
+    }
+    if len(response_list) == 0:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(response, status=status.HTTP_200_OK)
 
 def filter_executions_by_id(request, execution_id=None):
     response_list = []
@@ -233,6 +250,22 @@ def filter_executions_by_id(request, execution_id=None):
 
 
 def filter_executions_by_result_dir(request, execution_id=None, result_dir=None):
+    """
+        Get the list of images and coresponding state_name, city_name, and content_name
+        Args: 
+            exe_id: execution id 
+            result_dir: dirs of this execution
+        Output:
+            [
+                {
+                    image_name: xxx
+                    state_name: xxx
+                    city_name: xxx
+                    content_name: xxx 
+                }
+                ...
+            ]
+    """
     response_list = []
     executions = get_all_completed_exes(request.user, execution_id)
     if executions:
@@ -248,8 +281,27 @@ def filter_executions_by_result_dir(request, execution_id=None, result_dir=None)
                 if dir_list is None:
                     return response_list
                 response_list = dir_list
-    return response_list
+        
+        res = []
+        for image_name in response_list:
+            city_name = ""
+            if algorithm == "ceus":
+                city_name = image_name.split("-")[1].split("_")[0]
+                state_name = image_name.split("-")[1].split("_")[1]
+            else:
+                city_name = image_name.split("-")[-2].split("_")[0]
+                state_name = image_name.split("-")[-2].split("_")[1]        
+            content_name = image_name.split("-")[-1].split(".")[0]
 
+            res.append(
+                {
+                    "image_name": image_name,
+                    "state_name": state_name,
+                    "city_name": city_name,
+                    "content_name": content_name
+                }
+            )
+    return res
 
 def filter_executions_by_city(request, execution_id=None, result_dir=None, city_name=None):
     response_list = []
@@ -366,7 +418,7 @@ def filter_executions_by_city_and_content(request, execution_id=None, result_dir
                     response['Content-Disposition'] = "attachment; filename=" + response_list[0]
                     return response
                 elif len(response_list) > 1:
-                    response = {"execution_result_by_coty_and_content": response_list}
+                    response = {"execution_result_by_city_and_content": response_list}
                     return Response(response, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_404_NOT_FOUND)
 
