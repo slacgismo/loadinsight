@@ -11,7 +11,6 @@ DATABASES = {
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = [{"NAME": "backend.validators.Is666"}]
 
 SECRET_KEY = "@=dd@hf(quaim(*xu1f%g8&1ig0lnrg8-_w3^ho89705cc+pw6"
 
@@ -82,7 +81,7 @@ DJOSER = {
 }
 
 # PLEASE DO NOT LEAVE ANY SENSITIVE INFO REGARDING PASSWORD HERE
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = ''  # this should be exactly the same as EMAIL_HOST_USER
 EMAIL_USE_TLS = True  # whether use TLS
 EMAIL_HOST = 'smtp.mailtrap.io'  # SMTP server.

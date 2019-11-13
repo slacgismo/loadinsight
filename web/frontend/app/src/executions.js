@@ -1,7 +1,6 @@
 /* eslint-disable no-script-url */
 
 import React from 'react';
-import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -48,7 +47,7 @@ export default function Executions(props) {
             <TableCell>Id</TableCell>
             <TableCell>Started Time</TableCell>
             <TableCell>Algorithm</TableCell>
-            {/*<TableCell align="right">Status</TableCell>*/}
+            <TableCell align="right">Status</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -56,9 +55,9 @@ export default function Executions(props) {
           data.map(row => (
             <TableRow key={row.id} hover={true} onClick={() => {onClick(row.id)}}>
               <TableCell>{row.id}</TableCell>
-              <TableCell>{String(row.create_time).split('T').map(str => str.split('.')[0]).join(' ')}</TableCell>
+              <TableCell>{String(row.time).split('T').map(str => str.split('.')[0]).join(' ')}</TableCell>
               <TableCell>{row.algorithm}</TableCell>
-              {/*<TableCell align="right">{row.shipTo}</TableCell>*/}
+              <TableCell align="right">{row.status}</TableCell>
             </TableRow>
           ))
           }

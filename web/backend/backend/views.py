@@ -57,7 +57,7 @@ def get_pipeline_configs(request):
 def handle_executions(request):
     if request.method == "POST":
         config_data = request.data['configs']
-        pipeline_name = config_data['pipeline_name']
+        pipeline_name = request.data['pipeline_name']
         exe = Executions(user_id=request.user, algorithm=pipeline_name)
         exe.save()
         try:

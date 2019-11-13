@@ -20,7 +20,7 @@ export const mainListItems = (
 
 function onClick (key) {
   const token = localStorage.getItem('auth_token');
-  axios.get(`api/execute/${key}/`, {headers: {'Authorization': `Token ${token}`}}).then(response => {alert('Started successfully!')}).catch(error => alert(error));
+  axios.post(`api/executions/`, {configs: null, pipeline_name: key}, {headers: {'Authorization': `Token ${token}`}}).then(response => {alert('Started successfully!')}).catch(error => alert(error));
 }
 
 const algorithms = ['rbsa', 'ceus', 'mix'];
