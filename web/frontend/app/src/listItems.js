@@ -5,7 +5,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
-import axios from 'axios';
+import List from '@material-ui/core/List';
 
 export const mainListItems = (
   <div>
@@ -18,15 +18,21 @@ export const mainListItems = (
   </div>
 );
 
-function onClick (key) {
-  const token = localStorage.getItem('auth_token');
-  axios.post(`api/executions/`, {configs: null, pipeline_name: key}, {headers: {'Authorization': `Token ${token}`}}).then(response => {alert('Started successfully!')}).catch(error => alert(error));
-}
+
 
 const algorithms = ['rbsa', 'ceus', 'mix'];
 
-export const secondaryListItems = (
-  <div>
+export const Pipelines = function(props) {
+  function onClick (key) {
+    // const token = localStorage.getItem('auth_token');
+    // axios.post(`api/executions/`, {configs: null, pipeline_name: key}, {headers: {'Authorization': `Token ${token}`}}).then(response => {alert('Started successfully!')}).catch(error => alert(error));
+    console.log(props);
+    props.history.push(`/dashboard/pipeline/${key}`);
+  }
+
+  return (
+    <List>
+    <div>
     <ListSubheader inset>Execute Algorithms</ListSubheader>
     {algorithms.map((item) =>
       <ListItem button key={item} onClick={() => {onClick(item)}}>
@@ -36,4 +42,7 @@ export const secondaryListItems = (
       <ListItemText primary={item} />
     </ListItem>)}
   </div>
-);
+    </List>
+      );
+  };
+
