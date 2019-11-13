@@ -267,6 +267,7 @@ def filter_executions_by_result_dir(request, execution_id=None, result_dir=None)
             ]
     """
     response_list = []
+    res = []
     executions = get_all_completed_exes(request.user, execution_id)
     if executions:
         serializer = ExecutionsSerializer(executions, many=True)
@@ -282,16 +283,20 @@ def filter_executions_by_result_dir(request, execution_id=None, result_dir=None)
                     return response_list
                 response_list = dir_list
         
-        res = []
         for image_name in response_list:
             city_name = ""
-            if algorithm == "ceus":
-                city_name = image_name.split("-")[1].split("_")[0]
-                state_name = image_name.split("-")[1].split("_")[1]
+            state_name = ""
+            content_name = ""
+            if result_dir == "loadshapes" or result_dir == "ceus_loadshapes":
+                city_name = state_name = content_name = None
             else:
-                city_name = image_name.split("-")[-2].split("_")[0]
-                state_name = image_name.split("-")[-2].split("_")[1]        
-            content_name = image_name.split("-")[-1].split(".")[0]
+                if algorithm == "ceus":
+                    city_name = image_name.split("-")[1].split("_")[0]
+                    state_name = image_name.split("-")[1].split("_")[1]
+                else:
+                    city_name = image_name.split("-")[-2].split("_")[0]
+                    state_name = image_name.split("-")[-2].split("_")[1]        
+                content_name = image_name.split("-")[-1].split(".")[0]
 
             res.append(
                 {
