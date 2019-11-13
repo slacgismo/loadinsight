@@ -1,7 +1,4 @@
-/* eslint-disable no-script-url */
-
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -10,11 +7,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Title from './title';
 import useSWR from "@zeit/swr";
 
-const useStyles = makeStyles(theme => ({
-  seeMore: {
-    marginTop: theme.spacing(3),
-  },
-}));
 
 export default function Executions(props) {
   const token = localStorage.getItem('auth_token');
@@ -37,7 +29,6 @@ export default function Executions(props) {
     props.history.push(`/dashboard/executions/${execution_id}`);
   }
 
-  const classes = useStyles();
   return (
     <React.Fragment>
       <Title>Recent Executions</Title>
