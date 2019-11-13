@@ -24,9 +24,6 @@ const algorithms = ['rbsa', 'ceus', 'mix'];
 
 export const Pipelines = function(props) {
   function onClick (key) {
-    // const token = localStorage.getItem('auth_token');
-    // axios.post(`api/executions/`, {configs: null, pipeline_name: key}, {headers: {'Authorization': `Token ${token}`}}).then(response => {alert('Started successfully!')}).catch(error => alert(error));
-    console.log(props);
     props.history.push(`/dashboard/pipeline/${key}`);
   }
 
