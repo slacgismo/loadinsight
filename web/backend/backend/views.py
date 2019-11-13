@@ -208,9 +208,9 @@ def get_images_of_execution_result(request, execution_id, result_dir):
         exeid = int(execution_id)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    city_name_filter = request.data.get("city_name", None)
-    state_name_filter = request.data.get('state_name', None)
-    content_name_filter = request.data.get('content_name', None)
+    city_name_filter = request.GET.get("city_name", None)
+    state_name_filter = request.GET.get('state_name', None)
+    content_name_filter = request.GET.get('content_name', None)
 
     images = filter_executions_by_result_dir(request, execution_id, result_dir)
 
@@ -220,9 +220,9 @@ def get_images_of_execution_result(request, execution_id, result_dir):
         state_name = image["state_name"]
         city_name = image["city_name"]
         content_name = image["content_name"]
-        if city_name_filter is None or city_name_filter == city_name:
-            if state_name_filter is None or state_name_filter == state_name:
-                if content_name_filter is None or content_name_filter == content_name:
+        if city_name_filter is None or city_name_filter.lower() == city_name.lower():
+            if state_name_filter is None or state_name_filter.lower() == state_name.lower():
+                if content_name_filter is None or content_name_filter.lower() == content_name.lower():
                     response_list.append(image_name)
     response = {
         "images": response_list
