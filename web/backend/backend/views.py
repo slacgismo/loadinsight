@@ -11,9 +11,10 @@ from load_model.execute_pipelines import init_error_reporting as  init_error_rep
 from load_model.execute_pipelines import execute_lctk as execute_lctk
 import djoser.permissions
 from background_task import background
+from background_task.models import Task
 from background_task.models_completed import CompletedTask
 from django.contrib.auth import get_user_model
-from settings import S3_BUCKET_PATH, USER_CUSTOMIZABLE_CONFIGS
+from settings import S3_BUCKET_PATH, USER_CUSTOMIZABLE_CONFIGS, EMAIL_RETRY_TIMES
 
 
 @background(schedule=timezone.now())
@@ -23,8 +24,15 @@ def execute_task(algorithm, user_id, execution_id, config_data):
     # start the pipeline
     execute_lctk(algorithm, execution_id, config_data)
     user = get_user_model().objects.get(pk=user_id)
-    user.email_user('Here is a notification', 'Your pipeline has been executed successfully!')
 
+    # Retry email send EMAIL_RETRY_TIMES times 
+    for retry in range(EMAIL_RETRY_TIMES):
+        try:
+            user.email_user('Here is a notification', 'Your pipeline has been executed successfully!')
+        except:
+            logging.exception("Send email to {0} failed | retried {1} times ".format(user_id, retry))
+            continue
+        break
 
 @api_view(['GET'])
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
@@ -44,24 +52,74 @@ def get_pipeline_configs(request):
     return Response(config_json, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
 def execute_pipeline(request):
-    config_data = request.data['configs']
-    pipeline_name = config_data['pipeline_name']
-    exe = Executions(user_id=request.user, algorithm=pipeline_name)
-    exe.save()
-    try:
-        # creator is used to identify the owner of this task
-        # verbose_name is used to associate the Execution objects 
-        # with the database objects in Django-background-tasks (Tasks and Completed_Tasks)
-        # IMPORTANT: DO NOT MODIFY THIS PART THANKS!
-        execute_task(pipeline_name, request.user.id, exe.id, config_data, \
-                                    creator = request.user, verbose_name = str(exe))
-        return Response(status=status.HTTP_200_OK)
-    except Exception as e:
-        logging.exception(e)
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    if request.method == "POST":
+        config_data = request.data['configs']
+        pipeline_name = config_data['pipeline_name']
+        exe = Executions(user_id=request.user, algorithm=pipeline_name)
+        exe.save()
+        try:
+            # creator is used to identify the owner of this task
+            # verbose_name is used to associate the Execution objects 
+            # with the database objects in Django-background-tasks (Tasks and Completed_Tasks)
+            # IMPORTANT: DO NOT MODIFY THIS PART THANKS!
+            execute_task(pipeline_name, request.user.id, exe.id, config_data, \
+                                        creator = request.user, verbose_name = str(exe))
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            logging.exception(e)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    elif request.method == "GET":
+        executions = get_executions_with_status(user_id=request.user)
+        if executions:
+            return Response(executions, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+def get_executions_with_status(user_id):
+    """
+        This function accept a user object and get all executions with status for this user 
+        Args: 
+            user_id: user object
+        Output:
+            a list of executions:
+                executions: a Execution queryset, all executions are completed.
+            Example: 
+            {
+                "id": 16,
+                "algorithm": "rbsa",
+                "create_time": "2019-11-11T16:07:25.307645",
+                "status": f/s/r,
+            }
+    """
+    user = user_id
+
+    succeeded_tasks = CompletedTask.objects.created_by(user).succeeded()
+    failed_tasks = CompletedTask.objects.created_by(user).failed()
+
+    succeeded_exe_ids = set([int(task.verbose_name.split('_')[0]) for task in succeeded_tasks])
+    failed_exe_ids = set([int(task.verbose_name.split('_')[0]) for task in failed_tasks])
+
+    exes = Executions.objects.filter(user_id=user)
+
+    res = []
+    for exe in exes:
+        status = ''
+        if exe.id in succeeded_exe_ids:
+            status = "Succeeded"
+        elif exe.id in failed_exe_ids:
+            status = "Failed"
+        else:
+            status = "Running"
+        
+        res.append({
+            "id": exe.id,
+            "algorithm": exe.algorithm,
+            "time": str(exe.create_time),
+            "status": status
+        })
+    return res 
 
 
 def get_all_completed_exes(user_id, exe_id = None):
@@ -88,17 +146,6 @@ def get_all_completed_exes(user_id, exe_id = None):
         exe_id = int(exe_id)
         exe_ids = [exe_id] if exe_id in exe_ids else []
         return Executions.objects.filter(pk__in=exe_ids)
-
-
-@api_view(['GET'])
-@permission_classes([djoser.permissions.CurrentUserOrAdmin])
-def get_executions(request):
-    executions = get_all_completed_exes(user_id=request.user)
-    if executions:
-        serializer = ExecutionsSerializer(executions, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_404_NOT_FOUND)
-
 
 @api_view(['GET'])
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
