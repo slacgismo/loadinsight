@@ -153,7 +153,7 @@ def get_all_completed_exes(user_id, exe_id=None):
 @permission_classes([djoser.permissions.CurrentUserOrAdmin])
 def get_executions_by_image(request, execution_id=None, result_dir=None, image_name=None):
     if execution_id is not None and result_dir is not None and image_name is not None:
-        executions = Executions.objects.filter(user_id=request.user)
+        executions = get_all_completed_exes(request.user, execution_id)
         if executions:
             serializer = ExecutionsSerializer(executions, many=True)
             data = json.loads(json.dumps(serializer.data))
@@ -162,12 +162,10 @@ def get_executions_by_image(request, execution_id=None, result_dir=None, image_n
             for _dir in all_dirs:
                 if _dir.startswith(execution_id) and _dir.__contains__(algorithm):
                     new_path = S3_BUCKET_PATH + _dir + result_dir + "/" + image_name
-                    response_list = list_files_in_dir(new_path)
-                    if len(response_list) == 1:
-                        file = read_file_binary(new_path)
-                        response = HttpResponse(file, content_type='image/png')
-                        response['Content-Disposition'] = "attachment; filename=" + image_name
-                        return response
+                    image = read_file_binary(new_path)
+                    response = HttpResponse(image, content_type='image/png')
+                    response['Content-Disposition'] = "attachment; filename=" + image_name
+                    return response
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
