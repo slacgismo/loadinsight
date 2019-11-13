@@ -10,11 +10,11 @@ import List from '@material-ui/core/List';
 export const History = function(props) {
   return (
   <div>
-    <ListItem button>
+    <ListItem button onClick={() => {props.history.push(`/dashboard`)}}>
       <ListItemIcon>
         <BarChartIcon />
       </ListItemIcon>
-      <ListItemText primary="History" onClick={() => {props.history.push(`/dashboard`)}}/>
+      <ListItemText primary="History"/>
     </ListItem>
   </div>
   );
