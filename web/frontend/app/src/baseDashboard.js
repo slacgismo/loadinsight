@@ -119,7 +119,6 @@ export default function BaseDashboard(props) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   return (
     <div className={classes.root}>
@@ -164,7 +163,7 @@ export default function BaseDashboard(props) {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
+        <Container maxWidth="xl" className={classes.container}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper className={classes.paper}>

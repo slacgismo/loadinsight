@@ -1,15 +1,14 @@
 import React from 'react';
 import useSWR from "@zeit/swr";
 import ClipLoader from 'react-spinners/ClipLoader';
+import authedAxios from "./authedAxios"
 
 export default ({src, ...other}) => {
-  const token = localStorage.getItem('auth_token');
   const { data: dataURL, error } = useSWR(
     src,
      async (key) => {
-      const image = await fetch(key, {
-        headers: new Headers([['Authorization', `Token ${token}`], ['responseType', 'blob']])});
-      const imageBlob = await image.blob();
+      const response = await authedAxios.get(key, {responseType: 'blob'});
+      const imageBlob = response.data;
       const reader = new FileReader();
       return new Promise((resolve, reject) => {
         reader.onloadend = () => {

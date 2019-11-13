@@ -7,6 +7,9 @@ function _authed_config(config) {
   if (config === null || config === undefined) {
     return {headers: {'Authorization': `Token ${token}`}};
   } else {
+    if (config.headers === null || config.headers === undefined) {
+      config.headers = {}
+    }
     config.headers['Authorization'] = `Token ${token}`;
     return config;
   }

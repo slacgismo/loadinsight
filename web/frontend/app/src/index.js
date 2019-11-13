@@ -6,7 +6,7 @@ import SignIn from "./signin";
 import SignUp from "./signup";
 import ActivateEmail from "./activateEmail";
 import ResultDirs from './result_dir';
-import DashboardImage from "./dashboard_image";
+import Images from "./dashboard_image";
 import BaseDashboard from "./baseDashboard"
 import Executions from "./executions";
 import ExecutePipeline from "./executePipeline";
@@ -44,7 +44,7 @@ function App() {
         <PublicRoute path="/signup" component={SignUp} />
         <PublicRoute path="/activate/:uid/:token" component={ActivateEmail} />
         <PrivateRoute path="/dashboard/pipeline/:pipeline_name" component={dashboard(ExecutePipeline)} />
-        <PrivateRoute path="/dashboard/executions/:execution_id/results/:result_dir" component={DashboardImage} />
+        <PrivateRoute path="/dashboard/executions/:execution_id/results/:result_dir" component={dashboard(Images)} />
         <PrivateRoute path="/dashboard/executions/:execution_id" component={dashboard(ResultDirs)} />
         <PrivateRoute path="/dashboard" component={dashboard(Executions)}/>
       </Switch>
