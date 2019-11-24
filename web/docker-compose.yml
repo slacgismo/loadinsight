@@ -15,6 +15,10 @@ services:
       EMAIL_APP_PWD: "xxx"
       # TODO: Please specify the host of this website
       ALLOWED_HOSTS: "ec2xxxx.compute.amazonaws.com"
+      # TODO：Plesae specify the aws access key id 
+      AWS_ACCESS_KEY_ID: ""
+      # TODO: Please specify the aws secret access key
+      AWS_SECRET_ACCESS_KEY: ""
       DJANGO_MANAGEPY_MIGRATE: "on"
     build:
       context: . 
