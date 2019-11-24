@@ -23,11 +23,12 @@ def execute_task(algorithm, user_id, execution_id, config_data):
     # start the pipeline
     execute_lctk(algorithm, execution_id, config_data)
     user = get_user_model().objects.get(pk=user_id)
-
+    exe = Executions.objects.get(pk=execution_id)
     # Retry email send EMAIL_RETRY_TIMES times 
     for retry in range(EMAIL_RETRY_TIMES):
         try:
-            user.email_user('Here is a notification', 'Your pipeline has been executed successfully!')
+            user.email_user('Here is a notification for your execution',
+                            'Your pipeline {0}, started at {1} has been executed successfully!'.format(algorithm, str(exe.create_time)))
         except:
             logging.exception("Send email to {0} failed | retried {1} times ".format(user_id, retry))
             continue
