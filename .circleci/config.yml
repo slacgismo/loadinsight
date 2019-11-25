@@ -8,13 +8,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install linux dependencies
+          command: apt-get update && apt-get install -y gcc
+      - run:
           name: Install Node.js
           command: bash web/node-install.sh
-            # wget https://deb.nodesource.com/setup_13.x
-            # && chmod +x setup_13.x
-            # && bash setup_13.x
-            # && rm setup_13.x
-            # && apt-get install -y nodejs
       - run:
           name: Install Postgres Client
           command:
@@ -26,12 +24,20 @@ jobs:
           name: Build web code
           working_directory: web/frontend/app
           command:
-            CI=false
+            export CI=false
             && npm install .
             && npm run build
+      - run:
+          name: Create conda environment
+          command:
+            conda config --add channels conda-forge
+            && conda env create --quiet -f loadinsight-environment.yml
       - run: 
           name: Run Unit Tests
-          command: python -m unittest
+          command: 
+            source /opt/conda/etc/profile.d/conda.sh
+            && conda activate venv_loadinsight
+            && python -m unittest
           
   deploy:
     docker:
