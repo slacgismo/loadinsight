@@ -125,16 +125,16 @@ class MixedFeederPipeline():
         self._create_results_storage(rural_mix_hour_norm_plots_dir)
 
         logger.info('GENERATING SUBURBAN MIX PLOTS')
-        self.mix_type_plotting(mix_type=residential_mix, mix_type_name='SUBURBAN', normalization='summer total peak', directory=residential_mix_plots_dir, s3_directory=s3_residential_mix_plots_dir)
+        self.mix_type_plotting(mix_type=residential_mix, mix_type_name='SUBURBAN', normalization='summer_total_peak', directory=residential_mix_plots_dir, s3_directory=s3_residential_mix_plots_dir)
 
         logger.info('GENERATING URBAN MIX PLOTS')
-        self.mix_type_plotting(mix_type=commercial_mix, mix_type_name='URBAN', normalization='summer total peak', directory=commercial_mix_plots_dir, s3_directory=s3_commercial_mix_plots_dir)
+        self.mix_type_plotting(mix_type=commercial_mix, mix_type_name='URBAN', normalization='summer_total_peak', directory=commercial_mix_plots_dir, s3_directory=s3_commercial_mix_plots_dir)
 
         logger.info('GENERATING MIXED MIX PLOTS')
-        self.mix_type_plotting(mix_type=mixed_mix, mix_type_name='MIXED', normalization='summer total peak', directory=mixed_mix_plots_dir, s3_directory=s3_mixed_mix_plots_dir)
+        self.mix_type_plotting(mix_type=mixed_mix, mix_type_name='MIXED', normalization='summer_total_peak', directory=mixed_mix_plots_dir, s3_directory=s3_mixed_mix_plots_dir)
 
         logger.info('GENERATING RURAL MIX PLOTS')
-        self.mix_type_plotting(mix_type=rural_mix, mix_type_name='RURAL', normalization='summer total peak', directory=rural_mix_plots_dir, s3_directory=s3_rural_mix_plots_dir)
+        self.mix_type_plotting(mix_type=rural_mix, mix_type_name='RURAL', normalization='summer_total_peak', directory=rural_mix_plots_dir, s3_directory=s3_rural_mix_plots_dir)
 
         logger.info('GENERATING hour_norm SUBURBAN MIX PLOTS')
         self.mix_type_plotting(mix_type=residential_mix_hour_norm, mix_type_name='SUBURBAN', normalization='hour_norm', directory=residential_mix_hour_norm_plots_dir, s3_directory=s3_residential_mix_hour_norm_plots_dir)

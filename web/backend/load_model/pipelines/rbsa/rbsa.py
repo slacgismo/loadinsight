@@ -239,7 +239,7 @@ class RbsaPipeline():
                 local_file_name = f'{directory}/{title}.png'
                 fig.savefig(local_file_name)
                 s3_helper.upload_file(local_file_name, base.S3_OUTPUT_BUCKET_PATH, f'{s3_directory}/{title}.png')
-                plt.close(fig) 
+                plt.close(fig)
 
     def execute(self):
         """
