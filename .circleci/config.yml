@@ -26,7 +26,8 @@ jobs:
           name: Build web code
           working_directory: web/frontend/app
           command:
-            npm install .
+            CI=false
+            && npm install .
             && npm run build
       - run: 
           name: Run Unit Tests
