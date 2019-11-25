@@ -1,3 +1,7 @@
+NODE_VERSION=13.0.1
+ARCH=x64
+PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
+
 buildDeps='xz-utils' 
 
 apt-get update && apt-get install -y ca-certificates curl wget gnupg dirmngr $buildDeps --no-install-recommends
@@ -20,7 +24,7 @@ for key in \
     gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
     gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
 done 
-curl -O "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-$ARCH.tar.xz"
+curl -O "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-$PLATFORM-$ARCH.tar.xz"
 curl -O "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt"
 curl -O "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.sig"
 # Verify SUASUMS256.txt
