@@ -7,19 +7,14 @@ jobs:
     working_directory: ~/loadinsight
     steps:
       - checkout
-      # - run:
-      #     name: Install Conda
-      #     command: 
-      #       wget https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh && bash Anaconda3-2019.10-Linux-x86_64.sh -b && rm Anaconda3-2019.10-Linux-x86_64.sh
-      #       echo "PATH=~/anaconda3/bin:$PATH" > ~/.bashrc && source ~/.bashrc
       - run:
           name: Install Node.js
-          command:
-            wget https://deb.nodesource.com/setup_13.x
-            && chmod +x setup_13.x
-            && bash setup_13.x
-            && rm setup_13.x
-            && apt-get install -y nodejs
+          command: bash web/node-install.sh
+            # wget https://deb.nodesource.com/setup_13.x
+            # && chmod +x setup_13.x
+            # && bash setup_13.x
+            # && rm setup_13.x
+            # && apt-get install -y nodejs
       - run:
           name: Install Postgres Client
           command:
@@ -31,7 +26,7 @@ jobs:
           name: Build web code
           working_directory: web/frontend/app
           command:
-            npm install .
+            npm i -f
             && npm run build
       - run: 
           name: Run Unit Tests
