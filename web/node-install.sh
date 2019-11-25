@@ -39,8 +39,8 @@ curl -O "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.sig"
 # Verify SUASUMS256.txt
 gpg --verify SHASUMS256.txt.sig SHASUMS256.txt
 # Verify xx.tar.xz
-grep "node-v$NODE_VERSION-linux-$ARCH.tar.xz\$" SHASUMS256.txt | sha256sum -c -
-tar -xJf "node-v$NODE_VERSION-linux-$ARCH.tar.xz" -C /usr/local --strip-components=1 --no-same-owner
-rm "node-v$NODE_VERSION-linux-$ARCH.tar.xz" SHASUMS256.txt.sig SHASUMS256.txt
+grep "node-v$NODE_VERSION-$PLATFORM-$ARCH.tar.xz\$" SHASUMS256.txt | sha256sum -c -
+tar -xJf "node-v$NODE_VERSION-$PLATFORM-$ARCH.tar.xz" -C /usr/local --strip-components=1 --no-same-owner
+rm "node-v$NODE_VERSION-$PLATFORM-$ARCH.tar.xz" SHASUMS256.txt.sig SHASUMS256.txt
 apt-get purge -y --auto-remove $buildDeps
 ln -s /usr/local/bin/node /usr/local/bin/nodejs
