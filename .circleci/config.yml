@@ -27,6 +27,7 @@ jobs:
             export CI=false
             && npm install .
             && npm run build
+            && export CI=true
       - run:
           name: Create conda environment
           command:
