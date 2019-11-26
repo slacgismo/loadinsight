@@ -47,6 +47,9 @@ jobs:
     working_directory: ~/loadinsight
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "d4:13:c2:ff:ed:c7:d9:1b:69:8e:fb:75:ed:0c:c7:c2"
       - run: 
           name: Create Env file
           command: 
