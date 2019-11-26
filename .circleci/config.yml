@@ -64,6 +64,11 @@ jobs:
             && echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> ~/loadinsight/web/env.txt
             && echo "DJANGO_MANAGEPY_MIGRATE=$DJANGO_MANAGEPY_MIGRATE" >> ~/loadinsight/web/env.txt
             && cat ~/loadinsight/web/env.txt 
+      - run:
+          name: fix host authenticity for production server
+          command: 
+            ssh-keyscan $WEB_HOST >> ~/.ssh/known_hosts
+            && ssh-keyscan $TASK_HOST >> ~/.ssh/known_hosts
       - run: 
           name: Deploy the website 
           command: 
