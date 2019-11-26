@@ -20,7 +20,7 @@ source ~/loadinsight/web/env.txt
 export $(cut -d= -f1 ~/loadinsight/web/env.txt)
 
 # Activate conda env
-source "${CONDA_PREFIX}/etc/profile.d/conda.sh" 
+source ~/anaconda3/etc/profile.d/conda.sh 
 conda activate venv_loadinsight
 
 # Check database status
@@ -33,28 +33,38 @@ if [ "x$DJANGO_MANAGEPY_MIGRATE" = 'xon' ]; then
 	python manage.py migrate --noinput
 fi
 
-python manage.py collectstatic --noinput
-
 # Start uwsgi processes
 echo Starting uwsgi.
 
-# Run uwsgi in nohup
 if [ "$1" = "task" ]; then
-	nohup uwsgi --ini ~/loadinsight/web/uwsgi_process_tasks.ini 2>&1 &
+	run_uwsgi="$CONDA_PREFIX/bin/uwsgi --ini $HOME/loadinsight/web/uwsgi_process_tasks.ini --pidfile=/tmp/uwsgi.pid"
 else		
-	pushd ~/loadinsight/web/frontend/app/
+	run_uwsgi="$CONDA_PREFIX/bin/uwsgi --ini $HOME/loadinsight/web/uwsgi.ini --pidfile=/tmp/uwsgi.pid"
+fi
 
-	# Build front end 
-	npm install .
-	npm run build 
+# Run uwsgi in 
+if [ -f /tmp/uwsgi.pid ] && [[ $(ps -p $(cat /tmp/uwsgi.pid) -o cmd=) = $run_uwsgi ]]; then 
+	uwsgi --reload /tmp/uwsgi.pid
+else
+	if [ "$1" = "task" ]; then
+		$run_uwsgi &
+	else		
+		pushd ~/loadinsight/web/frontend/app/
 
-	popd
+		# Build front end 
+		npm install .
+		npm run build 
 
-	# Check if the symbol link exists
-	test -h /etc/nginx/sites-enabled/nginx.conf && sudo unlink /etc/nginx/sites-enabled/nginx.conf
+		popd
 
-	sudo ln -s ~/loadinsight/web/nginx.conf /etc/nginx/sites-enabled/
-	sudo /etc/init.d/nginx restart
+		python manage.py collectstatic --noinput
 
-	nohup uwsgi --ini ~/loadinsight/web/uwsgi.ini 2>&1 &
+		# Check if the symbol link exists
+		test -h /etc/nginx/sites-enabled/nginx.conf && sudo unlink /etc/nginx/sites-enabled/nginx.conf
+
+		sudo ln -s ~/loadinsight/web/nginx.conf /etc/nginx/sites-enabled/
+		sudo /etc/init.d/nginx restart
+
+		$run_uwsgi &
+	fi
 fi

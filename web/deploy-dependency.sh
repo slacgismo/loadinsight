@@ -1,7 +1,4 @@
-# scp -r ~/loadinsight ubuntu@ec2-34-222-207-189.us-west-2.compute.amazonaws.com:~/loadinsight
-
 sudo apt-get update && sudo apt-get install -y gcc libssl-dev 
-
 
 CONDAENV='off'
 # Install Coressponding 
@@ -40,16 +37,12 @@ fi
 
 
 if [ "$CONDAENV" = 'off' ]; then
-    conda remove --quiet -y --name venv_loadinsight --all
+    conda env update --quiet -f ~/loadinsight/web/loadinsight-environment.yml
 else
-   conda config --add channels conda-forge > /dev/null 2>&1
+    conda config --add channels conda-forge > /dev/null 2>&1
+    conda env create --quiet -f ~/loadinsight/web/loadinsight-environment.yml
+    conda install -y -n venv_loadinsight uwsgi 
 fi
-
-conda env create --quiet -f ~/loadinsight/web/loadinsight-environment.yml
-
-source ~/anaconda3/etc/profile.d/conda.sh
-conda activate venv_loadinsight
-conda install -y uwsgi
 
 # Update the backend for matplotlib 
 matplotfile=$(python -c "import matplotlib; print(matplotlib.matplotlib_fname())")
