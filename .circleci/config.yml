@@ -38,6 +38,8 @@ jobs:
           command: 
             source /opt/conda/etc/profile.d/conda.sh
             && conda activate venv_loadinsight
+            && (python web/backend/manage.py runserver &)
+            && sleep 5
             && python -m unittest
           
   deploy:
