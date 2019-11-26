@@ -1,6 +1,7 @@
 wget https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh && bash Anaconda3-2019.10-Linux-x86_64.sh -b && rm Anaconda3-2019.10-Linux-x86_64.sh
 
-echo "PATH=~/anaconda3/bin:$PATH" > .bashrc
+echo "export PATH=~/anaconda3/bin:$PATH" > ~/.bashrc
+source ~/.bashrc
 
 sudo apt-get update \
     && sudo apt-get install -y gcc libssl-dev nginx

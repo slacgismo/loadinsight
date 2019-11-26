@@ -21,7 +21,8 @@ fi
 if [ "$CONDA" = 'on' ]; then
     echo "Install Conda"
 	wget https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh && bash Anaconda3-2019.10-Linux-x86_64.sh -b && rm Anaconda3-2019.10-Linux-x86_64.sh
-    echo "PATH=~/anaconda3/bin:$PATH" > .bashrc
+    echo "export PATH=~/anaconda3/bin:$PATH" > ~/.bashrc
+    source ~/.bashrc
 fi
 
 if [ "$PSQL" = 'on' ]; then
@@ -29,7 +30,7 @@ if [ "$PSQL" = 'on' ]; then
 	sudo touch /etc/apt/sources.list.d/pgdg.list
     sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" | sudo tee -a /etc/apt/sources.list.d/pgdg.list
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-    apt-get install -y postgresql-client-11 libpq-dev
+    sudo apt-get install -y postgresql-client-11 libpq-dev
 fi
 
 if [ "$NGINX" = 'on' ]; then
@@ -46,16 +47,9 @@ fi
 
 conda env create --quiet -f ~/loadinsight/web/loadinsight-environment.yml
 
-source "${CONDA_PREFIX}/etc/profile.d/conda.sh" 
+source ~/anaconda3/etc/profile.d/conda.sh
 conda activate venv_loadinsight
 conda install -y uwsgi
-
-# REPLACE %%HOME%% in config files with $HOME
-search="%%HOME%%"
-replace=$HOME
-sed -i "s_${search}/${replace}_g" ~/loadinsight/web/uwsgi.ini
-sed -i "s_${search}/${replace}_g" ~/loadinsight/web/nginx.conf 
-
 
 # Update the backend for matplotlib 
 matplotfile=$(python -c "import matplotlib; print(matplotlib.matplotlib_fname())")
@@ -65,3 +59,8 @@ matplotfile=$(python -c "import matplotlib; print(matplotlib.matplotlib_fname())
 echo $matplotfile
 ! grep -Fxq "backend      : Agg" $matplotfile && (echo "backend      : Agg" | sudo tee -a $matplotfile)
 
+# REPLACE %%HOME%% in config files with $HOME
+search="%%HOME%%"
+replace=$HOME
+sed -i "s_${search}_${replace}_g" ~/loadinsight/web/uwsgi.ini
+sed -i "s_${search}_${replace}_g" ~/loadinsight/web/nginx.conf 
