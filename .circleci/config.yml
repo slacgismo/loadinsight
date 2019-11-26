@@ -74,16 +74,14 @@ jobs:
       - run: 
           name: Deploy the website 
           command: 
-            ssh ubuntu@$WEB_HOST "[ -d ~/loadinsight/ ]" && ssh ubuntu@$WEB_HOST "rm -rf ~/loadinsight" 
-            && scp -r -q ~/loadinsight ubuntu@$WEB_HOST:~/loadinsight
+            scp -r -q ~/loadinsight ubuntu@$WEB_HOST:~/loadinsight
             && ssh ubuntu@$WEB_HOST "ls" 
             # && ssh ubuntu@$WEB_HOST "bash ~/loadinsight/web/deploy-dependency.sh"
             # && ssh ubuntu@$WEB_HOST "bash ~/loadinsight/web/deploy-run.sh web"
       - run: 
           name: Deploy django-background-tasks 
           command: 
-            ssh ubuntu@$TASK_HOST "[ -d ~/loadinsight/ ]" && ssh ubuntu@$TASK_HOST "rm -rf ~/loadinsight" 
-            && scp -r -q ~/loadinsight ubuntu@$TASK_HOST:~/loadinsight
+            scp -r -q ~/loadinsight ubuntu@$TASK_HOST:~/loadinsight
             && ssh ubuntu@$TASK_HOST "ls" 
             # && ssh ubuntu@$TASK_HOST "bash ~/loadinsight/web/deploy-dependency.sh"
             # && ssh ubuntu@$TASK_HOST "bash ~/loadinsight/web/deploy-run.sh task"
