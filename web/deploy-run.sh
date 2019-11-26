@@ -40,7 +40,7 @@ echo Starting uwsgi.
 
 # Run uwsgi in nohup
 if [ "$1" = "task" ]; then
-	exec uwsgi --ini ~/loadinsight/web/uwsgi_process_tasks.ini
+	nohup uwsgi --ini ~/loadinsight/web/uwsgi_process_tasks.ini 2>&1 &
 else		
 	pushd ~/loadinsight/web/frontend/app/
 
@@ -56,5 +56,5 @@ else
 	sudo ln -s ~/loadinsight/web/nginx.conf /etc/nginx/sites-enabled/
 	sudo /etc/init.d/nginx restart
 
-	exec uwsgi --ini ~/loadinsight/web/uwsgi.ini
+	nohup uwsgi --ini ~/loadinsight/web/uwsgi.ini 2>&1 &
 fi
