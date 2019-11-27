@@ -20,7 +20,7 @@ source ~/loadinsight/web/env.txt
 export $(cut -d= -f1 ~/loadinsight/web/env.txt)
 
 # Activate conda env
-source ~/anaconda3/etc/profile.d/conda.sh 
+source $(conda info --base)/etc/profile.d/conda.sh 
 conda activate venv_loadinsight
 
 # Check database status

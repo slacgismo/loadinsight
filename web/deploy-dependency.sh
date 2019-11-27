@@ -3,7 +3,6 @@ sudo apt-get update && sudo apt-get install -y gcc libssl-dev
 CONDAENV='off'
 # Install Coressponding 
 npm --version > /dev/null 2>&1 || NPM='on'
-conda --version > /dev/null 2>&1 || CONDA='on'
 psql --version > /dev/null 2>&1 || PSQL='on'
 nginx -v > /dev/null 2>&1 || NGINX='on'
 conda list -n venv_loadinsight > /dev/null 2>&1 || CONDAENV='on'
@@ -15,19 +14,12 @@ if [ "$NPM" = 'on' ]; then
     sudo apt-get install -y nodejs
 fi
 
-if [ "$CONDA" = 'on' ]; then
-    echo "Install Conda"
-	wget https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh && bash Anaconda3-2019.10-Linux-x86_64.sh -b && rm Anaconda3-2019.10-Linux-x86_64.sh
-    echo "export PATH=~/anaconda3/bin:$PATH" > ~/.bashrc
-    source ~/.bashrc
-fi
-
 if [ "$PSQL" = 'on' ]; then
     echo "Install Psql"
 	sudo touch /etc/apt/sources.list.d/pgdg.list
     sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" | sudo tee -a /etc/apt/sources.list.d/pgdg.list
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-    sudo apt-get install -y postgresql-client-11 libpq-dev
+    sudo apt-get update && sudo apt-get install -y postgresql-client-11 libpq-dev
 fi
 
 if [ "$NGINX" = 'on' ]; then
@@ -43,6 +35,9 @@ else
     conda env create --quiet -f ~/loadinsight/web/loadinsight-environment.yml
     conda install -y -n venv_loadinsight uwsgi 
 fi
+
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate venv_loadinsight
 
 # Update the backend for matplotlib 
 matplotfile=$(python -c "import matplotlib; print(matplotlib.matplotlib_fname())")

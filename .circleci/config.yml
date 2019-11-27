@@ -76,15 +76,17 @@ jobs:
           command: 
             scp -r -q ~/loadinsight ubuntu@$WEB_HOST:~/loadinsight
             && ssh ubuntu@$WEB_HOST "ls" 
-            # && ssh ubuntu@$WEB_HOST "bash ~/loadinsight/web/deploy-dependency.sh"
-            # && ssh ubuntu@$WEB_HOST "bash ~/loadinsight/web/deploy-run.sh web"
+            && ssh ubuntu@$WEB_HOST "bash ~/loadinsight/web/deploy-dependency.sh"
+            && export CI=false
+            && ssh ubuntu@$WEB_HOST "bash ~/loadinsight/web/deploy-run.sh web"
+            && export CI=true
       - run: 
           name: Deploy django-background-tasks 
           command: 
             scp -r -q ~/loadinsight ubuntu@$TASK_HOST:~/loadinsight
             && ssh ubuntu@$TASK_HOST "ls" 
-            # && ssh ubuntu@$TASK_HOST "bash ~/loadinsight/web/deploy-dependency.sh"
-            # && ssh ubuntu@$TASK_HOST "bash ~/loadinsight/web/deploy-run.sh task"
+            && ssh ubuntu@$TASK_HOST "bash ~/loadinsight/web/deploy-dependency.sh"
+            && ssh ubuntu@$TASK_HOST "bash ~/loadinsight/web/deploy-run.sh task"
       - run: |
           echo "Finish deploy, please test the website on $WEB_HOST:8000"
 
