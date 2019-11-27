@@ -102,7 +102,8 @@ def execute_lctk(algorithm, execution_id, config_data):
     """
     Perform the necessary setup before starting
     """
-    print('Running LCTK with DEBUG set to True')
+    print('Running LCTK with DEBUG set to True', flush=True)
+    print('Start running algorithm {0}'.format(algorithm), flush=True)
     LOCAL_DEBUG = True
     base = importlib.import_module('load_model.settings.base')
     # config_data = {

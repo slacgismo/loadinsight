@@ -42,6 +42,8 @@ else
 	run_uwsgi="$CONDA_PREFIX/bin/uwsgi --ini $HOME/loadinsight/web/uwsgi.ini --pidfile=/tmp/uwsgi.pid"
 fi
 
+# uwsgi --stop /tmp/uwsgi.pid
+
 # Run uwsgi in 
 if [ -f /tmp/uwsgi.pid ] && [[ $(ps -p $(cat /tmp/uwsgi.pid) -o cmd=) = $run_uwsgi ]]; then 
 	uwsgi --reload /tmp/uwsgi.pid
