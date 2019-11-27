@@ -47,7 +47,7 @@ if [ -f /tmp/uwsgi.pid ] && [[ $(ps -p $(cat /tmp/uwsgi.pid) -o cmd=) = $run_uws
 	uwsgi --reload /tmp/uwsgi.pid
 else
 	if [ "$1" = "task" ]; then
-		$run_uwsgi &
+		$run_uwsgi > loadinsight_task.log 2>&1 &
 	else		
 		pushd ~/loadinsight/web/frontend/app/
 
@@ -65,6 +65,6 @@ else
 		sudo ln -s ~/loadinsight/web/nginx.conf /etc/nginx/sites-enabled/
 		sudo /etc/init.d/nginx restart
 
-		$run_uwsgi &
+		$run_uwsgi > loadinsight_web.log 2>&1 &
 	fi
 fi
