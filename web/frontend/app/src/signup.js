@@ -86,8 +86,9 @@ export default function SignUp(props) {
               username, email, password
             }).then(response => {
               console.log(response.data);
+              alert('Sign up successfully! Please go to your mailbox to check the activation email.')
             }).catch(error => {
-              console.log(error);
+              alert('The username or email may have been used by others, please try with other choices.');
             });
           }}
         >

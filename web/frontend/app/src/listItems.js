@@ -3,68 +3,45 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import LayersIcon from '@material-ui/icons/Layers';
-import AssignmentIcon from '@material-ui/icons/Assignment';
+import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
+import List from '@material-ui/core/List';
 
-export const mainListItems = (
+export const History = function(props) {
+  return (
   <div>
-    <ListItem button>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Dashboard" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <ShoppingCartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Orders" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <PeopleIcon />
-      </ListItemIcon>
-      <ListItemText primary="Customers" />
-    </ListItem>
-    <ListItem button>
+    <ListItem button onClick={() => {props.history.push(`/dashboard`)}}>
       <ListItemIcon>
         <BarChartIcon />
       </ListItemIcon>
-      <ListItemText primary="Reports" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <LayersIcon />
-      </ListItemIcon>
-      <ListItemText primary="Integrations" />
+      <ListItemText primary="History"/>
     </ListItem>
   </div>
-);
+  );
+};
 
-export const secondaryListItems = (
-  <div>
-    <ListSubheader inset>Saved reports</ListSubheader>
-    <ListItem button>
+
+
+const algorithms = ['rbsa', 'ceus', 'mix'];
+
+export const Pipelines = function(props) {
+  function onClick (key) {
+    props.history.push(`/dashboard/pipeline/${key}`);
+  }
+
+  return (
+    <List>
+    <div>
+    <ListSubheader inset>Execute Algorithms</ListSubheader>
+    {algorithms.map((item) =>
+      <ListItem button key={item} onClick={() => {onClick(item)}}>
       <ListItemIcon>
-        <AssignmentIcon />
+        <PlayCircleFilledIcon />
       </ListItemIcon>
-      <ListItemText primary="Current month" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last quarter" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Year-end sale" />
-    </ListItem>
+      <ListItemText primary={item} />
+    </ListItem>)}
   </div>
-);
+    </List>
+      );
+  };
+

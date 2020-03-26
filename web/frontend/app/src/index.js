@@ -5,8 +5,11 @@ import Home from './home';
 import SignIn from "./signin";
 import SignUp from "./signup";
 import ActivateEmail from "./activateEmail";
-import Dashboard from "./dashboard";
-
+import ResultDirs from './result_dir';
+import BaseDashboard from "./baseDashboard"
+import Executions from "./executions";
+import ExecutePipeline from "./executePipeline";
+import ImageGallery from "./imageGallery"
 
 const PrivateRoute = ({component: Component, ...rest}) => (
   <Route
@@ -30,6 +33,7 @@ const PublicRoute = ({component: Component, ...rest}) => (
   />
 );
 
+const dashboard = (Component) => (props) => (<BaseDashboard {...props}><Component {...props}/></BaseDashboard>);
 
 function App() {
   return (
@@ -39,7 +43,10 @@ function App() {
         <PublicRoute path="/signin" component={SignIn} />
         <PublicRoute path="/signup" component={SignUp} />
         <PublicRoute path="/activate/:uid/:token" component={ActivateEmail} />
-        <PrivateRoute path="/dashboard" component={Dashboard} />
+        <PrivateRoute path="/dashboard/pipeline/:pipeline_name" component={dashboard(ExecutePipeline)} />
+        <PrivateRoute path="/dashboard/executions/:execution_id/results/:result_dir" component={dashboard(ImageGallery)} />
+        <PrivateRoute path="/dashboard/executions/:execution_id" component={dashboard(ResultDirs)} />
+        <PrivateRoute path="/dashboard" component={dashboard(Executions)}/>
       </Switch>
     </BrowserRouter>
   );

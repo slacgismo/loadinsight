@@ -5,14 +5,17 @@
   "dependencies": {
     "@material-ui/core": "^4.4.3",
     "@material-ui/icons": "^4.4.3",
+    "@zeit/swr": "^0.1.1",
     "axios": "^0.19.0",
     "formik": "^2.0.1",
     "formik-material-ui": "0.0.22",
     "js-cookie": "^2.2.1",
     "react": "^16.10.1",
     "react-dom": "^16.10.1",
+    "react-json-view": "^1.19.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.1.2",
+    "react-spinners": "^0.6.1",
     "yup": "^0.27.0"
   },
   "scripts": {

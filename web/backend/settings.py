@@ -12,15 +12,12 @@ DATABASES = {
 }
 
 
-AUTH_PASSWORD_VALIDATORS = [{"NAME": "backend.validators.Is666"}]
-
 SECRET_KEY = "@=dd@hf(quaim(*xu1f%g8&1ig0lnrg8-_w3^ho89705cc+pw6"
 
 MIDDLEWARE = ["django.contrib.sessions.middleware.SessionMiddleware",
               'django.contrib.auth.middleware.AuthenticationMiddleware',
               'django.contrib.messages.middleware.MessageMiddleware',
               ]
-
 
 INSTALLED_APPS = (
     "django.contrib.admin",
@@ -33,7 +30,8 @@ INSTALLED_APPS = (
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
-    "backend",
+    "backend.apps.BackendConfig",
+    'background_task',
 )
 
 BUILD_DIR = os.path.join(BASE_DIR, '../frontend/app/build')
@@ -75,24 +73,32 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-
 DJOSER = {
-    "SEND_ACTIVATION_EMAIL": False,
-    "PASSWORD_RESET_CONFIRM_URL": "/password/reset/confirm/{uid}/{token}",
-    "USERNAME_RESET_CONFIRM_URL": "/username/reset/confirm/{uid}/{token}",
-    "ACTIVATION_URL": "/activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
+    "USERNAME_RESET_CONFIRM_URL": "username/reset/confirm/{uid}/{token}",
+    "ACTIVATION_URL": "activate/{uid}/{token}",
 }
+
 # PLEASE DO NOT LEAVE ANY SENSITIVE INFO REGARDING PASSWORD HERE
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-DEFAULT_FROM_EMAIL = '362408430cf190'  # this should be exactly the same as EMAIL_HOST_USER
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = ''  # this should be exactly the same as EMAIL_HOST_USER
 EMAIL_USE_TLS = True  # whether use TLS
 EMAIL_HOST = 'smtp.mailtrap.io'  # SMTP server.
 EMAIL_PORT = 2525  # port of SMTF server
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL  # sender's email address
-EMAIL_HOST_PASSWORD = '6ed83b7380749d'  # password of sender's email address
+EMAIL_HOST_PASSWORD = ''  # password of sender's email address
 EMAIL_FROM = EMAIL_HOST_USER
-
-
+EMAIL_RETRY_TIMES = 3
 
 WSGI_APPLICATION = 'wsgi.application'
 
+# settings for Django Background Task
+MAX_ATTEMPTS = 1  # controls how many times a task will be attempted (default 25)
+
+S3_BUCKET_PATH = 'loadinsight-bucket/'
+
+USER_CUSTOMIZABLE_CONFIGS = ['DAYTYPE_DEFINITIONS.json',
+                             'EXCLUDED_LOCATIONS.json',
+                             'GAS_FRACTIONS.json',
+                             'SENSITIVITY_TEMPERATURES.json']

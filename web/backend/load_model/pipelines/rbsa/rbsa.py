@@ -3,6 +3,7 @@ import logging
 from time import time
 from load_model.settings import base
 from load_model.generics import pipeline as p, task as t
+from backend.helpers import s3_helper
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -25,7 +26,7 @@ logger = logging.getLogger('LCTK_APPLICATION_LOGGER')
 
 
 class RbsaPipeline():
-    def __init__(self, pipeline_configuration=None):
+    def __init__(self, pipeline_configuration=None, execution_id=None):
         self.name = 'rbsa'
         self.pipeline = p.Pipeline(self.name)
 
@@ -36,10 +37,9 @@ class RbsaPipeline():
         self.artifact_tmy_base_dir = 'tmy_base'
         self.artifact_tmy_target_dir = 'tmy_target'
         self.artifact_target_weather_dir = 'target_weather'
-
         # the local directory where all the output images are saved for this pipeline run
-        self.run_dir = f'{time()}__{self.name}'
-
+        # change the run dir name: add user_id in the dir
+        self.run_dir = f'{execution_id}__{time()}__{self.name}'
         if pipeline_configuration:
             # TODO: establish a configuration scheme for this to run dynamically
             pass
@@ -152,28 +152,33 @@ class RbsaPipeline():
         self.ticks = np.arange(0, 25, 3)
 
         normal_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/normal_loadshapes'
+        s3_normal_plots_dir = f'{self.run_dir}/normal_loadshapes'
         self._create_results_storage(normal_plots_dir)
 
         enduse_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/enduse_loadshapes'
+        s3_enduse_plots_dir = f'{self.run_dir}/enduse_loadshapes'
         self._create_results_storage(enduse_plots_dir)
 
         total_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/total_loadshapes'
+        s3_total_plots_dir = f'{self.run_dir}/total_loadshapes'
         self._create_results_storage(total_plots_dir)
 
         loadshapes_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/loadshapes'
+        s3_loadshapes_plots_dir = f'{self.run_dir}/loadshapes'
         self._create_results_storage(loadshapes_plots_dir)
 
         components_plots_dir = f'{base.LOCAL_PATH}/{self.run_dir}/components'
+        s3_components_plots_dir = f'{self.run_dir}/components'
         self._create_results_storage(components_plots_dir)
 
         logger.info('GENERATING RBSA NORMAL LOADSHAPE PLOTS')
-        self.loadshapes_plotting(loadshapes=normal_loadshapes, directory=normal_plots_dir, base_enduses=base_enduses)
+        self.loadshapes_plotting(loadshapes=normal_loadshapes, directory=normal_plots_dir, s3_directory=s3_normal_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING RBSA ENDUSE LOADSHAPE PLOTS')
-        self.loadshapes_plotting(loadshapes=enduse_loadshapes, directory=enduse_plots_dir, base_enduses=base_enduses)
+        self.loadshapes_plotting(loadshapes=enduse_loadshapes, directory=enduse_plots_dir, s3_directory=s3_enduse_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING RBSA TOTAL LOADSHAPE PLOTS')
-        self.loadshapes_plotting(loadshapes=total_loadshapes, directory=total_plots_dir, base_enduses=base_enduses)
+        self.loadshapes_plotting(loadshapes=total_loadshapes, directory=total_plots_dir, s3_directory=s3_total_plots_dir, base_enduses=base_enduses)
 
         logger.info('GENERATING RBSA LOADSHAPE PLOTS')
 
@@ -190,7 +195,9 @@ class RbsaPipeline():
             plt.xlabel('Hour-of-Day')
             plt.ylabel('Load (pu. base total peak)')
             fig = plot.get_figure()
-            fig.savefig(f'{loadshapes_plots_dir}/{title}.png')
+            local_file_name = f'{loadshapes_plots_dir}/{title}.png'
+            fig.savefig(local_file_name)
+            s3_helper.upload_file(local_file_name, base.S3_OUTPUT_BUCKET_PATH, f'{s3_loadshapes_plots_dir}/{title}.png')
             plt.close(fig)
 
         logger.info('GENERATING RBSA COMPONENT PLOTS')
@@ -208,10 +215,12 @@ class RbsaPipeline():
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
-                fig.savefig(f'{components_plots_dir}/{title}.png')
+                local_file_name = f'{components_plots_dir}/{title}.png'
+                fig.savefig(local_file_name)
+                s3_helper.upload_file(local_file_name, base.S3_OUTPUT_BUCKET_PATH, f'{s3_components_plots_dir}/{title}.png')
                 plt.close(fig)
 
-    def loadshapes_plotting(self, loadshapes, directory, base_enduses):
+    def loadshapes_plotting(self, loadshapes, directory, s3_directory, base_enduses):
         ######## Plotting helper function
         for idx, city in enumerate(loadshapes.target.unique()):
             city_df = loadshapes.loc[loadshapes.target == city]
@@ -227,8 +236,10 @@ class RbsaPipeline():
                 plt.xlabel('Hour-of-Day')
                 plt.ylabel('Load (pu. summer total peak)')
                 fig = plot.get_figure()
-                fig.savefig(f'{directory}/{title}.png')
-                plt.close(fig) 
+                local_file_name = f'{directory}/{title}.png'
+                fig.savefig(local_file_name)
+                s3_helper.upload_file(local_file_name, base.S3_OUTPUT_BUCKET_PATH, f'{s3_directory}/{title}.png')
+                plt.close(fig)
 
     def execute(self):
         """

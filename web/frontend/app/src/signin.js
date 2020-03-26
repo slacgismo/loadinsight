@@ -77,13 +77,13 @@ export default function SignIn(props) {
           }}
           validationSchema={SigninSchema}
           onSubmit={({username, password}, actions) => {
-            axios.post('/api/signin/', {
+            axios.post('/auth/token/login/', {
               username, password
             }).then(response => {
-              localStorage.setItem('auth_token', response.data.token);
+              localStorage.setItem('auth_token', response.data.auth_token);
               props.history.push('/dashboard');
             }).catch(error => {
-              console.log(error);
+              alert('There is incorrect username or password, or your account hasn\'t been activated yet.')
             });
           }}
         >

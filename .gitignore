@@ -375,3 +375,7 @@ $RECYCLE.BIN/
 *.png
 *.log.*
 # End of https://www.gitignore.io/api/macos,django,python,windows,pycharm,sublimetext,visualstudiocode
+# 
+# ignore all .idea files
+.idea
+custom_configs/

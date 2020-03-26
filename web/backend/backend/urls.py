@@ -1,10 +1,11 @@
 from django.urls import path, re_path
-from django.views.generic import TemplateView
 from .views import *
 
 urlpatterns = [
-    path('api/execute/<str:algorithm>/', execute_piplines),
-    # path('api/getImages/<str:timestamp>/<str:algorithm>/', get_images),
-    # keep the path below at bottom because it is used to catch all other urls served by react
-    re_path('', TemplateView.as_view(template_name='index.html'), name='index')
+    path('executions/configs/', get_pipeline_configs),  # GET pipeline configs
+    path('executions/', handle_executions),  # POST to execute, GET to get all executions
+    re_path(r'^executions/(?P<execution_id>\w+)/$', get_result_dirs_of_execution),
+    re_path(r'^executions/(?P<execution_id>\w+)/results/(?P<result_dir>\w+)/$', get_images_of_execution_result), # GET, but the GET body contains city name, state name, and content name
+    re_path(r'^executions/(?P<execution_id>\w+)/results/(?P<result_dir>\w+)/images/(?P<image_name>[\w\-\.]+)/$',
+            get_executions_by_image),
 ]

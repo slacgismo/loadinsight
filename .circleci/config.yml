@@ -2,26 +2,93 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.8
+      - image: continuumio/miniconda3
 
     working_directory: ~/loadinsight
     steps:
       - checkout
       - run:
-          name: Install build dependencies
-          command: sudo pip install -r ci-build-requirements.txt
+          name: Install linux dependencies
+          command: apt-get update && apt-get install -y gcc
+      - run:
+          name: Install Node.js
+          command: bash web/node-install.sh
+      - run:
+          name: Install Postgres Client
+          command:
+            echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+            && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+            && apt-get update
+            && apt-get install -y postgresql-client-11 libpq-dev && rm -rf /var/lib/apt/lists/*
+      - run:
+          name: Build web code
+          working_directory: web/frontend/app
+          command:
+            export CI=false
+            && npm install .
+            && npm run build
+            && export CI=true
+      - run:
+          name: Create conda environment
+          command:
+            conda config --add channels conda-forge
+            && conda env create --quiet -f loadinsight-environment.yml
       - run: 
           name: Run Unit Tests
-          command: python -m unittest
+          command: 
+            source /opt/conda/etc/profile.d/conda.sh
+            && conda activate venv_loadinsight
+            && (python web/backend/manage.py runserver --settings=settings &)
+            && sleep 5
+            && python -m unittest
           
   deploy:
     docker:
-      - image: circleci/python:3.6.8
+      - image: circleci/python:3.7.4
 
     working_directory: ~/loadinsight
     steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "d4:13:c2:ff:ed:c7:d9:1b:69:8e:fb:75:ed:0c:c7:c2"
+      - run: 
+          name: Create Env file
+          command: 
+            echo "" > ~/loadinsight/web/env.txt
+            && echo "DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE" >> ~/loadinsight/web/env.txt
+            && echo "DATABASE_URL=$DATABASE_URL" >> ~/loadinsight/web/env.txt
+            && echo "EMAIL=$EMAIL" >> ~/loadinsight/web/env.txt
+            && echo "EMAIL_HOST=$EMAIL_HOST" >> ~/loadinsight/web/env.txt
+            && echo "EMAIL_APP_PWD=$EMAIL_APP_PWD" >> ~/loadinsight/web/env.txt
+            && echo "ALLOWED_HOSTS=$WEB_HOST" >> ~/loadinsight/web/env.txt
+            && echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> ~/loadinsight/web/env.txt
+            && echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> ~/loadinsight/web/env.txt
+            && echo "DJANGO_MANAGEPY_MIGRATE=$DJANGO_MANAGEPY_MIGRATE" >> ~/loadinsight/web/env.txt
+            && cat ~/loadinsight/web/env.txt 
+      - run:
+          name: fix host authenticity for production server
+          command: 
+            ssh-keyscan $WEB_HOST >> ~/.ssh/known_hosts
+            && ssh-keyscan $TASK_HOST >> ~/.ssh/known_hosts
+      - run: 
+          name: Deploy the website 
+          command: 
+            scp -r -q ~/loadinsight ubuntu@$WEB_HOST:~/loadinsight
+            && ssh ubuntu@$WEB_HOST "ls" 
+            && ssh ubuntu@$WEB_HOST "bash ~/loadinsight/web/deploy-dependency.sh"
+            && export CI=false
+            && ssh ubuntu@$WEB_HOST "bash ~/loadinsight/web/deploy-run.sh web"
+            && export CI=true
+      - run: 
+          name: Deploy django-background-tasks 
+          command: 
+            scp -r -q ~/loadinsight ubuntu@$TASK_HOST:~/loadinsight
+            && ssh ubuntu@$TASK_HOST "ls" 
+            && ssh ubuntu@$TASK_HOST "bash ~/loadinsight/web/deploy-dependency.sh"
+            && ssh ubuntu@$TASK_HOST "bash ~/loadinsight/web/deploy-run.sh task"
       - run: |
-          echo "Hello, I'm not deploying yet, but that's ok, I will soon..."
+          echo "Finish deploy, please test the website on $WEB_HOST:8000"
 
 workflows:
   version: 2
@@ -33,4 +100,6 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: 
+                - master
+                - cmu
