@@ -11,7 +11,7 @@ from load_model.execute_pipelines import init_error_reporting as init_error_repo
 from load_model.execute_pipelines import execute_lctk as execute_lctk
 import djoser.permissions
 from background_task import background
-from background_task.models_completed import CompletedTask
+from background_task.models import CompletedTask
 from django.contrib.auth import get_user_model
 from settings import S3_BUCKET_PATH, USER_CUSTOMIZABLE_CONFIGS, EMAIL_RETRY_TIMES
 
