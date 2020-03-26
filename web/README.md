@@ -1,39 +1,34 @@
 # Project Setup
 
-## Install Django and Django REST framework
-```
-pip install django
-pip install djangorestframework
-```
-
-## Install JWT
-```
-pip install djangorestframework-jwt
-```
-You may also need to install django-rest-auth and django-allauth :
-```
-pip install django-rest-auth 
-pip install django-allauth
-```
-
-## Install psycopg2
-```
-pip install psycopg2
+## Install dependencies
+```bash
+cd backend
+pip install -r requirements.txt
 ```
 
 ## Start the project
 ### Migrate before run the project
-```
+```bash
 python manage.py migrate
 ```
+
 ### Create a super user
-```
+```bash
 python manage.py createsuperuser
 ```
+
 ### Run server
-```
+```bash
 python manage.py runserver
 ```
+
+### Running the frontend
+```bash
+cd frontend/app
+npm install
+npm run build
+```
+
 ### Functionalities
 
 - login: navigate to http://localhost:8000/login/
