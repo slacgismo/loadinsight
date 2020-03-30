@@ -29,7 +29,8 @@ psql $DATABASE_URL -c '\l' || (>&2 echo "Postgres is unavailable" && exit 1)
 
 pushd ~/loadinsight/web/backend/
 
-pip install django-background-tasks
+echo "What do I have available?"
+pip list
 
 if [ "x$DJANGO_MANAGEPY_MIGRATE" = 'xon' ]; then
 	python manage.py migrate --noinput
