@@ -29,8 +29,8 @@ psql $DATABASE_URL -c '\l' || (>&2 echo "Postgres is unavailable" && exit 1)
 
 pushd ~/loadinsight/web/backend/
 
-echo "What do I have available?"
-conda list
+>&2 echo "What do I have available?"
+conda list | xargs >&2 echo $1
 
 echo "install dependency"
 pip install django-background-tasks
