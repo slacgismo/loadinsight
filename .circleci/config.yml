@@ -76,7 +76,7 @@ jobs:
           command: echo $WEB_HOST
       - run:
           name: "What is my ssh key`"
-          command: ls ~/.ssh/
+          command: ls ~/.ssh/ && cat ~/.ssh/id_rsa_d413c2ffedc7d91b698efb75ed0cc7c2
       - run: 
           name: Deploy the website 
           command: 
