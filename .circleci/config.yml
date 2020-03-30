@@ -71,6 +71,12 @@ jobs:
           command: 
             ssh-keyscan $WEB_HOST >> ~/.ssh/known_hosts
             && ssh-keyscan $TASK_HOST >> ~/.ssh/known_hosts
+      - run:
+          name: "What is my web host"
+          command: echo $WEB_HOST
+      - run:
+          name: "What is my ssh key`"
+          command: ls ~/.ssh/
       - run: 
           name: Deploy the website 
           command: 
