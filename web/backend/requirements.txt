@@ -7,7 +7,7 @@ cycler==0.10.0
 Django==2.2.10
 django-background-tasks==1.2.5
 django-templated-mail==1.1.1
-djangorestframework==3.10.3
+djangorestframework==3.11.2
 djet==0.2.2
 djoser==2.0.3
 docutils==0.15.2
